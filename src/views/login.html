@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - KEEP UP Patient Record Management</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-card glass-panel">
+      
+      <div class="brand-section">
+        <div class="brand-logo-container">
+          <svg class="brand-logo-svg" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <h1 class="brand-name">Keep Up</h1>
+        <div class="brand-subtitle">Health Center Record Management</div>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrapper">
+            <input 
+              class="form-input" 
+              type="email" 
+              id="email" 
+              placeholder="e.g., admin@keepup.com" 
+              required
+            >
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrapper">
+            <input 
+              class="form-input" 
+              type="password" 
+              id="password" 
+              placeholder="••••••••" 
+              required
+            >
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" id="submit-btn">
+          <span class="btn-text">Sign In</span>
+          <span class="spinner"></span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Script tags -->
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginForm = document.getElementById('login-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+
+      // Check query parameter errors on load (like account_disabled or session expired)
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorParam = urlParams.get('error');
+      if (errorParam === 'account_disabled') {
+        showToast('Access Denied: Account is disabled.', 'error');
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      // Prefetch CSRF token for login POST
+      API.ensureCsrfToken().catch(() => {});
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        // Frontend validation
+        if (!email || !password) {
+          showToast('Please enter both your email address and password.', 'warning');
+          return;
+        }
+
+        // Add loading state
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        try {
+          const res = await API.login(email, password);
+          if (res && res.success) {
+            showToast(res.message, 'success');
+            // Wait slightly for success toast to animate
+            setTimeout(() => {
+              window.location.href = res.redirectUrl;
+            }, 1000);
+          }
+        } catch (error) {
+          showToast(error.message || 'Login failed. Please try again.', 'error');
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Records Staff Dashboard - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .stats-card-alert {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      cursor: pointer;
+    }
+    .stats-card-alert:hover {
+      border-color: var(--color-danger);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+    }
+    .shortcuts-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .shortcut-btn-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: var(--border-radius-sm);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .shortcut-btn-card:hover {
+      border-color: var(--card-border-focus);
+      background: rgba(99, 102, 241, 0.05);
+      transform: translateY(-2px);
+    }
+    .shortcut-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+    }
+    .shortcut-icon-box svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .shortcut-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <div class="welcome-banner">
+        <h2 class="welcome-title">Welcome back, <span id="welcome-user-name">Staff</span>!</h2>
+        <p class="welcome-desc">Records Portal - KEEP UP Patient File Management System with automated AI OCR Digitization.</p>
+      </div>
+
+      <!-- Guidance Alert for Records Filing -->
+      <div class="glass-panel" style="padding: 16px; border: 1px dashed rgba(99, 102, 241, 0.3); border-radius: var(--border-radius-sm); margin-bottom: 25px; display: flex; align-items: center; gap: 15px; background: rgba(99, 102, 241, 0.02);">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; color: var(--color-primary); flex-shrink: 0;">
+          <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </div>
+        <div>
+          <h5 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">How to Digitize & Scan Documents</h5>
+          <p style="margin: 4px 0 0; font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            Go to the <a href="/dashboard/patients" style="color: var(--color-primary); font-weight: 600; text-decoration: underline;">Patient Directory</a>, select a patient profile, and click <strong>+ Scan / Upload File</strong> to upload medical sheets, consultation notes, or vaccination records with automated AI-assisted OCR scanning.
+          </p>
+        </div>
+      </div>
+
+      <!-- Dashboard Statistics Row -->
+      <div class="stats-grid">
+        <div class="stats-card glass-panel">
+          <div class="stats-info">
+            <span class="stats-label">Digitized Records</span>
+            <span class="stats-value" id="stats-total-files">0</span>
+          </div>
+          <div class="stats-icon-wrapper" style="color: var(--color-info);">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          </div>
+        </div>
+
+        <div class="stats-card glass-panel">
+          <div class="stats-info">
+            <span class="stats-label">Registered Patients</span>
+            <span class="stats-value" id="stats-total-patients">0</span>
+          </div>
+          <div class="stats-icon-wrapper" style="color: var(--color-primary);">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </div>
+        </div>
+
+        <!-- Rose red alerting card clicking navigates to Warnings review center -->
+        <div class="stats-card glass-panel stats-card-alert" id="duplicate-warning-card" onclick="window.location.href='/dashboard/duplicates'">
+          <div class="stats-info">
+            <span class="stats-label" style="color: #fda4af;">Duplicate Alerts</span>
+            <span class="stats-value" id="stats-total-warnings" style="color: var(--color-danger);">0</span>
+          </div>
+          <div class="stats-icon-wrapper" style="color: var(--color-danger); background: rgba(239, 68, 68, 0.1);">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Shortcuts Row -->
+      <h4 class="result-section-title" style="margin-bottom: 12px; font-size: 13px;">Administrative Filing Shortcuts</h4>
+      <div class="shortcuts-panel">
+        <div class="shortcut-btn-card glass-panel" onclick="window.location.href='/dashboard/patients'">
+          <div class="shortcut-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </div>
+          <span class="shortcut-label">Register New Patient</span>
+        </div>
+
+        <div class="shortcut-btn-card glass-panel" onclick="window.location.href='/dashboard/search'">
+          <div class="shortcut-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </div>
+          <span class="shortcut-label">Run Keyword Search</span>
+        </div>
+
+        <div class="shortcut-btn-card glass-panel" onclick="window.location.href='/dashboard/duplicates'">
+          <div class="shortcut-icon-box" style="color: var(--color-danger);">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <span class="shortcut-label">Demographic Duplicates</span>
+        </div>
+      </div>
+
+      <!-- Recent Digital Attachments filing streams -->
+      <div class="content-card glass-panel" style="flex: 1; min-height: 350px; margin-bottom: 0;">
+        <h3 class="card-title" style="margin-bottom: 4px;">Recent Digitized Documents</h3>
+        <p class="card-subtitle">Showing recently scanned files registered across category binders.</p>
+
+        <div class="table-responsive" style="margin-top: 20px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Patient Profile</th>
+                <th>Filing Binder</th>
+                <th>Upload Date</th>
+              </tr>
+            </thead>
+            <tbody id="recent-records-stream">
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading recent files list...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Load user profile details
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      // Restrict access on frontend
+      if (currentUser.role !== 'RECORDS_STAFF') {
+        window.location.href = '/login';
+        return;
+      }
+
+      // 2. Set mobile header initials
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+      }
+
+      // 3. Inject Navigation Links
+      injectSidebarLinks(currentUser.role);
+
+      // 4. Load statistics and filing stream
+      await loadDashboardData();
+
+      // 5. Logout handler
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    async function loadDashboardData() {
+      try {
+        // Fetch all patients to count
+        const patientRes = await API.fetchJson('/api/patients');
+        const activePatients = patientRes.success ? (patientRes.patients || []) : [];
+        document.getElementById('stats-total-patients').textContent = activePatients.length;
+
+        // Fetch duplicate warnings counts
+        const duplicateRes = await API.fetchJson('/api/duplicates');
+        const pendingFlags = duplicateRes.success ? (duplicateRes.flags || []) : [];
+        document.getElementById('stats-total-warnings').textContent = pendingFlags.length;
+
+        // Fetch recent digitized records from dedicated endpoint
+        const recentRes = await API.fetchJson('/api/records/recent?limit=50');
+        const allRecords = recentRes && recentRes.success ? (recentRes.records || []) : [];
+        document.getElementById('stats-total-files').textContent =
+          recentRes && recentRes.success ? recentRes.total : allRecords.length;
+
+        // Populate table stream (max 5)
+        const streamContainer = document.getElementById('recent-records-stream');
+        if (allRecords.length === 0) {
+          streamContainer.innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                No patient documents have been digitized yet.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const recentList = allRecords.slice(0, 5);
+        let html = '';
+        recentList.forEach(rec => {
+          const fileLink = `<a href="${rec.file_url}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(rec.file_name)}</a>`;
+          
+          const profileLink = `<a href="/dashboard/patients/profile/${rec.patient_id}" style="color: #f8fafc; font-weight: 600;" class="hover-underline">${escapeHtml(rec.patient_name)}</a>`;
+          
+          const dateStr = new Date(rec.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+          html += `
+            <tr>
+              <td>${fileLink}</td>
+              <td>${profileLink} (${escapeHtml(rec.patient_number)})</td>
+              <td><span class="badge" style="background: rgba(255,255,255,0.04);">${formatCategory(rec.record_type)}</span></td>
+              <td>${dateStr}</td>
+            </tr>
+          `;
+        });
+        streamContainer.innerHTML = html;
+
+      } catch (err) {
+        console.error('Failed to load records dashboard counts', err);
+      }
+    }
+
+    function formatCategory(type) {
+      switch (type) {
+        case 'PATIENT_INFORMATION_SHEET': return 'Information Sheet';
+        case 'CONSULTATION_RECORD': return 'Consultation Record';
+        case 'IMMUNIZATION_RECORD': return 'Immunization';
+        case 'ANTI_RABIES_RECORD': return 'Anti-Rabies';
+        case 'MATERNAL_CARE_RECORD': return 'Maternal Care';
+        default: return type;
+      }
+    }
+
+    function injectSidebarLinks(role) {
+      const navContainer = document.getElementById('layout-nav-links');
+      
+      navContainer.innerHTML = `
+        <li>
+          <a href="/dashboard/records" class="nav-link active">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Dashboard Overview
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/patients" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Patient Directory
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/search" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            Unified Search
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/duplicates" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Duplicate Warnings
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/reports" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Reports Dashboard
+          </a>
+        </li>
+      `;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digitize Patient Record - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .patient-summary-banner {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--border-radius-sm);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .summary-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .summary-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .upload-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius-md);
+      padding: 40px 20px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.3);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--color-primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      fill: var(--text-muted);
+      transition: var(--transition);
+    }
+    .upload-zone:hover .upload-icon {
+      fill: var(--color-primary);
+      transform: translateY(-4px);
+    }
+    .upload-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .upload-subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .file-input {
+      display: none;
+    }
+    .file-preview-card {
+      display: none;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--border-radius-sm);
+      padding: 16px 20px;
+      margin-top: 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .file-icon {
+      width: 32px;
+      height: 32px;
+      fill: var(--color-primary);
+    }
+    .file-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .file-size {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .remove-file-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-danger);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .remove-file-btn:hover {
+      background: var(--color-danger-glow);
+    }
+    .ocr-loader-panel {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 40px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-md);
+      margin-top: 30px;
+    }
+    .ocr-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .ocr-status-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .ocr-status-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 450px;
+    }
+    .review-panel {
+      display: none;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-md);
+      padding: 24px;
+      margin-top: 30px;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .review-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 20px;
+      gap: 6px;
+      border: 1px solid transparent;
+    }
+    .confidence-high {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .confidence-medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .confidence-low {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .alert-banner {
+      padding: 12px 16px;
+      border-radius: var(--border-radius-sm);
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border: 1px solid transparent;
+    }
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+    .alert-info {
+      background: rgba(99, 102, 241, 0.1);
+      color: #a5b4fc;
+      border-color: rgba(99, 102, 241, 0.2);
+    }
+    .extracted-text-area {
+      width: 100%;
+      height: 200px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--border-radius-sm);
+      padding: 14px;
+      color: var(--text-primary);
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-y: auto;
+      resize: vertical;
+    }
+    .extracted-text-area:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <div class="content-card glass-panel" style="margin-top: 20px; max-width: 800px;">
+        <div class="card-title-section">
+          <div>
+            <h2 class="card-title">Digitize Healthcare Record</h2>
+            <p class="card-subtitle">Upload physical health documents (PNG, JPG, PDF) to scan, OCR-digitize, and auto-classify under the patient's record binder.</p>
+          </div>
+        </div>
+
+        <!-- Patient Demographics Summary -->
+        <div class="patient-summary-banner">
+          <div class="summary-item">
+            <span class="summary-label">Patient Number</span>
+            <span class="summary-value" id="summary-number">Loading...</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Patient Name</span>
+            <span class="summary-value" id="summary-name">Loading...</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Birth Date</span>
+            <span class="summary-value" id="summary-birthdate">Loading...</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Sex Assignment</span>
+            <span class="summary-value" id="summary-sex">Loading...</span>
+          </div>
+        </div>
+
+        <!-- STAGE 1: Upload Form -->
+        <div id="upload-stage">
+          <form id="record-upload-form">
+            <div class="form-group">
+              <label class="form-label">Upload Document *</label>
+              <div class="upload-zone" id="upload-zone">
+                <svg class="upload-icon" viewBox="0 0 24 24">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                </svg>
+                <span class="upload-text">Drag and drop file here, or click to browse</span>
+                <span class="upload-subtext">Supports PNG, JPG, JPEG, and PDF (Max 10MB)</span>
+                <input type="file" class="file-input" id="document" accept=".png,.jpg,.jpeg,.pdf" required>
+              </div>
+
+              <!-- File Selected Preview Card -->
+              <div class="file-preview-card" id="file-preview-card">
+                <div class="file-info">
+                  <svg class="file-icon" viewBox="0 0 24 24">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                  </svg>
+                  <div>
+                    <div class="file-name" id="file-name">filename.jpg</div>
+                    <div class="file-size" id="file-size">1.2 MB</div>
+                  </div>
+                </div>
+                <button type="button" class="remove-file-btn" id="remove-file-btn" title="Remove selected file">
+                  <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+              <button type="button" class="btn btn-secondary" id="back-profile-btn">Back to Profile</button>
+              <button class="btn btn-primary" type="submit" id="upload-btn">
+                <span class="btn-text">Extract OCR and Suggest Category</span>
+                <span class="spinner"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Stage Loading Pane -->
+        <div class="ocr-loader-panel" id="ocr-loader-panel">
+          <div class="ocr-spinner"></div>
+          <div>
+            <h4 class="ocr-status-title">Running AI OCR Character Extraction...</h4>
+            <p class="ocr-status-subtitle" id="ocr-status-subtitle">Converting document and running classification rules. Please do not navigate away.</p>
+          </div>
+        </div>
+
+        <!-- STAGE 2: Verification Review Screen -->
+        <div class="review-panel" id="review-panel">
+          <div class="review-header">
+            <div>
+              <h4 class="review-title">Review Extracted Information</h4>
+              <p class="card-subtitle" style="margin-top: 2px;">Please review and correct the extracted information before saving.</p>
+            </div>
+            <div class="confidence-badge" id="review-confidence-badge">
+              <span id="review-confidence-level">HIGH CONFIDENCE</span>
+            </div>
+          </div>
+
+          <div class="alert-banner alert-info" id="review-explanation-banner">
+            <svg style="width: 20px; height: 20px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            <span id="review-explanation-text">Classification details</span>
+          </div>
+
+          <form id="record-confirm-form">
+            <div class="form-group">
+              <label class="form-label" for="review-filename">Document Filename</label>
+              <input type="text" class="form-control" id="review-filename" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 18px;">
+              <label class="form-label" for="review-category">Record Category Binder</label>
+              <select class="form-select" id="review-category" required>
+                <option value="PATIENT_INFORMATION_SHEET">Patient Information Sheet</option>
+                <option value="CONSULTATION_RECORD">Consultation Record</option>
+                <option value="IMMUNIZATION_RECORD">Routine Childhood Immunization Record</option>
+                <option value="ANTI_RABIES_RECORD">Anti-Rabies Vaccination Record</option>
+                <option value="MATERNAL_CARE_RECORD">Maternal Care-Related Record</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 18px;">
+              <label class="form-label" for="review-extracted-text">Extracted Digital Text (Editable)</label>
+              <textarea class="extracted-text-area" id="review-extracted-text" placeholder="No text extracted. You can type here to insert text manually."></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+              <button type="button" class="btn btn-secondary" id="review-retry-btn" style="border: 1px solid rgba(255, 255, 255, 0.1);">Re-run OCR / Try Again</button>
+              <div style="display: flex; gap: 15px;">
+                <button type="button" class="btn btn-secondary" id="review-cancel-btn" style="color: var(--color-danger);">Cancel Upload</button>
+                <button class="btn btn-primary" type="submit" id="confirm-save-btn">
+                  <span class="btn-text">Confirm and Save Record</span>
+                  <span class="spinner"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentUser = null;
+    let patientId = '';
+    let selectedFile = null;
+    let currentToken = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const pathParts = window.location.pathname.split('/');
+      patientId = pathParts[pathParts.length - 1];
+
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      if (currentUser.role !== 'RECORDS_STAFF') {
+        window.location.href = `/dashboard/patients/profile/${patientId}?error=unauthorized`;
+        return;
+      }
+
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+      }
+
+      injectSidebarLinks(currentUser.role);
+      await loadPatientSummary();
+
+      const uploadZone = document.getElementById('upload-zone');
+      const fileInput = document.getElementById('document');
+      const filePreviewCard = document.getElementById('file-preview-card');
+      const fileNameEl = document.getElementById('file-name');
+      const fileSizeEl = document.getElementById('file-size');
+      const removeFileBtn = document.getElementById('remove-file-btn');
+      
+      const uploadStage = document.getElementById('upload-stage');
+      const ocrLoaderPanel = document.getElementById('ocr-loader-panel');
+      const ocrSubtitle = document.getElementById('ocr-status-subtitle');
+      const reviewPanel = document.getElementById('review-panel');
+
+      const reviewFilename = document.getElementById('review-filename');
+      const reviewCategory = document.getElementById('review-category');
+      const reviewExtractedText = document.getElementById('review-extracted-text');
+      const reviewConfidenceBadge = document.getElementById('review-confidence-badge');
+      const reviewConfidenceLevel = document.getElementById('review-confidence-level');
+      const reviewExplanationText = document.getElementById('review-explanation-text');
+      const reviewExplanationBanner = document.getElementById('review-explanation-banner');
+
+      uploadZone.addEventListener('click', () => fileInput.click());
+      
+      uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+      });
+
+      uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+      });
+
+      uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+          handleFileSelection(e.dataTransfer.files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelection(e.target.files[0]);
+        }
+      });
+
+      removeFileBtn.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        filePreviewCard.style.display = 'none';
+        uploadZone.style.display = 'flex';
+      });
+
+      function handleFileSelection(file) {
+        const allowedExtensions = ['png', 'jpg', 'jpeg', 'pdf'];
+        const extension = file.name.split('.').pop().toLowerCase();
+        
+        if (!allowedExtensions.includes(extension)) {
+          showToast('Only PNG, JPG, JPEG, and PDF documents are supported.', 'error');
+          return;
+        }
+
+        selectedFile = file;
+        fileNameEl.textContent = file.name;
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        fileSizeEl.textContent = `${sizeMb} MB`;
+        
+        uploadZone.style.display = 'none';
+        filePreviewCard.style.display = 'flex';
+      }
+
+      document.getElementById('back-profile-btn').addEventListener('click', () => {
+        window.location.href = `/dashboard/patients/profile/${patientId}`;
+      });
+
+      // Submit file for temporary processing / preview suggestions
+      document.getElementById('record-upload-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!selectedFile) {
+          showToast('Please select a healthcare document file first.', 'error');
+          return;
+        }
+
+        uploadStage.style.display = 'none';
+        ocrLoaderPanel.style.display = 'flex';
+        reviewPanel.style.display = 'none';
+
+        const extension = selectedFile.name.split('.').pop().toLowerCase();
+        if (['png', 'jpg', 'jpeg'].includes(extension)) {
+          ocrSubtitle.textContent = 'Running high-accuracy Tesseract character extraction and text classification rules. This takes 3-6 seconds.';
+        } else {
+          ocrSubtitle.textContent = 'Parsing PDF structure and extracting text. This can take several seconds depending on pages.';
+        }
+
+        const formData = new FormData();
+        formData.append('patient_id', patientId);
+        formData.append('document', selectedFile);
+
+        try {
+          const csrfHeaders = await API.getCsrfHeaders();
+          const response = await fetch('/api/records/ocr-preview', {
+            method: 'POST',
+            headers: csrfHeaders,
+            body: formData
+          });
+
+          const data = await response.json();
+          if (response.status === 401) {
+            window.location.href = '/login';
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error(data.message || `OCR preview failed with status code ${response.status}`);
+          }
+
+          if (data && data.success) {
+            currentToken = data.token;
+            const preview = data.preview;
+
+            reviewFilename.value = preview.file_name;
+            reviewCategory.value = preview.suggested_category;
+            reviewExtractedText.value = preview.extracted_text || '';
+            reviewExplanationText.textContent = `${preview.classification_reason} Matched words: [${(preview.matched_terms || []).join(', ')}]`;
+
+            reviewConfidenceBadge.className = 'confidence-badge';
+            if (preview.confidence_level === 'HIGH') {
+              reviewConfidenceBadge.classList.add('confidence-high');
+              reviewConfidenceLevel.textContent = 'HIGH CONFIDENCE';
+              reviewExplanationBanner.className = 'alert-banner alert-info';
+            } else if (preview.confidence_level === 'MEDIUM') {
+              reviewConfidenceBadge.classList.add('confidence-medium');
+              reviewConfidenceLevel.textContent = 'MEDIUM CONFIDENCE';
+              reviewExplanationBanner.className = 'alert-banner alert-warning';
+            } else {
+              reviewConfidenceBadge.classList.add('confidence-low');
+              reviewConfidenceLevel.textContent = 'LOW CONFIDENCE - REVIEW CAREFULLY';
+              reviewExplanationBanner.className = 'alert-banner alert-warning';
+              showToast('Low-confidence classification. Please confirm the document category manually.', 'warning');
+            }
+
+            ocrLoaderPanel.style.display = 'none';
+            reviewPanel.style.display = 'block';
+          }
+        } catch (err) {
+          showToast(err.message || 'An error occurred during text extraction scan.', 'error');
+          ocrLoaderPanel.style.display = 'none';
+          uploadStage.style.display = 'block';
+        }
+      });
+
+      // Confirm & Save record finalized submission
+      document.getElementById('record-confirm-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const confirmSaveBtn = document.getElementById('confirm-save-btn');
+        
+        confirmSaveBtn.classList.add('loading');
+        confirmSaveBtn.disabled = true;
+
+        const payload = {
+          token: currentToken,
+          file_name: reviewFilename.value,
+          record_type: reviewCategory.value,
+          extracted_text: reviewExtractedText.value
+        };
+
+        try {
+          const res = await API.postJson('/api/records/confirm-upload', payload);
+          if (res && res.success) {
+            showToast(res.message, 'success');
+            setTimeout(() => {
+              window.location.href = `/dashboard/patients/profile/${patientId}`;
+            }, 1000);
+          } else {
+            throw new Error(res.message || 'Confirmation failed.');
+          }
+        } catch (err) {
+          showToast(err.message || 'An error occurred while confirming document upload.', 'error');
+          confirmSaveBtn.classList.remove('loading');
+          confirmSaveBtn.disabled = false;
+        }
+      });
+
+      // Cancel temporary upload session
+      document.getElementById('review-cancel-btn').addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to discard this temporary upload? The file will be deleted.')) {
+          return;
+        }
+        
+        try {
+          const res = await API.postJson('/api/records/cancel-upload', { token: currentToken });
+          if (res && res.success) {
+            showToast(res.message, 'info');
+            resetUploadStage();
+          }
+        } catch (err) {
+          showToast('Failed to clean up upload session.', 'error');
+          resetUploadStage();
+        }
+      });
+
+      document.getElementById('review-retry-btn').addEventListener('click', () => {
+        resetUploadStage();
+      });
+
+      function resetUploadStage() {
+        currentToken = '';
+        selectedFile = null;
+        fileInput.value = '';
+        filePreviewCard.style.display = 'none';
+        uploadZone.style.display = 'flex';
+        reviewPanel.style.display = 'none';
+        uploadStage.style.display = 'block';
+      }
+
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    async function loadPatientSummary() {
+      try {
+        const res = await API.fetchJson(`/api/patients/${patientId}`);
+        if (res && res.success) {
+          const patient = res.patient;
+          document.getElementById('summary-number').textContent = patient.patient_number;
+          document.getElementById('summary-name').textContent = `${patient.first_name} ${patient.middle_name || ''} ${patient.last_name}`;
+          
+          const birthDate = new Date(patient.birth_date);
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          document.getElementById('summary-birthdate').textContent = birthDate.toLocaleDateString('en-US', options);
+          document.getElementById('summary-sex').textContent = patient.sex;
+        }
+      } catch (err) {
+        showToast('Failed to load patient demographics.', 'error');
+      }
+    }
+
+    function injectSidebarLinks(role) {
+      const navContainer = document.getElementById('layout-nav-links');
+      let linksHtml = '';
+
+      if (role === 'RECORDS_STAFF') {
+        linksHtml = `
+          <li>
+            <a href="/dashboard/records" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              Dashboard Overview
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/patients" class="nav-link active">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Patient Directory
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/search" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              Unified Search
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/duplicates" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              Duplicate Warnings
+            </a>
+          </li>
+        `;
+      }
+
+      navContainer.innerHTML = linksHtml;
+    }
+  </script>
+</body>
+</html>

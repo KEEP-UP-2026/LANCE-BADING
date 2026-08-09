@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Patient - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 576px) {
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar Drawer -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <!-- Dynamic navigation links -->
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically by JS -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main View Area -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <!-- Content Section -->
+      <div class="content-card glass-panel" style="margin-top: 20px; max-width: 800px;">
+        <div class="card-title-section">
+          <div>
+            <h2 class="card-title">Edit Patient Record</h2>
+            <p class="card-subtitle">Modify and correct demographic details for <strong style="color: var(--color-primary);" id="patient-number-title">PAT-XXXX</strong>.</p>
+          </div>
+        </div>
+
+        <form id="edit-patient-form" style="margin-top: 20px;">
+          <!-- Name fields -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="first_name">First Name *</label>
+              <input class="form-input" style="padding-left: 14px;" type="text" id="first_name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="middle_name">Middle Name</label>
+              <input class="form-input" style="padding-left: 14px;" type="text" id="middle_name">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="last_name">Last Name *</label>
+              <input class="form-input" style="padding-left: 14px;" type="text" id="last_name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="birth_date">Birth Date *</label>
+              <input class="form-input" style="padding-left: 14px; cursor: pointer;" type="date" id="birth_date" required>
+            </div>
+          </div>
+
+          <!-- Sex and contact info -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="sex">Sex *</label>
+              <select class="form-select" id="sex" required>
+                <option value="" disabled>Select sex</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="contact_number">Contact Number</label>
+              <input class="form-input" style="padding-left: 14px;" type="text" id="contact_number">
+            </div>
+          </div>
+
+          <!-- Address and Philhealth -->
+          <div class="form-group">
+            <label class="form-label" for="address">Residential Address *</label>
+            <textarea class="form-input" style="padding-left: 14px; height: 80px; resize: vertical;" id="address" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="philhealth_number">PhilHealth Number</label>
+            <input class="form-input" style="padding-left: 14px;" type="text" id="philhealth_number">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+            <a href="/dashboard/patients" class="btn btn-secondary">Cancel</a>
+            <button class="btn btn-primary" type="submit" id="save-btn">
+              <span class="btn-text">Save Changes</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentUser = null;
+    let patientId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Get patient ID from URL path
+      const pathParts = window.location.pathname.split('/');
+      patientId = pathParts[pathParts.length - 1];
+
+      if (!patientId) {
+        showToast('Invalid request URL. Missing patient identifier.', 'error');
+        setTimeout(() => { window.location.href = '/dashboard/patients'; }, 2000);
+        return;
+      }
+
+      // 2. Load user profile details
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      // Restrict access on frontend
+      if (currentUser.role !== 'RECORDS_STAFF') {
+        window.location.href = '/dashboard/patients?error=unauthorized';
+        return;
+      }
+
+      // 3. Set mobile header initials
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+      }
+
+      // 4. Inject Navigation Links
+      injectSidebarLinks(currentUser.role);
+
+      // 5. Pre-fill patient details
+      await loadPatientData();
+
+      // 6. Form submission handler
+      const editForm = document.getElementById('edit-patient-form');
+      const saveBtn = document.getElementById('save-btn');
+
+      editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const first_name = document.getElementById('first_name').value;
+        const middle_name = document.getElementById('middle_name').value;
+        const last_name = document.getElementById('last_name').value;
+        const birth_date = document.getElementById('birth_date').value;
+        const sex = document.getElementById('sex').value;
+        const address = document.getElementById('address').value;
+        const contact_number = document.getElementById('contact_number').value;
+        const philhealth_number = document.getElementById('philhealth_number').value;
+
+        saveBtn.classList.add('loading');
+        saveBtn.disabled = true;
+
+        try {
+          const res = await API.fetchJson(`/api/patients/${patientId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              first_name,
+              middle_name,
+              last_name,
+              birth_date,
+              sex,
+              address,
+              contact_number,
+              philhealth_number
+            })
+          });
+
+          if (res && res.success) {
+            showToast(res.message, 'success');
+            setTimeout(() => {
+              window.location.href = '/dashboard/patients';
+            }, 1000);
+          }
+        } catch (error) {
+          showToast(error.message || 'Failed to update patient profile.', 'error');
+          saveBtn.classList.remove('loading');
+          saveBtn.disabled = false;
+        }
+      });
+
+      // 7. Logout handler
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    // Fetch existing patient details and map to form inputs
+    async function loadPatientData() {
+      try {
+        const res = await API.fetchJson(`/api/patients/${patientId}`);
+        if (res && res.success) {
+          const p = res.patient;
+          
+          document.getElementById('patient-number-title').textContent = p.patient_number;
+          document.getElementById('first_name').value = p.first_name;
+          document.getElementById('middle_name').value = p.middle_name || '';
+          document.getElementById('last_name').value = p.last_name;
+          document.getElementById('sex').value = p.sex;
+          document.getElementById('address').value = p.address;
+          document.getElementById('contact_number').value = p.contact_number || '';
+          document.getElementById('philhealth_number').value = p.philhealth_number || '';
+          
+          // Format date for inputs (YYYY-MM-DD)
+          if (p.birth_date) {
+            const dateObj = new Date(p.birth_date);
+            if (!isNaN(dateObj.getTime())) {
+              const y = dateObj.getFullYear();
+              const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+              const d = String(dateObj.getDate()).padStart(2, '0');
+              document.getElementById('birth_date').value = `${y}-${m}-${d}`;
+            }
+          }
+        }
+      } catch (error) {
+        showToast('Error loading patient demographics.', 'error');
+        setTimeout(() => { window.location.href = '/dashboard/patients'; }, 2000);
+      }
+    }
+
+    // Write navigation links
+    function injectSidebarLinks(role) {
+      const navContainer = document.getElementById('layout-nav-links');
+      let linksHtml = '';
+
+      if (role === 'RECORDS_STAFF') {
+        linksHtml = `
+          <li>
+            <a href="/dashboard/records" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              Dashboard Overview
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/patients" class="nav-link active">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Patient Directory
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/search" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              Unified Search
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/duplicates" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              Duplicate Warnings
+            </a>
+          </li>
+        `;
+      }
+
+      navContainer.innerHTML = linksHtml;
+    }
+  </script>
+</body>
+</html>

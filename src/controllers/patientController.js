@@ -1,0 +1,328 @@
+const PatientModel = require('../models/patientModel');
+const DuplicateModel = require('../models/duplicateModel');
+const AuditMiddleware = require('../middleware/auditMiddleware');
+const { FuzzyMatcher } = require('../utils/fuzzyMatcher');
+
+// Helper to run duplicate checking on a patient object
+async function runDuplicateCheck(patient) {
+  try {
+    // Clear any existing PENDING flags where this patient is involved to avoid duplicate warning rows
+    await DuplicateModel.deleteFlagsForPatient(patient.id);
+
+    const activePatients = await PatientModel.findAllActive();
+    
+    for (const other of activePatients) {
+      if (other.id === patient.id) continue;
+
+      const result = FuzzyMatcher.comparePatients(patient, other);
+      if (result.isCandidate) {
+        // Prevent duplicate flags for the same patient pair
+        const pairExists = await DuplicateModel.checkPairExists(patient.id, other.id);
+        if (!pairExists) {
+          // Save flag to duplicate_flags
+          await DuplicateModel.create({
+            patient_id: patient.id,
+            possible_duplicate_patient_id: other.id,
+            reason: result.explanation,
+            similarity_score: result.score,
+            status: 'PENDING'
+          });
+
+          // Log duplicate detection event
+          await AuditMiddleware.logActivity(
+            null,
+            'system@keepup.com',
+            'DUPLICATE_CANDIDATE_DETECTED',
+            `Possible duplicate detected between ${patient.first_name} ${patient.last_name} and ${other.first_name} ${other.last_name} (Score: ${result.score}%)`,
+            null
+          );
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error running duplicate check:', err);
+  }
+}
+
+const PatientController = {
+  // Fetch all ACTIVE patients
+  async listPatients(req, res) {
+    try {
+      const patients = await PatientModel.findAllActive();
+      return res.status(200).json({
+        success: true,
+        patients
+      });
+    } catch (error) {
+      console.error('List patients error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while retrieving the patient list.'
+      });
+    }
+  },
+
+  // Get details of a single patient by ID
+  async getPatient(req, res) {
+    try {
+      const { id } = req.params;
+      const patient = await PatientModel.findById(id);
+
+      if (!patient) {
+        return res.status(404).json({
+          success: false,
+          message: 'Patient profile not found.'
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        patient
+      });
+    } catch (error) {
+      console.error('Get patient error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while retrieving patient details.'
+      });
+    }
+  },
+
+  // Create a new patient profile (Records Staff only)
+  async createPatient(req, res) {
+    try {
+      const { 
+        first_name, 
+        middle_name, 
+        last_name, 
+        birth_date, 
+        sex, 
+        address, 
+        contact_number, 
+        philhealth_number 
+      } = req.body;
+
+      // 1. Validate required fields
+      if (!first_name || !first_name.trim()) {
+        return res.status(400).json({ success: false, message: 'First name is required.' });
+      }
+      if (!last_name || !last_name.trim()) {
+        return res.status(400).json({ success: false, message: 'Last name is required.' });
+      }
+      if (!birth_date || !birth_date.trim()) {
+        return res.status(400).json({ success: false, message: 'Birth date is required.' });
+      }
+      if (!sex || !sex.trim()) {
+        return res.status(400).json({ success: false, message: 'Sex assignment is required.' });
+      }
+      if (!address || !address.trim()) {
+        return res.status(400).json({ success: false, message: 'Residential address is required.' });
+      }
+
+      // Check birth date validity
+      const bDate = new Date(birth_date);
+      if (isNaN(bDate.getTime())) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid birth date.' });
+      }
+
+      // 2. Generate unique patient_number (PAT-YYYYMM-XXXX)
+      let patientNumber = '';
+      let isUnique = false;
+      const year = bDate.getFullYear();
+      const month = String(bDate.getMonth() + 1).padStart(2, '0');
+
+      while (!isUnique) {
+        const randomNum = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
+        patientNumber = `PAT-${year}${month}-${randomNum}`;
+        const exists = await PatientModel.checkPatientNumberExists(patientNumber);
+        if (!exists) {
+          isUnique = true;
+        }
+      }
+
+      // 3. Save patient information
+      const newPatient = await PatientModel.create({
+        patient_number: patientNumber,
+        first_name: first_name.trim(),
+        middle_name: middle_name ? middle_name.trim() : null,
+        last_name: last_name.trim(),
+        birth_date: birth_date,
+        sex: sex.trim(),
+        address: address.trim(),
+        contact_number: contact_number ? contact_number.trim() : null,
+        philhealth_number: philhealth_number ? philhealth_number.trim() : null,
+        created_by: req.user.id
+      });
+
+      // 4. Run background duplicate record check
+      await runDuplicateCheck(newPatient);
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'PATIENT_CREATED', `Created patient profile: ${newPatient.first_name} ${newPatient.last_name} (${newPatient.patient_number})`, req);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Patient record created successfully.',
+        patient: newPatient
+      });
+
+    } catch (error) {
+      console.error('Create patient error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while creating the patient record.'
+      });
+    }
+  },
+
+  // Update existing patient (Records Staff only)
+  async updatePatient(req, res) {
+    try {
+      const { id } = req.params;
+      const { 
+        first_name, 
+        middle_name, 
+        last_name, 
+        birth_date, 
+        sex, 
+        address, 
+        contact_number, 
+        philhealth_number 
+      } = req.body;
+
+      // 1. Verify existence
+      const patient = await PatientModel.findById(id);
+      if (!patient) {
+        return res.status(404).json({ success: false, message: 'Patient profile not found.' });
+      }
+
+      // 2. Validate required fields
+      if (!first_name || !first_name.trim()) {
+        return res.status(400).json({ success: false, message: 'First name is required.' });
+      }
+      if (!last_name || !last_name.trim()) {
+        return res.status(400).json({ success: false, message: 'Last name is required.' });
+      }
+      if (!birth_date || !birth_date.trim()) {
+        return res.status(400).json({ success: false, message: 'Birth date is required.' });
+      }
+      if (!sex || !sex.trim()) {
+        return res.status(400).json({ success: false, message: 'Sex assignment is required.' });
+      }
+      if (!address || !address.trim()) {
+        return res.status(400).json({ success: false, message: 'Residential address is required.' });
+      }
+
+      // Check birth date validity
+      const bDate = new Date(birth_date);
+      if (isNaN(bDate.getTime())) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid birth date.' });
+      }
+
+      // 3. Update in database
+      const updatedPatient = await PatientModel.update(id, {
+        first_name: first_name.trim(),
+        middle_name: middle_name ? middle_name.trim() : null,
+        last_name: last_name.trim(),
+        birth_date: birth_date,
+        sex: sex.trim(),
+        address: address.trim(),
+        contact_number: contact_number ? contact_number.trim() : null,
+        philhealth_number: philhealth_number ? philhealth_number.trim() : null
+      });
+
+      // 4. Run background duplicate check on updated patient details
+      await runDuplicateCheck(updatedPatient);
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'PATIENT_UPDATED', `Updated patient profile: ${updatedPatient.first_name} ${updatedPatient.last_name} (${updatedPatient.patient_number})`, req);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Patient record updated successfully.',
+        patient: updatedPatient
+      });
+
+    } catch (error) {
+      console.error('Update patient error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while updating the patient record.'
+      });
+    }
+  },
+
+  // Archive patient (Records Staff only)
+  async archivePatient(req, res) {
+    try {
+      const { id } = req.params;
+
+      const patient = await PatientModel.findById(id);
+      if (!patient) {
+        return res.status(404).json({ success: false, message: 'Patient profile not found.' });
+      }
+
+      const archivedPatient = await PatientModel.archive(id);
+
+      // Clean up duplicate flags where this patient is involved since they are archived
+      await DuplicateModel.deleteFlagsForPatient(id);
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'PATIENT_ARCHIVED', `Archived patient profile: ${patient.first_name} ${patient.last_name} (${patient.patient_number})`, req);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Patient record archived successfully.',
+        patient: archivedPatient
+      });
+
+    } catch (error) {
+      console.error('Archive patient error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while archiving the patient record.'
+      });
+    }
+  },
+
+  // Restore patient (Records Staff only)
+  async restorePatient(req, res) {
+    try {
+      const { id } = req.params;
+
+      const patient = await PatientModel.findById(id);
+      if (!patient) {
+        return res.status(404).json({ success: false, message: 'Patient profile not found.' });
+      }
+
+      if (patient.status === 'ACTIVE') {
+        return res.status(400).json({ success: false, message: 'Patient profile is already active.' });
+      }
+
+      const restoredPatient = await PatientModel.update(id, { status: 'ACTIVE' });
+
+      // Run background duplicate check on restored patient details
+      await runDuplicateCheck(restoredPatient);
+
+      await AuditMiddleware.logActivity(
+        req.user.id,
+        req.user.email,
+        'PATIENT_RESTORED',
+        `Restored patient profile: ${restoredPatient.first_name} ${restoredPatient.last_name} (${restoredPatient.patient_number})`,
+        req
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'Patient record restored successfully.',
+        patient: restoredPatient
+      });
+
+    } catch (error) {
+      console.error('Restore patient error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while restoring the patient record.'
+      });
+    }
+  }
+};
+
+module.exports = PatientController;

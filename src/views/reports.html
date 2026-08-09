@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports Dashboard - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Load jsPDF and AutoTable locally for client-side PDF export -->
+  <script src="/js/jspdf.umd.min.js"></script>
+  <script src="/js/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    .filter-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+      align-items: flex-end;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+    .reports-tabs-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 15px;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: var(--border-radius-sm);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+    .tab-btn.active {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+    .report-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .report-section {
+      display: none;
+    }
+    .report-section.active {
+      display: block;
+    }
+    .percentage-bar-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .percentage-bar-container {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .percentage-bar-fill {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.5s ease-out;
+    }
+    .summary-metrics-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    .summary-block-card {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: var(--border-radius-sm);
+      padding: 20px;
+    }
+    .summary-block-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      padding-bottom: 6px;
+    }
+    .summary-metric-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.02);
+    }
+    .summary-metric-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main View -->
+    <main class="main-content">
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <div class="welcome-banner">
+        <h2 class="welcome-title">Healthcare Reports Dashboard</h2>
+        <p class="welcome-desc">Compile clinical charts, monitor active database growth, evaluate duplicates registries, and export summaries.</p>
+      </div>
+
+      <!-- Date / Patient Filter Panel -->
+      <div class="content-card glass-panel" style="margin-bottom: 25px;">
+        <h4 class="result-section-title" style="margin-top: 0; margin-bottom: 12px; font-size: 12px;">Report Filter Criteria</h4>
+        <div class="filter-panel">
+          <div class="filter-group">
+            <label class="filter-label" for="filter-start-date">Start Date</label>
+            <input type="date" id="filter-start-date" class="form-input">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="filter-end-date">End Date</label>
+            <input type="date" id="filter-end-date" class="form-input">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label" for="filter-patient-name">Patient Name / No.</label>
+            <input type="text" id="filter-patient-name" class="form-input" placeholder="e.g. John Doe, PAT-1002">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="apply-filters-btn" class="btn btn-primary" style="flex: 1; padding: 12px;">Apply</button>
+            <button id="reset-filters-btn" class="btn btn-secondary" style="padding: 12px;">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel & Reports Tabs -->
+      <div class="content-card glass-panel" style="flex: 1; min-height: 450px; margin-bottom: 0;">
+        <div class="card-title-section" style="margin-bottom: 20px;">
+          <div>
+            <h3 class="card-title" id="active-report-title">Dashboard Summary Overview</h3>
+            <p class="card-subtitle" id="active-report-subtitle">Aggregated system metadata showing total patients, filing registries, and duplicates warnings.</p>
+          </div>
+          
+          <!-- Exports Group (Hidden for Records View-Only Users) -->
+          <div class="action-icons-group" id="export-actions-group">
+            <button id="export-csv-btn" class="btn btn-secondary" style="font-size: 12px; padding: 8px 14px; gap: 6px; display: inline-flex; align-items: center;">
+              <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+              Export CSV
+            </button>
+            <button id="export-pdf-btn" class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; gap: 6px; display: inline-flex; align-items: center; background: linear-gradient(135deg, var(--color-primary), #4f46e5); border: none;">
+              <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+              Export PDF
+            </button>
+          </div>
+
+          <!-- View-Only notice for Records Staff -->
+          <div id="records-staff-view-only-alert" style="display: none; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 4px;">
+            <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            View-Only Access Enabled
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="reports-tabs-bar">
+          <button class="tab-btn active" onclick="switchTab('overview')">Overview Dashboard</button>
+          <button class="tab-btn" onclick="switchTab('patients')">Patient Records</button>
+          <button class="tab-btn" onclick="switchTab('consultations')">Consultation</button>
+          <button class="tab-btn" onclick="switchTab('immunizations')">Immunization</button>
+          <button class="tab-btn" onclick="switchTab('anti-rabies')">Anti-Rabies</button>
+          <button class="tab-btn" onclick="switchTab('maternal-care')">Maternal Care</button>
+          <button class="tab-btn" onclick="switchTab('duplicates')">Duplicates Warning</button>
+          <button class="tab-btn" onclick="switchTab('summary')">Healthcare Summary</button>
+        </div>
+
+        <!-- TAB 1: OVERVIEW DASHBOARD -->
+        <div id="section-overview" class="report-section active">
+          <div class="report-card-grid">
+            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
+              <div class="stats-info">
+                <span class="stats-label">Active Patients</span>
+                <span class="stats-value" id="overview-active-patients">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
+              <div class="stats-info">
+                <span class="stats-label">Archived Patients</span>
+                <span class="stats-value" id="overview-archived-patients">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
+              <div class="stats-info">
+                <span class="stats-label">Total Digitized Records</span>
+                <span class="stats-value" id="overview-total-records">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
+              <div class="stats-info">
+                <span class="stats-label">Duplicate Flags</span>
+                <span class="stats-value" id="overview-duplicate-flags" style="color: var(--color-danger);">0</span>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="result-section-title" style="margin-bottom: 12px; font-size: 13px;">Document Binder Distributions</h4>
+          <div class="report-card-grid">
+            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
+              <div class="stats-info">
+                <span class="stats-label">Consultations</span>
+                <span class="stats-value" id="overview-consultations">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
+              <div class="stats-info">
+                <span class="stats-label">Immunizations</span>
+                <span class="stats-value" id="overview-immunizations">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
+              <div class="stats-info">
+                <span class="stats-label">Anti-Rabies</span>
+                <span class="stats-value" id="overview-anti-rabies">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
+              <div class="stats-info">
+                <span class="stats-label">Maternal Care</span>
+                <span class="stats-value" id="overview-maternal-care">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: PATIENT RECORD SUMMARY -->
+        <div id="section-patients" class="report-section">
+          <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
+            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Patient Status Metrics</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Patients</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px;" id="metric-patients-total">0</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Active Profiles</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--color-success);" id="metric-patients-active">0</div>
+                <div class="percentage-bar-wrapper">
+                  <div class="percentage-bar-container"><div id="bar-patients-active" class="percentage-bar-fill" style="background: var(--color-success);"></div></div>
+                  <span style="font-size: 11px; font-weight: 600;" id="label-patients-active">0%</span>
+                </div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Archived Profiles</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--text-secondary);" id="metric-patients-archived">0</div>
+                <div class="percentage-bar-wrapper">
+                  <div class="percentage-bar-container"><div id="bar-patients-archived" class="percentage-bar-fill" style="background: var(--text-secondary);"></div></div>
+                  <span style="font-size: 11px; font-weight: 600;" id="label-patients-archived">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Patient No.</th>
+                  <th>Full Name</th>
+                  <th>Birth Date</th>
+                  <th>Sex</th>
+                  <th>Status</th>
+                  <th>Registration Date</th>
+                </tr>
+              </thead>
+              <tbody id="table-patients-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No patients matching filters found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: CONSULTATIONS REPORT -->
+        <div id="section-consultations" class="report-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Consultations count: <strong id="consultations-count-badge" style="color: #fff;">0</strong></h4>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Filing Date</th>
+                  <th>Patient Number</th>
+                  <th>Patient Name</th>
+                  <th>Document File Name</th>
+                </tr>
+              </thead>
+              <tbody id="table-consultations-body">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No consultation records matching filters found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: IMMUNIZATIONS REPORT -->
+        <div id="section-immunizations" class="report-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Immunizations count: <strong id="immunizations-count-badge" style="color: #fff;">0</strong></h4>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Filing Date</th>
+                  <th>Patient Number</th>
+                  <th>Patient Name</th>
+                  <th>Document File Name</th>
+                </tr>
+              </thead>
+              <tbody id="table-immunizations-body">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No immunization records matching filters found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 5: ANTI-RABIES REPORT -->
+        <div id="section-anti-rabies" class="report-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Anti-Rabies count: <strong id="anti-rabies-count-badge" style="color: #fff;">0</strong></h4>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Filing Date</th>
+                  <th>Patient Number</th>
+                  <th>Patient Name</th>
+                  <th>Document File Name</th>
+                </tr>
+              </thead>
+              <tbody id="table-anti-rabies-body">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No anti-rabies records matching filters found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 6: MATERNAL CARE REPORT -->
+        <div id="section-maternal-care" class="report-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Maternal Care count: <strong id="maternal-care-count-badge" style="color: #fff;">0</strong></h4>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Filing Date</th>
+                  <th>Patient Number</th>
+                  <th>Patient Name</th>
+                  <th>Document File Name</th>
+                </tr>
+              </thead>
+              <tbody id="table-maternal-care-body">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No maternal care records matching filters found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 7: DUPLICATE RECORD REPORT -->
+        <div id="section-duplicates" class="report-section">
+          <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
+            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Duplicate Demographic Conflict States</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 15px;">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Detected</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px;" id="metric-dup-total">0</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Pending Review</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--color-danger);" id="metric-dup-pending">0</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Reviewed</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--color-success);" id="metric-dup-reviewed">0</div>
+              </div>
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Ignored</span>
+                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--text-secondary);" id="metric-dup-ignored">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Detected At</th>
+                  <th>Patient A (Number)</th>
+                  <th>Patient B (Number)</th>
+                  <th>Conflict Reason</th>
+                  <th>Match %</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="table-duplicates-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No duplicate flags matching filters found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 8: HEALTHCARE SUMMARY REPORT -->
+        <div id="section-summary" class="report-section">
+          <div class="summary-metrics-container">
+            <!-- Patient Stats Summary Card -->
+            <div class="summary-block-card">
+              <div class="summary-block-title">Demographics Summary</div>
+              <div class="summary-metric-item"><span>Total Registered Patients</span><strong id="sum-pat-total">0</strong></div>
+              <div class="summary-metric-item"><span>Active Patient Profiles</span><strong id="sum-pat-active" style="color: var(--color-success);">0</strong></div>
+              <div class="summary-metric-item"><span>Archived Profiles</span><strong id="sum-pat-archived">0</strong></div>
+            </div>
+
+            <!-- Health Binders Card -->
+            <div class="summary-block-card">
+              <div class="summary-block-title">Document Filing Summary</div>
+              <div class="summary-metric-item"><span>Consultation Records</span><strong id="sum-rec-consultation">0</strong></div>
+              <div class="summary-metric-item"><span>Childhood Immunizations</span><strong id="sum-rec-immunization">0</strong></div>
+              <div class="summary-metric-item"><span>Anti-Rabies Vaccinations</span><strong id="sum-rec-antirabies">0</strong></div>
+              <div class="summary-metric-item"><span>Maternal Care Records</span><strong id="sum-rec-maternal">0</strong></div>
+              <div class="summary-metric-item"><span>Total Active Scan Logs</span><strong id="sum-rec-total" style="color: var(--color-info);">0</strong></div>
+            </div>
+
+            <!-- Duplicate States Card -->
+            <div class="summary-block-card">
+              <div class="summary-block-title">Demographic Duplicates Summary</div>
+              <div class="summary-metric-item"><span>Pending Warnings Review</span><strong id="sum-dup-pending" style="color: var(--color-danger);">0</strong></div>
+              <div class="summary-metric-item"><span>Reviewed Conflicts</span><strong id="sum-dup-reviewed" style="color: var(--color-success);">0</strong></div>
+              <div class="summary-metric-item"><span>Ignored Warnings</span><strong id="sum-dup-ignored">0</strong></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentUser = null;
+    let currentTab = 'overview';
+    let currentReportData = null; // Store query result for CSV/PDF exports
+
+    const tabData = {
+      overview: { title: 'Dashboard Summary Overview', desc: 'Aggregated system metadata showing total patients, filing registries, and duplicates warnings.' },
+      patients: { title: 'Patient Record Summary Report', desc: 'Summary of active vs archived patient profiles with registration timelines.' },
+      consultations: { title: 'Consultation Summary Report', desc: 'Historical stream of consultation notes, diagnostic checkups, and doctor findings.' },
+      immunizations: { title: 'Childhood Immunization Report', desc: 'Filing logs of vaccination cards, shots records, and immunization trackers.' },
+      'anti-rabies': { title: 'Anti-Rabies Vaccination Report', desc: 'Registries of animal bite treatment notes, dog bites records, and vaccination schedules.' },
+      'maternal-care': { title: 'Maternal Care Records Report', desc: 'Pregnancy trackers, pre-natal cards, and obstetrics checkup documentation.' },
+      duplicates: { title: 'Demographic Duplicates Report', desc: 'Warnings and pending reviews on overlapping patient folders.' },
+      summary: { title: 'Healthcare Summary Report', desc: 'Combined statistics of all clinical registries, patient data, and duplicates warnings.' }
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      // Restrict access on frontend
+      const allowedRoles = ['RHU_ADMINISTRATOR', 'ADMINISTRATIVE_STAFF', 'RECORDS_STAFF'];
+      if (!allowedRoles.includes(currentUser.role)) {
+        window.location.href = '/login';
+        return;
+      }
+
+      // Hide exports if role is RECORDS_STAFF (View-Only)
+      if (currentUser.role === 'RECORDS_STAFF') {
+        document.getElementById('export-actions-group').style.display = 'none';
+        document.getElementById('records-staff-view-only-alert').style.display = 'flex';
+      }
+
+      // Inject Navigation Links
+      injectSidebarLinks(currentUser.role);
+
+      // Load static counts on dashboard load
+      await refreshOverviewCounters();
+      
+      // Load current filtered reports data
+      await refreshReportData();
+
+      // Listeners for Filters
+      document.getElementById('apply-filters-btn').addEventListener('click', async () => {
+        await refreshReportData();
+      });
+
+      document.getElementById('reset-filters-btn').addEventListener('click', async () => {
+        document.getElementById('filter-start-date').value = '';
+        document.getElementById('filter-end-date').value = '';
+        document.getElementById('filter-patient-name').value = '';
+        await refreshReportData();
+      });
+
+      // Export Buttons Listeners
+      document.getElementById('export-csv-btn').addEventListener('click', () => {
+        if (!currentReportData) return;
+        exportCSV();
+      });
+
+      document.getElementById('export-pdf-btn').addEventListener('click', () => {
+        if (!currentReportData) return;
+        exportPDF();
+      });
+
+      // Logout handler
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    // Refresh Overview stats count cards
+    async function refreshOverviewCounters() {
+      try {
+        const res = await API.fetchJson('/api/reports/stats?report_type=overview');
+        if (res && res.success) {
+          const s = res.stats;
+          document.getElementById('overview-active-patients').textContent = s.patients.active;
+          document.getElementById('overview-archived-patients').textContent = s.patients.archived;
+          document.getElementById('overview-total-records').textContent = s.binders.total_active;
+          document.getElementById('overview-duplicate-flags').textContent = s.duplicates.total;
+
+          document.getElementById('overview-consultations').textContent = s.binders.consultation;
+          document.getElementById('overview-immunizations').textContent = s.binders.immunization;
+          document.getElementById('overview-anti-rabies').textContent = s.binders.anti_rabies;
+          document.getElementById('overview-maternal-care').textContent = s.binders.maternal_care;
+        }
+      } catch (err) {
+        console.error('Failed to load overview statistics', err);
+      }
+    }
+
+    // Refresh active tables data
+    async function refreshReportData() {
+      try {
+        const start = document.getElementById('filter-start-date').value;
+        const end = document.getElementById('filter-end-date').value;
+        const patient = document.getElementById('filter-patient-name').value;
+
+        // Determine category mapping from tab
+        let categoryQuery = 'ALL';
+        if (currentTab === 'consultations') categoryQuery = 'CONSULTATION_RECORD';
+        if (currentTab === 'immunizations') categoryQuery = 'IMMUNIZATION_RECORD';
+        if (currentTab === 'anti-rabies') categoryQuery = 'ANTI_RABIES_RECORD';
+        if (currentTab === 'maternal-care') categoryQuery = 'MATERNAL_CARE_RECORD';
+
+        const queryUrl = `/api/reports/data?start_date=${start}&end_date=${end}&patient_name=${encodeURIComponent(patient)}&category=${categoryQuery}&report_type=${encodeURIComponent(currentTab)}`;
+        const res = await API.fetchJson(queryUrl);
+
+        if (res && res.success) {
+          currentReportData = res.report;
+          renderActiveTabViews();
+        }
+      } catch (err) {
+        showToast('Error compilation report details.', 'error');
+      }
+    }
+
+    // Render active tab view tables
+    function renderActiveTabViews() {
+      if (!currentReportData) return;
+
+      const rep = currentReportData;
+
+      // 1. Patient Record Summary
+      const pat = rep.patientSummary;
+      document.getElementById('metric-patients-total').textContent = pat.total;
+      document.getElementById('metric-patients-active').textContent = pat.active;
+      document.getElementById('metric-patients-archived').textContent = pat.archived;
+      
+      document.getElementById('label-patients-active').textContent = `${pat.active_percentage}%`;
+      document.getElementById('bar-patients-active').style.width = `${pat.active_percentage}%`;
+      
+      document.getElementById('label-patients-archived').textContent = `${pat.archived_percentage}%`;
+      document.getElementById('bar-patients-archived').style.width = `${pat.archived_percentage}%`;
+
+      const patBody = document.getElementById('table-patients-body');
+      if (pat.list.length === 0) {
+        patBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No patients found matching the criteria.</td></tr>`;
+      } else {
+        patBody.innerHTML = pat.list.map(p => `
+          <tr>
+            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(p.patient_number)}</td>
+            <td style="font-weight:600;">${escapeHtml(p.name)}</td>
+            <td>${formatDate(p.birth_date)}</td>
+            <td><span class="badge">${escapeHtml(p.sex)}</span></td>
+            <td><span class="badge ${p.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${p.status}</span></td>
+            <td>${formatDate(p.created_at)}</td>
+          </tr>
+        `).join('');
+      }
+
+      // 2. Consultation Table
+      document.getElementById('consultations-count-badge').textContent = rep.consultations.length;
+      const conBody = document.getElementById('table-consultations-body');
+      if (rep.consultations.length === 0) {
+        conBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No consultation records found.</td></tr>`;
+      } else {
+        conBody.innerHTML = rep.consultations.map(c => `
+          <tr>
+            <td>${formatDate(c.created_at)}</td>
+            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
+            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
+            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+          </tr>
+        `).join('');
+      }
+
+      // 3. Immunization Table
+      document.getElementById('immunizations-count-badge').textContent = rep.immunizations.length;
+      const immBody = document.getElementById('table-immunizations-body');
+      if (rep.immunizations.length === 0) {
+        immBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No immunization records found.</td></tr>`;
+      } else {
+        immBody.innerHTML = rep.immunizations.map(c => `
+          <tr>
+            <td>${formatDate(c.created_at)}</td>
+            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
+            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
+            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+          </tr>
+        `).join('');
+      }
+
+      // 4. Anti-Rabies Table
+      document.getElementById('anti-rabies-count-badge').textContent = rep.antiRabies.length;
+      const rabBody = document.getElementById('table-anti-rabies-body');
+      if (rep.antiRabies.length === 0) {
+        rabBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No anti-rabies records found.</td></tr>`;
+      } else {
+        rabBody.innerHTML = rep.antiRabies.map(c => `
+          <tr>
+            <td>${formatDate(c.created_at)}</td>
+            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
+            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
+            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+          </tr>
+        `).join('');
+      }
+
+      // 5. Maternal Care Table
+      document.getElementById('maternal-care-count-badge').textContent = rep.maternalCares.length;
+      const matBody = document.getElementById('table-maternal-care-body');
+      if (rep.maternalCares.length === 0) {
+        matBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No maternal care records found.</td></tr>`;
+      } else {
+        matBody.innerHTML = rep.maternalCares.map(c => `
+          <tr>
+            <td>${formatDate(c.created_at)}</td>
+            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
+            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
+            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+          </tr>
+        `).join('');
+      }
+
+      // 6. Duplicate warnings Report
+      const dup = rep.duplicateSummary;
+      document.getElementById('metric-dup-total').textContent = dup.total;
+      document.getElementById('metric-dup-pending').textContent = dup.pending;
+      document.getElementById('metric-dup-reviewed').textContent = dup.reviewed;
+      document.getElementById('metric-dup-ignored').textContent = dup.ignored;
+
+      const dupBody = document.getElementById('table-duplicates-body');
+      if (dup.list.length === 0) {
+        dupBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No duplicate warnings matching filters found.</td></tr>`;
+      } else {
+        dupBody.innerHTML = dup.list.map(f => {
+          let badgeClass = 'badge-inactive';
+          if (f.status === 'PENDING') badgeClass = 'badge-danger';
+          if (f.status === 'REVIEWED') badgeClass = 'badge-active';
+
+          return `
+            <tr>
+              <td>${formatDate(f.detected_at)}</td>
+              <td><span style="font-weight:600;">${escapeHtml(f.patient_name)}</span> <span style="font-size:11px; color:var(--text-secondary);">(${escapeHtml(f.patient_number)})</span></td>
+              <td><span style="font-weight:600;">${escapeHtml(f.duplicate_patient_name)}</span> <span style="font-size:11px; color:var(--text-secondary);">(${escapeHtml(f.duplicate_patient_number)})</span></td>
+              <td style="max-width:250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeHtml(f.reason)}">${escapeHtml(f.reason)}</td>
+              <td style="font-weight:700; color:var(--color-danger);">${f.similarity_score}%</td>
+              <td><span class="badge ${badgeClass}">${f.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 7. Combined Summary metrics
+      document.getElementById('sum-pat-total').textContent = pat.total;
+      document.getElementById('sum-pat-active').textContent = pat.active;
+      document.getElementById('sum-pat-archived').textContent = pat.archived;
+
+      document.getElementById('sum-rec-consultation').textContent = rep.consultations.length;
+      document.getElementById('sum-rec-immunization').textContent = rep.immunizations.length;
+      document.getElementById('sum-rec-antirabies').textContent = rep.antiRabies.length;
+      document.getElementById('sum-rec-maternal').textContent = rep.maternalCares.length;
+      document.getElementById('sum-rec-total').textContent = rep.allRecords.length;
+
+      document.getElementById('sum-dup-pending').textContent = dup.pending;
+      document.getElementById('sum-dup-reviewed').textContent = dup.reviewed;
+      document.getElementById('sum-dup-ignored').textContent = dup.ignored;
+    }
+
+    // Switch Tabs handler
+    function switchTab(tabId) {
+      currentTab = tabId;
+
+      // Update Active Button styling
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(tabId)) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Update Card Header titles
+      document.getElementById('active-report-title').textContent = tabData[tabId].title;
+      document.getElementById('active-report-subtitle').textContent = tabData[tabId].desc;
+
+      // Toggle Active section panel display
+      const sections = document.querySelectorAll('.report-section');
+      sections.forEach(sec => sec.classList.remove('active'));
+
+      const activeSec = document.getElementById(`section-${tabId}`);
+      if (activeSec) {
+        activeSec.classList.add('active');
+      }
+
+      // Hide or show filter options depending on context
+      // Re-fetch category filtered data dynamically
+      refreshReportData();
+    }
+
+    async function recordExportAudit(exportFormat) {
+      if (!currentReportData) return;
+      const start = document.getElementById('filter-start-date').value;
+      const end = document.getElementById('filter-end-date').value;
+      let category = 'ALL';
+      if (currentTab === 'consultations') category = 'CONSULTATION_RECORD';
+      if (currentTab === 'immunizations') category = 'IMMUNIZATION_RECORD';
+      if (currentTab === 'anti-rabies') category = 'ANTI_RABIES_RECORD';
+      if (currentTab === 'maternal-care') category = 'MATERNAL_CARE_RECORD';
+      try {
+        await API.logReportExport({
+          export_format: exportFormat,
+          report_type: currentTab,
+          start_date: start,
+          end_date: end,
+          category
+        });
+      } catch (err) {
+        console.warn('Export audit logging failed:', err);
+      }
+    }
+
+    // CLIENT-SIDE EXPORTS: CSV
+    async function exportCSV() {
+      let csvContent = "";
+      const filename = `keepup-report-${currentTab}-${Date.now()}.csv`;
+
+      csvContent += `"KEEP UP SYSTEM - HEALTHCARE REPORT"\r\n`;
+      csvContent += `"Report:","${tabData[currentTab].title}"\r\n`;
+      csvContent += `"Period:","${currentReportData.period.start} to ${currentReportData.period.end}"\r\n`;
+      csvContent += `"Generation Date:","${new Date().toLocaleString()}"\r\n\r\n`;
+
+      if (currentTab === 'patients') {
+        csvContent += `"Patient Number","Full Name","Birth Date","Sex","Status","Registration Date"\r\n`;
+        currentReportData.patientSummary.list.forEach(p => {
+          csvContent += `"${p.patient_number}","${p.name}","${p.birth_date}","${p.sex}","${p.status}","${p.created_at}"\r\n`;
+        });
+      } 
+      else if (currentTab === 'duplicates') {
+        csvContent += `"Detected At","Patient Name","Patient No.","Duplicate Patient Name","Duplicate Patient No.","Reason","Score","Status"\r\n`;
+        currentReportData.duplicateSummary.list.forEach(f => {
+          csvContent += `"${f.detected_at}","${f.patient_name}","${f.patient_number}","${f.duplicate_patient_name}","${f.duplicate_patient_number}","${f.reason}","${f.similarity_score}%","${f.status}"\r\n`;
+        });
+      }
+      else if (currentTab === 'summary') {
+        const pat = currentReportData.patientSummary;
+        const dup = currentReportData.duplicateSummary;
+        csvContent += `"DEMOGRAPHICS SUMMARY"\r\n`;
+        csvContent += `"Total Registered Patients","${pat.total}"\r\n`;
+        csvContent += `"Active Profiles","${pat.active}"\r\n`;
+        csvContent += `"Archived Profiles","${pat.archived}"\r\n\r\n`;
+
+        csvContent += `"DOCUMENT BINDERS SUMMARY"\r\n`;
+        csvContent += `"Consultation Records","${currentReportData.consultations.length}"\r\n`;
+        csvContent += `"Childhood Immunizations","${currentReportData.immunizations.length}"\r\n`;
+        csvContent += `"Anti-Rabies Vaccinations","${currentReportData.antiRabies.length}"\r\n`;
+        csvContent += `"Maternal Care Records","${currentReportData.maternalCares.length}"\r\n`;
+        csvContent += `"Total Scanned Files","${currentReportData.allRecords.length}"\r\n\r\n`;
+
+        csvContent += `"DUPLICATE PROFILE WARNINGS"\r\n`;
+        csvContent += `"Pending Review","${dup.pending}"\r\n`;
+        csvContent += `"Reviewed Conflicts","${dup.reviewed}"\r\n`;
+        csvContent += `"Ignored Warnings","${dup.ignored}"\r\n`;
+      }
+      else {
+        // Records collections: consultations, immunizations, anti-rabies, maternal care, overview
+        let list = currentReportData.allRecords;
+        if (currentTab === 'consultations') list = currentReportData.consultations;
+        if (currentTab === 'immunizations') list = currentReportData.immunizations;
+        if (currentTab === 'anti-rabies') list = currentReportData.antiRabies;
+        if (currentTab === 'maternal-care') list = currentReportData.maternalCares;
+
+        csvContent += `"Filing Date","Patient Number","Patient Name","Document File Name","Category"\r\n`;
+        list.forEach(c => {
+          csvContent += `"${c.created_at}","${c.patient_number}","${c.patient_name}","${c.file_name}","${c.record_type}"\r\n`;
+        });
+      }
+
+      // Download Trigger
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      showToast('CSV report downloaded successfully.', 'success');
+      await recordExportAudit('CSV');
+    }
+
+    // CLIENT-SIDE EXPORTS: PDF (jsPDF + autoTable)
+    async function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const timestamp = new Date().toLocaleString();
+      const periodStr = `${currentReportData.period.start} to ${currentReportData.period.end}`;
+
+      // Title & Document Header
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(30, 41, 59); // dark slate blue
+      doc.text("KEEP UP SYSTEM - HEALTHCARE REPORT", 14, 22);
+
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139); // muted gray
+      doc.text(`Report Subject: ${tabData[currentTab].title}`, 14, 30);
+      doc.text(`Report Period: ${periodStr}`, 14, 35);
+      doc.text(`Generation Date: ${timestamp}`, 14, 40);
+
+      // Add a line divider
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.5);
+      doc.line(14, 45, 196, 45);
+
+      // Table Setup
+      let headers = [];
+      let body = [];
+
+      if (currentTab === 'patients') {
+        headers = [['Patient No.', 'Full Name', 'Birth Date', 'Sex', 'Status', 'Reg Date']];
+        body = currentReportData.patientSummary.list.map(p => [
+          p.patient_number,
+          p.name,
+          formatDate(p.birth_date),
+          p.sex,
+          p.status,
+          formatDate(p.created_at)
+        ]);
+      } 
+      else if (currentTab === 'duplicates') {
+        headers = [['Detected At', 'Patient A Name', 'Patient B Name', 'Reason', 'Match %', 'Status']];
+        body = currentReportData.duplicateSummary.list.map(f => [
+          formatDate(f.detected_at),
+          `${f.patient_name} (${f.patient_number})`,
+          `${f.duplicate_patient_name} (${f.duplicate_patient_number})`,
+          f.reason,
+          `${f.similarity_score}%`,
+          f.status
+        ]);
+      }
+      else if (currentTab === 'summary') {
+        const pat = currentReportData.patientSummary;
+        const dup = currentReportData.duplicateSummary;
+
+        // For summary report, render simple key-value blocks
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(13);
+        doc.setTextColor(79, 70, 229);
+        doc.text("1. Demographics Summary", 14, 55);
+        
+        doc.autoTable({
+          startY: 58,
+          theme: 'striped',
+          head: [['Metric Description', 'Tally count']],
+          body: [
+            ['Total Registered Patients', pat.total.toString()],
+            ['Active Patient Folders', pat.active.toString()],
+            ['Archived Profiles', pat.archived.toString()]
+          ]
+        });
+
+        const nextY1 = doc.previousAutoTable.finalY + 12;
+        doc.text("2. Document Filing Summary", 14, nextY1);
+        doc.autoTable({
+          startY: nextY1 + 3,
+          theme: 'striped',
+          head: [['Filing Binder Category', 'Digitized Document count']],
+          body: [
+            ['Consultation Records', currentReportData.consultations.length.toString()],
+            ['Childhood Immunizations', currentReportData.immunizations.length.toString()],
+            ['Anti-Rabies Vaccinations', currentReportData.antiRabies.length.toString()],
+            ['Maternal Care Records', currentReportData.maternalCares.length.toString()],
+            ['Total Scanned Files Registry', currentReportData.allRecords.length.toString()]
+          ]
+        });
+
+        const nextY2 = doc.previousAutoTable.finalY + 12;
+        doc.text("3. Demographic Duplicates Warning Summary", 14, nextY2);
+        doc.autoTable({
+          startY: nextY2 + 3,
+          theme: 'striped',
+          head: [['Warning review state', 'Flag count']],
+          body: [
+            ['Pending Warnings Review', dup.pending.toString()],
+            ['Reviewed Overlap Conflicts', dup.reviewed.toString()],
+            ['Ignored Warnings', dup.ignored.toString()]
+          ]
+        });
+
+        doc.save(`keepup-summary-report-${Date.now()}.pdf`);
+        showToast('PDF summary report downloaded successfully.', 'success');
+        return;
+      }
+      else {
+        // Record sections (Consultation, Anti-Rabies, Immunization, Maternal Care)
+        let list = currentReportData.allRecords;
+        if (currentTab === 'consultations') list = currentReportData.consultations;
+        if (currentTab === 'immunizations') list = currentReportData.immunizations;
+        if (currentTab === 'anti-rabies') list = currentReportData.antiRabies;
+        if (currentTab === 'maternal-care') list = currentReportData.maternalCares;
+
+        headers = [['Filing Date', 'Patient No.', 'Patient Name', 'Document File Name']];
+        body = list.map(c => [
+          formatDate(c.created_at),
+          c.patient_number,
+          c.patient_name,
+          c.file_name
+        ]);
+      }
+
+      // Render table layout in PDF
+      doc.autoTable({
+        startY: 50,
+        head: headers,
+        body: body,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [79, 70, 229], // matching Indigo 600 branding color
+          textColor: [255, 255, 255],
+          fontStyle: 'bold'
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 4
+        }
+      });
+
+      doc.save(`keepup-report-${currentTab}-${Date.now()}.pdf`);
+      showToast('PDF report downloaded successfully.', 'success');
+      await recordExportAudit('PDF');
+    }
+
+    // Helper functions
+    function formatDate(dateVal) {
+      if (!dateVal) return 'N/A';
+      return new Date(dateVal).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function injectSidebarLinks(role) {
+      const navContainer = document.getElementById('layout-nav-links');
+      let linksHtml = '';
+
+      if (role === 'RHU_ADMINISTRATOR') {
+        linksHtml = `
+          <li>
+            <a href="/dashboard/admin" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              Dashboard Overview
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/admin/users" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+              User Accounts
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/patients" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Patient Directory
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/search" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              Unified Search
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/duplicates" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              Duplicate Warnings
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/reports" class="nav-link active">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Reports Dashboard
+            </a>
+          </li>
+        `;
+      } 
+      else if (role === 'ADMINISTRATIVE_STAFF') {
+        linksHtml = `
+          <li>
+            <a href="/dashboard/reports" class="nav-link active">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Reports Dashboard
+            </a>
+          </li>
+        `;
+      }
+      else if (role === 'RECORDS_STAFF') {
+        linksHtml = `
+          <li>
+            <a href="/dashboard/records" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+              Dashboard Overview
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/patients" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Patient Directory
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/search" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              Unified Search
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/duplicates" class="nav-link">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              Duplicate Warnings
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard/reports" class="nav-link active">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Reports Dashboard
+            </a>
+          </li>
+        `;
+      }
+
+      navContainer.innerHTML = linksHtml;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+# Environment variables and secrets
+.env
+
+# Node modules
+node_modules/
+
+# Uploaded files (private patient data)
+uploads/
+storage/quarantine/
+
+# Backups (contain patient data)
+backups/
+
+# Test output and logs
+*.log
+test-server.log
+phase3-server.log
+
+# Cleanup reports
+cleanup-report-*.json
+
+# Walkthrough test evidence
+walkthrough-results-*.json
+
+# Test data analysis
+test-data-analysis.json
+
+# Database (may contain real patient data)
+database.json
+
+# Temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Optional: Test artifacts
+scratch/

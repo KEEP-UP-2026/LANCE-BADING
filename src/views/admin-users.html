@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Accounts - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .inline-select {
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      width: 200px;
+      background-position: right 8px center;
+      background-size: 16px;
+    }
+    
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 16px 10px 36px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      border-color: var(--color-primary);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar Drawer -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li>
+          <a href="/dashboard/admin" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Dashboard Overview
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/admin/users" class="nav-link active">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            User Accounts
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/patients" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Patient Directory
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/search" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            Unified Search
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/duplicates" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Duplicate Warnings
+          </a>
+        </li>
+        <li>
+          <a href="/dashboard/reports" class="nav-link">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Reports Dashboard
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main View Area -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <!-- Content Section -->
+      <div class="content-card glass-panel" style="margin-top: 20px;">
+        <div class="card-title-section">
+          <div>
+            <h2 class="card-title">User Account Management</h2>
+            <p class="card-subtitle">Authorize accounts, assign roles, and toggle access status.</p>
+          </div>
+          <button class="btn btn-primary" id="open-modal-btn">
+            <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            Add New User
+          </button>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="filter-bar">
+          <div class="search-input-wrapper">
+            <input type="text" class="search-input" id="search-users" placeholder="Search by name or email...">
+            <svg class="search-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Assigned Role</th>
+                <th>Status</th>
+                <th>Toggle Status</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                  Loading user records...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Create User Modal -->
+  <div class="modal-overlay" id="create-user-modal">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 class="card-title">Create User Account</h3>
+        <button class="modal-close" id="close-modal-btn">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+
+      <form id="create-user-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="full_name">Full Name</label>
+            <input class="form-input" style="padding-left: 14px;" type="text" id="full_name" placeholder="e.g., Jane Doe" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input class="form-input" style="padding-left: 14px;" type="email" id="email" placeholder="e.g., jane@keepup.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Initial Password</label>
+            <input class="form-input" style="padding-left: 14px;" type="password" id="password" placeholder="Min. 6 characters" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="role">System Role</label>
+            <select class="form-select" id="role" required>
+              <option value="" disabled selected>Select system role</option>
+              <option value="RHU_ADMINISTRATOR">RHU Administrator</option>
+              <option value="RECORDS_STAFF">Records Staff</option>
+              <option value="HEALTHCARE_PERSONNEL">Healthcare Personnel</option>
+              <option value="ADMINISTRATIVE_STAFF">Administrative Staff</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" id="cancel-modal-btn">Cancel</button>
+          <button class="btn btn-primary" type="submit" id="save-user-btn">
+            <span class="btn-text">Create Account</span>
+            <span class="spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let allUsers = [];
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Load current administrator details
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      // Inject mobile initials
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+      }
+
+      // Fetch user list
+      await fetchAndRenderUsers();
+
+      // Modal Controls
+      const modal = document.getElementById('create-user-modal');
+      const openBtn = document.getElementById('open-modal-btn');
+      const closeBtn = document.getElementById('close-modal-btn');
+      const cancelBtn = document.getElementById('cancel-modal-btn');
+      const createForm = document.getElementById('create-user-form');
+      const saveBtn = document.getElementById('save-user-btn');
+
+      const openModal = () => modal.classList.add('active');
+      const closeModal = () => {
+        modal.classList.remove('active');
+        createForm.reset();
+      };
+
+      openBtn.addEventListener('click', openModal);
+      closeBtn.addEventListener('click', closeModal);
+      cancelBtn.addEventListener('click', closeModal);
+
+      // Create User Submission Handler
+      createForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const full_name = document.getElementById('full_name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+
+        saveBtn.classList.add('loading');
+        saveBtn.disabled = true;
+
+        try {
+          const res = await API.createUser({ full_name, email, password, role });
+          if (res && res.success) {
+            showToast(res.message, 'success');
+            closeModal();
+            await fetchAndRenderUsers();
+          }
+        } catch (error) {
+          showToast(error.message || 'Failed to create user account.', 'error');
+        } finally {
+          saveBtn.classList.remove('loading');
+          saveBtn.disabled = false;
+        }
+      });
+
+      // Client-Side Search
+      document.getElementById('search-users').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        filterUsers(query);
+      });
+
+      // Logout handler
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    // Fetch users and render in table
+    async function fetchAndRenderUsers() {
+      try {
+        const res = await API.getUsers();
+        if (res && res.success) {
+          allUsers = res.users;
+          renderUsersTable(allUsers);
+        }
+      } catch (error) {
+        showToast('Error loading user list from database.', 'error');
+      }
+    }
+
+    // Render table rows
+    function renderUsersTable(usersList) {
+      const tableBody = document.getElementById('users-table-body');
+      
+      if (usersList.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">
+              No users matching search criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = usersList.map(user => {
+        const isSelf = user.id === currentUser.id;
+        const isActive = user.status === 'ACTIVE';
+        
+        return `
+          <tr data-id="${user.id}">
+            <td style="font-weight: 600;">${escapeHtml(user.full_name)} ${isSelf ? '<span style="color: var(--text-muted); font-size: 11px;">(You)</span>' : ''}</td>
+            <td style="color: var(--text-secondary);">${escapeHtml(user.email)}</td>
+            <td>
+              <select 
+                class="form-select inline-select" 
+                onchange="handleRoleChange('${user.id}', this.value)"
+                ${isSelf ? 'disabled' : ''}
+              >
+                <option value="RHU_ADMINISTRATOR" ${user.role === 'RHU_ADMINISTRATOR' ? 'selected' : ''}>RHU Administrator</option>
+                <option value="RECORDS_STAFF" ${user.role === 'RECORDS_STAFF' ? 'selected' : ''}>Records Staff</option>
+                <option value="HEALTHCARE_PERSONNEL" ${user.role === 'HEALTHCARE_PERSONNEL' ? 'selected' : ''}>Healthcare Personnel</option>
+                <option value="ADMINISTRATIVE_STAFF" ${user.role === 'ADMINISTRATIVE_STAFF' ? 'selected' : ''}>Administrative Staff</option>
+              </select>
+            </td>
+            <td>
+              <span class="badge ${isActive ? 'badge-active' : 'badge-inactive'}" id="badge-${user.id}">
+                ${user.status}
+              </span>
+            </td>
+            <td>
+              <label class="switch">
+                <input 
+                  type="checkbox" 
+                  ${isActive ? 'checked' : ''} 
+                  ${isSelf ? 'disabled' : ''} 
+                  onchange="handleStatusToggle('${user.id}', this.checked)"
+                >
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Filter list client-side
+    function filterUsers(query) {
+      if (!query) {
+        renderUsersTable(allUsers);
+        return;
+      }
+      const filtered = allUsers.filter(u => 
+        u.full_name.toLowerCase().includes(query) || 
+        u.email.toLowerCase().includes(query)
+      );
+      renderUsersTable(filtered);
+    }
+
+    // PUT API Wrapper for Role change
+    async function handleRoleChange(userId, newRole) {
+      try {
+        const res = await API.updateUser(userId, { role: newRole });
+        if (res && res.success) {
+          showToast(`Role updated to ${formatRole(newRole)} for ${res.user.full_name}`, 'success');
+          // Update cached copy
+          const idx = allUsers.findIndex(u => u.id === userId);
+          if (idx !== -1) allUsers[idx].role = newRole;
+        }
+      } catch (error) {
+        showToast(error.message || 'Failed to update user role.', 'error');
+        // Reload list to reset select values
+        await fetchAndRenderUsers();
+      }
+    }
+
+    // PUT API Wrapper for Status toggle
+    async function handleStatusToggle(userId, isChecked) {
+      const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
+      const badge = document.getElementById(`badge-${userId}`);
+      
+      try {
+        const res = await API.updateUser(userId, { status: newStatus });
+        if (res && res.success) {
+          showToast(`Account status updated to ${newStatus} for ${res.user.full_name}`, 'success');
+          
+          // Update cached copy
+          const idx = allUsers.findIndex(u => u.id === userId);
+          if (idx !== -1) allUsers[idx].status = newStatus;
+          
+          // Update Badge UI immediately
+          if (badge) {
+            badge.className = `badge ${isChecked ? 'badge-active' : 'badge-inactive'}`;
+            badge.textContent = newStatus;
+          }
+        }
+      } catch (error) {
+        showToast(error.message || 'Failed to update user status.', 'error');
+        // Reload to reset checkboxes
+        await fetchAndRenderUsers();
+      }
+    }
+
+    // Simple HTML escaper for safety
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
