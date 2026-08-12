@@ -12,24 +12,14 @@ console.log('========================================\n');
 // Test cases for Anti-Rabies
 const testCases = [
   {
-    name: 'Anti-Rabies Test 1: Basic rabies vaccine',
-    text: 'Patient received rabies vaccine after dog bite. Post-exposure prophylaxis administered.',
-    expected: 'ANTI_RABIES_RECORD'
+    name: 'Individual Treatment Record (ITR) Test 1',
+    text: 'Individual Treatment Record (ITR). Patient information sheet. Personal data: Full name, birthday...',
+    expected: 'PATIENT_INFORMATION_SHEET'
   },
   {
-    name: 'Anti-Rabies Test 2: With ERIG',
-    text: 'Dog bite category III. ERIG given at wound site. Rabies immunization started.',
-    expected: 'ANTI_RABIES_RECORD'
-  },
-  {
-    name: 'Anti-Rabies Test 3: Filipino terms',
-    text: 'May kagat ng aso. Binigyan ng anti-rabies vaccine. Gasgas ng hayop sa braso.',
-    expected: 'ANTI_RABIES_RECORD'
-  },
-  {
-    name: 'Anti-Rabies Test 4: Animal scratch',
-    text: 'Patient has animal scratch from cat. Wound cleaning done. PVRV vaccine given.',
-    expected: 'ANTI_RABIES_RECORD'
+    name: 'Individual Treatment Record (ITR) Test 2',
+    text: 'ITR Form. Treatment record and patient demographic info sheet...',
+    expected: 'PATIENT_INFORMATION_SHEET'
   },
   {
     name: 'Immunization Test 1: BCG vaccine',

@@ -1,0 +1,17 @@
+=== HEALTH FACILITY HEADER ===
+PAETE RURAL HEALTH UNIT
+Consultation & Outpatient Clinical Record
+
+=== PATIENT DEMOGRAPHICS ===
+Patient Name: Juan Dela Cruz
+Age: 26 | Sex: Male
+Date of Consultation: May 20, 2024
+
+=== CLINICAL FINDINGS & DIAGNOSIS ===
+Chief Complaint: Cough and mild fever for 2 days.
+Vital Signs: BP: 120/80 mmHg | Temp: 37.8 °C | Pulse: 78 bpm
+Assessment / Diagnosis: Acute Upper Respiratory Tract Infection (J06.9)
+Prescription & Treatment Plan:
+- Paracetamol 500mg tab q8h prn for fever
+- Increased oral fluid intake and rest
+- Follow-up after 3 days if symptoms persist

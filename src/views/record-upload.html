@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .patient-summary-banner {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: #F5F7FA;
+      border: 1px solid #e2e8f0;
       border-radius: var(--border-radius-sm);
       padding: 16px 20px;
       margin-bottom: 24px;
@@ -23,22 +23,22 @@
     }
     .summary-label {
       font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
+      font-weight: 800;
+      color: #334155;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
     .summary-value {
       font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
+      font-weight: 700;
+      color: #25282D;
     }
     .upload-zone {
-      border: 2px dashed rgba(255, 255, 255, 0.1);
+      border: 2px dashed #cbd5e1;
       border-radius: var(--border-radius-md);
       padding: 40px 20px;
       text-align: center;
-      background: rgba(15, 23, 42, 0.3);
+      background: #F5F7FA;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
@@ -47,35 +47,35 @@
       gap: 15px;
     }
     .upload-zone:hover, .upload-zone.dragover {
-      border-color: var(--color-primary);
-      background: rgba(99, 102, 241, 0.05);
+      border-color: #C62828;
+      background: #FCE8E8;
     }
     .upload-icon {
       width: 48px;
       height: 48px;
-      fill: var(--text-muted);
+      fill: #C62828;
       transition: var(--transition);
     }
     .upload-zone:hover .upload-icon {
-      fill: var(--color-primary);
+      fill: #C62828;
       transform: translateY(-4px);
     }
     .upload-text {
       font-size: 15px;
-      font-weight: 600;
-      color: var(--text-secondary);
+      font-weight: 700;
+      color: #25282D;
     }
     .upload-subtext {
       font-size: 12px;
-      color: var(--text-muted);
+      color: #334155;
     }
     .file-input {
       display: none;
     }
     .file-preview-card {
       display: none;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: #F5F7FA;
+      border: 1px solid #e2e8f0;
       border-radius: var(--border-radius-sm);
       padding: 16px 20px;
       margin-top: 20px;
@@ -90,20 +90,21 @@
     .file-icon {
       width: 32px;
       height: 32px;
-      fill: var(--color-primary);
+      fill: #C62828;
     }
     .file-name {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 14px;
+      color: #25282D;
     }
     .file-size {
       font-size: 12px;
-      color: var(--text-muted);
+      color: #334155;
     }
     .remove-file-btn {
       background: transparent;
       border: none;
-      color: var(--color-danger);
+      color: #C62828;
       cursor: pointer;
       padding: 4px;
       border-radius: 50%;
@@ -113,7 +114,7 @@
       transition: var(--transition);
     }
     .remove-file-btn:hover {
-      background: var(--color-danger-glow);
+      background: #FCE8E8;
     }
     .ocr-loader-panel {
       display: none;
@@ -123,73 +124,76 @@
       gap: 20px;
       padding: 40px;
       text-align: center;
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid var(--card-border);
+      background: #F5F7FA;
+      border: 1px solid #e2e8f0;
       border-radius: var(--border-radius-md);
       margin-top: 30px;
     }
     .ocr-spinner {
       width: 48px;
       height: 48px;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-top-color: var(--color-primary);
+      border: 4px solid #cbd5e1;
+      border-top-color: #C62828;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
     .ocr-status-title {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
+      color: #25282D;
     }
     .ocr-status-subtitle {
       font-size: 13px;
-      color: var(--text-secondary);
+      color: #334155;
       max-width: 450px;
     }
     .review-panel {
       display: none;
-      background: rgba(15, 23, 42, 0.4);
-      border: 1px solid var(--card-border);
+      background: #FFFFFF;
+      border: 1px solid #e2e8f0;
       border-radius: var(--border-radius-md);
       padding: 24px;
-      margin-top: 30px;
+      margin-top: 20px;
       animation: fadeIn 0.4s ease-out;
+      box-shadow: var(--shadow-sm);
     }
     .review-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid #e2e8f0;
       padding-bottom: 16px;
       margin-bottom: 20px;
     }
     .review-title {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
+      color: #25282D;
     }
     .confidence-badge {
       display: inline-flex;
       align-items: center;
-      padding: 6px 12px;
+      padding: 6px 14px;
       font-size: 11px;
-      font-weight: 700;
-      border-radius: 20px;
+      font-weight: 800;
+      border-radius: 30px;
       gap: 6px;
       border: 1px solid transparent;
     }
     .confidence-high {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border-color: rgba(16, 185, 129, 0.3);
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
     }
     .confidence-medium {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border-color: rgba(245, 158, 11, 0.3);
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a;
     }
     .confidence-low {
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      border-color: rgba(239, 68, 68, 0.3);
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #fca5a5;
     }
     .alert-banner {
       padding: 12px 16px;
@@ -198,53 +202,387 @@
       margin-bottom: 20px;
       display: flex;
       gap: 10px;
-      align-items: flex-start;
-      border: 1px solid transparent;
-    }
-    .alert-warning {
-      background: rgba(245, 158, 11, 0.1);
-      color: #f59e0b;
-      border-color: rgba(245, 158, 11, 0.2);
+      align-items: center;
     }
     .alert-info {
-      background: rgba(99, 102, 241, 0.1);
-      color: #a5b4fc;
-      border-color: rgba(99, 102, 241, 0.2);
+      background: #FCE8E8;
+      border: 1px solid #fca5a5;
+      color: #C62828;
+      font-weight: 600;
     }
-    .extracted-text-area {
-      width: 100%;
-      height: 200px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: var(--border-radius-sm);
-      padding: 14px;
-      color: var(--text-primary);
-      font-family: monospace;
+    .alert-warning {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    /* Verification Sub-Tabs & Form Navigation */
+    .vtab-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .vtab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #F5F7FA;
+      border: 1px solid #cbd5e1;
+      color: #25282D;
+      padding: 8px 18px;
+      border-radius: 30px;
       font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .vtab-btn:hover {
+      background: #FCE8E8;
+      color: #C62828;
+      border-color: #fca5a5;
+    }
+    .vtab-btn.active {
+      background: #C62828;
+      border-color: #C62828;
+      color: #ffffff;
+    }
+    .vtab-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Structured Sub-Form Pill Navigation */
+    .form-subnav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      background: #F5F7FA;
+      padding: 6px;
+      border-radius: 30px;
+      border: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+    }
+    .form-subnav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .form-subnav-btn:hover {
+      color: #C62828;
+      background: #FCE8E8;
+    }
+    .form-subnav-btn.active {
+      background: #C62828;
+      color: #ffffff;
+    }
+
+    .form-section-card {
+      background: #FFFFFF;
+      border: 1px solid #e2e8f0;
+      border-top: 3px solid #C62828;
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-section-header {
+      font-size: 12px;
+      font-weight: 800;
+      color: #C62828;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-section-header svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #25282D;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 0;
+    }
+    .form-control, .form-select {
+      background: #FFFFFF;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #25282D;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .form-control::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .form-control:hover, .form-select:hover {
+      border-color: #C62828;
+      background: #FFFFFF;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #C62828;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15);
+      outline: none;
+      color: #25282D;
+    }
+
+    /* ITR Official Paper Layout Styling */
+    .itr-paper {
+      background: #ffffff;
+      color: #0f172a;
+      padding: 28px 32px;
+      border-radius: 8px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+      margin-bottom: 24px;
       line-height: 1.5;
-      overflow-y: auto;
+    }
+    .itr-paper .header {
+      text-align: center;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .itr-paper .sub-header {
+      font-size: 12px;
+      font-weight: 500;
+      color: #334155;
+    }
+    .itr-paper .header h2 {
+      font-size: 17px;
+      font-weight: 800;
+      margin: 3px 0;
+      color: #0f172a;
+      letter-spacing: 0.04em;
+    }
+    .itr-paper .header h1 {
+      font-size: 20px;
+      font-weight: 900;
+      margin: 4px 0 2px 0;
+      color: #1e1b4b;
+      text-transform: uppercase;
+    }
+    .itr-paper .header h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin: 0;
+    }
+    .itr-paper table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+    }
+    .itr-paper table, .itr-paper th, .itr-paper td {
+      border: 1px solid #cbd5e1;
+    }
+    .itr-paper td, .itr-paper th {
+      padding: 8px 10px;
+    }
+    .itr-paper input[type="text"], .itr-paper input[type="number"] {
+      border: none;
+      border-bottom: 1.5px solid #0f172a;
+      background: transparent;
+      font-weight: 700;
+      font-size: 13px;
+      color: #0f172a;
+      padding: 2px 4px;
+      outline: none;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+    .itr-paper input[type="text"]:focus, .itr-paper input[type="number"]:focus {
+      border-bottom-color: #4f46e5;
+      background: #f1f5f9;
+    }
+    .itr-paper .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 850px) {
+      .itr-paper .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+    .itr-paper .col-left, .itr-paper .col-right {
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      border-radius: 4px;
+      background: #f8fafc;
+    }
+    .itr-paper .section-header {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #0f172a;
+      background: #e2e8f0;
+      padding: 6px 10px;
+      margin: -14px -14px 12px -14px;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .itr-paper .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      margin-right: 10px;
+      cursor: pointer;
+      user-select: none;
+      color: #1e293b;
+    }
+    .itr-paper .checkbox-label input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: #4f46e5;
+      cursor: pointer;
+    }
+    .itr-paper .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      background: #f8fafc;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+    .itr-paper .consultation-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      padding: 8px 10px;
+    }
+    .itr-paper .nested-risk-table {
+      width: 100%;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+    .itr-paper .nested-risk-table th {
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 4px 6px;
+    }
+    .itr-paper .nested-risk-table td {
+      padding: 3px 6px;
+    }
+    .itr-paper .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .itr-paper .checklist-item span {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    .form-select option {
+      background: #FFFFFF;
+      color: #25282D;
+      padding: 10px;
+    }
+
+    .extracted-text-area {
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      background: #FFFFFF;
+      color: #25282D;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      width: 100%;
+      min-height: 220px;
       resize: vertical;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
     }
     .extracted-text-area:focus {
+      border-color: #C62828;
+      box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15);
       outline: none;
-      border-color: var(--color-primary);
+    }
+
+    /* Custom Checkbox Pill Items */
+    .checkbox-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #F5F7FA;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #25282D;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .checkbox-pill:hover {
+      background: #FCE8E8;
+      border-color: #fca5a5;
+      color: #C62828;
+    }
+    .checkbox-pill input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #6366f1;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-
-  <div class="app-container">
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div class="app-layout">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          <svg style="width: 22px; height: 22px; fill: #ffffff;" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
           </svg>
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
@@ -254,7 +592,7 @@
         <div class="user-avatar" id="layout-user-initials">--</div>
         <div class="user-info">
           <div class="user-name" id="layout-user-name">Loading...</div>
-          <span class="user-role-badge" id="layout-user-role">---</span>
+          <span class="user-role-badge role-records" id="layout-user-role">---</span>
         </div>
       </div>
 
@@ -283,7 +621,7 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <div class="content-card glass-panel" style="margin-top: 20px; max-width: 800px;">
+      <div class="content-card glass-panel" id="main-content-card" style="margin-top: 20px; max-width: 900px; transition: max-width 0.3s ease;">
         <div class="card-title-section">
           <div>
             <h2 class="card-title">Digitize Healthcare Record</h2>
@@ -322,7 +660,7 @@
                 </svg>
                 <span class="upload-text">Drag and drop file here, or click to browse</span>
                 <span class="upload-subtext">Supports PNG, JPG, JPEG, and PDF (Max 10MB)</span>
-                <input type="file" class="file-input" id="document" accept=".png,.jpg,.jpeg,.pdf" required>
+                <input type="file" class="file-input" id="document" name="document" accept=".png,.jpg,.jpeg,.pdf">
               </div>
 
               <!-- File Selected Preview Card -->
@@ -347,64 +685,340 @@
             <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
               <button type="button" class="btn btn-secondary" id="back-profile-btn">Back to Profile</button>
               <button class="btn btn-primary" type="submit" id="upload-btn">
-                <span class="btn-text">Extract OCR and Suggest Category</span>
+                <span class="btn-text">Enhance Document &amp; Preview</span>
                 <span class="spinner"></span>
               </button>
             </div>
           </form>
         </div>
 
+        <!-- STAGE 1.5: Image Enhancement & Alignment Preview -->
+        <div id="enhancement-stage" style="display: none; background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: var(--border-radius-md); padding: 24px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 16px; flex-wrap: wrap;">
+            <div>
+              <h4 style="margin: 0; font-size: 18px; color: #25282D; font-weight: 800;" id="enhancement-stage-title">Document Enhanced &amp; Alignment Corrected</h4>
+              <p style="margin: 4px 0 0 0; font-size: 13px; color: #334155;" id="enhancement-stage-subtitle">Review the enhanced document preview below. Click confirm to extract text.</p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+              <span class="badge" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; font-size: 11px; padding: 5px 10px; font-weight: 700; transition: all 0.3s ease;" id="badge-angle">Alignment: Straight</span>
+              <span class="badge" style="background: #FCE8E8; color: #C62828; border: 1px solid #fca5a5; font-size: 11px; padding: 5px 10px; font-weight: 700;">Clarity &amp; Contrast: Enhanced</span>
+              <span class="badge" style="background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; font-size: 11px; padding: 5px 10px; font-weight: 700; transition: all 0.3s ease;" id="badge-perspective">Perspective: Checking...</span>
+              <span class="badge" style="background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; font-size: 11px; padding: 5px 10px; font-weight: 700; transition: all 0.3s ease;" id="badge-bg-remove">Background: Checking...</span>
+            </div>
+          </div>
+
+          <div style="text-align: center; background: #FFFFFF; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <img id="enhanced-preview-img" src="" alt="Enhanced Document Preview" style="max-width: 100%; max-height: 480px; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); object-fit: contain;">
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 18px;">
+            <button type="button" class="btn btn-secondary" id="enhancement-cancel-btn" style="color: var(--text-secondary);">Choose Different Image</button>
+            <button type="button" class="btn btn-primary" id="enhancement-confirm-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); border: none; font-weight: 700; font-size: 14px; padding: 12px 24px;">
+              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor; vertical-align: middle; margin-right: 6px;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Confirm &amp; Extract Text into OCR
+            </button>
+          </div>
+        </div>
+
         <!-- Stage Loading Pane -->
         <div class="ocr-loader-panel" id="ocr-loader-panel">
           <div class="ocr-spinner"></div>
           <div>
-            <h4 class="ocr-status-title">Running AI OCR Character Extraction...</h4>
+            <h4 class="ocr-status-title" id="ocr-status-title">Processing Document...</h4>
             <p class="ocr-status-subtitle" id="ocr-status-subtitle">Converting document and running classification rules. Please do not navigate away.</p>
           </div>
         </div>
 
         <!-- STAGE 2: Verification Review Screen -->
         <div class="review-panel" id="review-panel">
-          <div class="review-header">
+          <div class="review-header" style="flex-wrap: wrap; gap: 12px;">
             <div>
-              <h4 class="review-title">Review Extracted Information</h4>
-              <p class="card-subtitle" style="margin-top: 2px;">Please review and correct the extracted information before saving.</p>
+              <h4 class="review-title" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                <svg style="width: 20px; height: 20px; fill: #C62828;" viewBox="0 0 24 24">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                Verification &amp; Record Review
+              </h4>
+              <p class="card-subtitle" style="margin-top: 2px;">Verify extracted values against the original scan and correct form fields before saving.</p>
             </div>
-            <div class="confidence-badge" id="review-confidence-badge">
-              <span id="review-confidence-level">HIGH CONFIDENCE</span>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <span class="badge" style="background: #FCE8E8; color: #C62828; border: 1px solid #fca5a5; font-weight: 800; padding: 6px 12px; font-size: 11px; display: inline-flex; align-items: center; gap: 6px;" id="review-itr-page-badge">
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                ITR Page 1 (Demographics &amp; Risk Assessment)
+              </span>
+              <div class="confidence-badge" id="review-confidence-badge">
+                <span id="review-confidence-level">HIGH CONFIDENCE</span>
+              </div>
             </div>
           </div>
 
-          <div class="alert-banner alert-info" id="review-explanation-banner">
-            <svg style="width: 20px; height: 20px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24">
+          <div class="alert-banner alert-info" id="review-explanation-banner" style="margin-bottom: 20px;">
+            <svg style="width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
             </svg>
-            <span id="review-explanation-text">Classification details</span>
+            <span id="review-explanation-text">Classification determined strictly from document text content.</span>
+          </div>
+
+          <!-- 3 VERIFICATION REVIEW TABS -->
+          <div class="vtab-nav">
+            <button type="button" class="vtab-btn active" id="vtab-btn-form" onclick="switchVerificationTab('form')">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Information Form
+            </button>
+            <button type="button" class="vtab-btn" id="vtab-btn-scan" onclick="switchVerificationTab('scan')">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              Original Document Scan
+            </button>
+            <button type="button" class="vtab-btn" id="vtab-btn-text" onclick="switchVerificationTab('text')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              Extracted Full Text
+            </button>
           </div>
 
           <form id="record-confirm-form">
-            <div class="form-group">
-              <label class="form-label" for="review-filename">Document Filename</label>
-              <input type="text" class="form-control" id="review-filename" required>
+
+            <!-- Meta Header Controls -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
+              <div class="form-group">
+                <label class="form-label" for="review-filename">Document Filename</label>
+                <input type="text" class="form-control" id="review-filename" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="review-category">Record Category Binder (Content Classified)</label>
+                <select class="form-select" id="review-category" required>
+                  <option value="PATIENT_INFORMATION_SHEET">Individual Treatment Record</option>
+                  <option value="CONSULTATION_RECORD">Consultation Records</option>
+                  <option value="IMMUNIZATION_RECORD">Immunizations</option>
+                  <option value="MATERNAL_CARE_RECORD">Maternal Care</option>
+                </select>
+              </div>
             </div>
 
-            <div class="form-group" style="margin-top: 18px;">
-              <label class="form-label" for="review-category">Record Category Binder</label>
-              <select class="form-select" id="review-category" required>
-                <option value="PATIENT_INFORMATION_SHEET">Patient Information Sheet</option>
-                <option value="CONSULTATION_RECORD">Consultation Record</option>
-                <option value="IMMUNIZATION_RECORD">Routine Childhood Immunization Record</option>
-                <option value="ANTI_RABIES_RECORD">Anti-Rabies Vaccination Record</option>
-                <option value="MATERNAL_CARE_RECORD">Maternal Care-Related Record</option>
-              </select>
+            <!-- TAB CONTENT 1: STRUCTURED INFORMATION FORM (OFFICIAL ITR PAPER LAYOUT) -->
+            <div id="vtab-content-form" class="vtab-content" style="display: block;">
+              <div class="itr-paper">
+
+                <!-- HEADER -->
+                <div class="header">
+                    <div class="sub-header">Republic of the Philippines</div>
+                    <div class="sub-header">Province of Laguna</div>
+                    <div class="sub-header">Municipality of Paete</div>
+                    <h2>PAETE RURAL HEALTH UNIT</h2>
+                    <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                    <h1>Individual Treatment Record</h1>
+                    <h3>20 Years old and above</h3>
+                </div>
+
+                <!-- DEMOGRAPHICS TABLE -->
+                <table>
+                    <tr>
+                        <td style="width: 60%;">
+                            <strong>NAME:</strong> <input type="text" id="itr-field-name" style="width: 75%;" placeholder="">
+                        </td>
+                        <td style="width: 40%;">
+                            <strong>Philhealth No.:</strong> <input type="text" id="itr-field-philhealth" style="width: 60%;" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>ADDRESS:</strong> <input type="text" id="itr-field-address" style="width: 75%;" placeholder="">
+                        </td>
+                        <td>
+                            <strong>Civil Status:</strong> <input type="text" id="itr-field-civilstatus" style="width: 60%;" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div><strong>BIRTHDAY:</strong> <input type="text" id="itr-field-birthday" style="width: 130px;" placeholder=""></div>
+                                <div style="margin-right: 20px;"><strong>Age:</strong> <input type="number" id="itr-field-age" style="width: 50px;" placeholder=""></div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>CP No:</strong> <input type="text" id="itr-field-cpno" style="width: 70%;" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Educational Attainment:</strong> <input type="text" id="itr-field-education" style="width: 50%;" placeholder="">
+                        </td>
+                        <td>
+                            <strong>BHW:</strong> <input type="text" id="itr-field-bhw" style="width: 75%;" placeholder="">
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- MIDDLE LIFESTYLE & RISK FACTORS SECTION -->
+                <div class="grid-2col">
+                    <!-- LEFT COLUMN -->
+                    <div class="col-left">
+                        <div class="section-header">Smoking Cessation Profile:</div>
+                        <div style="margin-bottom: 8px;">
+                            <strong>Smokers?</strong><br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-current"> Current</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-passive"> Passive</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-never"> Never</label><br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-gt1yr"> Stopped &gt; a year</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-lt1yr"> Stopped &lt; a year</label>
+                            <input type="hidden" id="itr-field-smoking-status">
+                        </div>
+
+                        <div style="margin-bottom: 6px;">
+                            <strong>Brand of Cigarette?</strong> <input type="text" id="itr-field-smoking-brand" style="width: 50%;">
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <strong>How many stick per day?</strong> <input type="text" id="itr-field-smoking-sticks" style="width: 40%;">
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <strong>Age started?</strong> <input type="text" id="itr-field-smoking-agestarted" style="width: 55%;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>No of years smoking?</strong> <input type="text" id="itr-field-smoking-years" style="width: 45%;">
+                        </div>
+
+                        <div style="margin-bottom: 6px;">
+                            <strong>Reason for smoking?</strong> <input type="text" id="itr-field-smoking-reason" style="width: 50%;">
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <strong>Have you experienced side effect or illness brought by smoking?</strong><br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-sideeffect-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-sideeffect-no"> NO</label>
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <strong>If yes What effect?</strong> <input type="text" id="itr-field-smoking-effect" style="width: 60%;">
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <strong>Try quitting before?</strong>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-quit-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-smk-quit-no"> NO</label>
+                        </div>
+                        <div style="margin-bottom: 14px;">
+                            <strong>If yes why were not successful?</strong> <input type="text" id="itr-field-smoking-unsuccessful" style="width: 40%;">
+                        </div>
+
+                        <div class="section-header">Physical Activity</div>
+                        <div>
+                            <strong>Does at least 2 ½ hours a week of moderate intensity physical activity</strong><br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-pa-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-pa-no"> NO</label>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="col-right">
+                        <div class="section-header">Family History: * does pt. have 1<sup>st</sup> degree relative with</div>
+                        <div style="margin-bottom: 10px;">
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-htn"> Hypertension</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-stroke"> Stroke</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-heart"> Heart Attack</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-dm"> DM</label><br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-asthma"> Asthma</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-cancer"> Cancer</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fh-kidney"> Kidney Disease</label>
+                        </div>
+
+                        <div style="margin-bottom: 6px;">
+                            <strong>Co-Morbid:</strong> <input type="text" id="itr-field-comorbid" style="width: 70%;">
+                        </div>
+                        <div style="margin-bottom: 14px;">
+                            <strong>Allergy:</strong> <input type="text" id="itr-field-allergy" style="width: 75%;">
+                        </div>
+
+                        <div class="section-header">Alcohol Intake:</div>
+                        <div style="margin-left: 10px; margin-bottom: 6px;">
+                            <label class="checkbox-label"><input type="checkbox" id="itr-alc-never"> Never Consumed</label><br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-alc-yes"> Yes, drinks alcohol</label>
+                        </div>
+                        <div style="margin-left: 20px; margin-bottom: 14px;">
+                            <strong>Excessive Alcohol Intake:</strong><br>
+                            In the past mos., had 3 drinks in one occasion<br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-alc-excess-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-alc-excess-no"> NO</label>
+                        </div>
+
+                        <div class="section-header">High Fat / High Salt Food Intake</div>
+                        <div style="margin-bottom: 14px;">
+                            Eats processed / Fast foods and inihaw weekly<br>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fat-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fat-no"> NO</label>
+                        </div>
+
+                        <div class="section-header">Dietary Fiber Intake:</div>
+                        <div>
+                            3 servings of vegetables daily
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fiber-veg-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fiber-veg-no"> NO</label><br>
+                            2-3 servings of fruits daily
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fiber-fruit-yes"> YES</label>
+                            <label class="checkbox-label"><input type="checkbox" id="itr-fiber-fruit-no"> NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VITAL SIGNS SECTION -->
+                <div class="vitals-grid">
+                    <div>
+                        <strong>BMI:</strong> <input type="text" id="itr-field-bmi" style="width: 55px;"> &nbsp;&nbsp;
+                        <strong>WaistLine:</strong> <input type="text" id="itr-field-waist" style="width: 45px;"> Cm<br>
+                        <strong>HT:</strong> <input type="text" id="itr-field-ht" style="width: 45px;"> Cm &nbsp;&nbsp;
+                        <strong>WEIGHT:</strong> <input type="text" id="itr-field-wt" style="width: 45px;"> KG
+                    </div>
+                    <div>
+                        <strong>RAISED BP:</strong> <input type="text" id="itr-field-raisedbp" style="width: 70px;" placeholder="No">
+                    </div>
+                    <div>
+                        <strong>1<sup>ST</sup> READING:</strong> <input type="text" id="itr-field-bp1" style="width: 75px;"> mmHg<br>
+                        <strong>2<sup>ND</sup> READING:</strong> <input type="text" id="itr-field-bp2" style="width: 75px;"> mmHg
+                    </div>
+                </div>
+
+                <!-- CONSULTATION TABLE -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; margin-bottom: 8px;">
+                    <h4 style="margin: 0; color: #0f172a; font-size: 13.5px; text-transform: uppercase; font-weight: 800;">Consultation &amp; Clinical Findings Table</h4>
+                    <button type="button" class="btn btn-secondary" id="add-consultation-row-btn" style="font-size: 12px; padding: 6px 12px; border-radius: 4px; background: #4f46e5; color: #ffffff; border: none; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        Add Consultation Record Row
+                    </button>
+                </div>
+                <table class="consultation-table" style="margin-top: 6px; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">Date</th>
+                            <th style="width: 25%;">Subjective Findings</th>
+                            <th style="width: 22%;">Objective Findings</th>
+                            <th style="width: 20%;">Assessment Diagnosis</th>
+                            <th style="width: 16%;">Plan/ Treatment Plan</th>
+                            <th style="width: 5%; text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consultation-table-body">
+                        <!-- Dynamic Consultation Rows inserted here -->
+                    </tbody>
+                </table>
+
+              </div>
             </div>
 
-            <div class="form-group" style="margin-top: 18px;">
-              <label class="form-label" for="review-extracted-text">Extracted Digital Text (Editable)</label>
-              <textarea class="extracted-text-area" id="review-extracted-text" placeholder="No text extracted. You can type here to insert text manually."></textarea>
+            <!-- TAB CONTENT 2: ORIGINAL DOCUMENT SCAN -->
+            <div id="vtab-content-scan" class="vtab-content" style="display: none;">
+              <div style="background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: var(--border-radius-md); padding: 16px; text-align: center;">
+                <div style="margin-bottom: 12px; font-size: 12px; color: #334155; font-weight: 600;">Scanned &amp; Enhanced Document Preview (Side-by-Side Reference)</div>
+                <div style="max-height: 600px; overflow: auto; background: #FFFFFF; border: 1px solid #cbd5e1; border-radius: var(--border-radius-sm); padding: 10px; display: inline-block; width: 100%;">
+                  <img id="review-original-image" src="" alt="Scanned Document Preview" style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                </div>
+              </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+            <!-- TAB CONTENT 3: EXTRACTED TEXT VERSION -->
+            <div id="vtab-content-text" class="vtab-content" style="display: none;">
+              <div class="form-group">
+                <label class="form-label" for="review-extracted-text">Extracted Digital Text (Full Text Version)</label>
+                <textarea class="extracted-text-area" id="review-extracted-text" placeholder="No text extracted. You can type here to insert text manually."></textarea>
+              </div>
+            </div>
+
+            <!-- Bottom Action Footer -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
               <button type="button" class="btn btn-secondary" id="review-retry-btn" style="border: 1px solid rgba(255, 255, 255, 0.1);">Re-run OCR / Try Again</button>
               <div style="display: flex; gap: 15px;">
                 <button type="button" class="btn btn-secondary" id="review-cancel-btn" style="color: var(--color-danger);">Cancel Upload</button>
@@ -422,311 +1036,6 @@
 
   <script src="/js/toast.js"></script>
   <script src="/js/api.js"></script>
-  <script>
-    let currentUser = null;
-    let patientId = '';
-    let selectedFile = null;
-    let currentToken = '';
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      const pathParts = window.location.pathname.split('/');
-      patientId = pathParts[pathParts.length - 1];
-
-      currentUser = await loadUserProfile();
-      if (!currentUser) return;
-
-      if (currentUser.role !== 'RECORDS_STAFF') {
-        window.location.href = `/dashboard/patients/profile/${patientId}?error=unauthorized`;
-        return;
-      }
-
-      const mobileInitials = document.getElementById('mobile-user-initials');
-      if (mobileInitials && currentUser.full_name) {
-        mobileInitials.textContent = currentUser.full_name
-          .split(' ')
-          .map(n => n[0])
-          .join('')
-          .substring(0, 2)
-          .toUpperCase();
-      }
-
-      injectSidebarLinks(currentUser.role);
-      await loadPatientSummary();
-
-      const uploadZone = document.getElementById('upload-zone');
-      const fileInput = document.getElementById('document');
-      const filePreviewCard = document.getElementById('file-preview-card');
-      const fileNameEl = document.getElementById('file-name');
-      const fileSizeEl = document.getElementById('file-size');
-      const removeFileBtn = document.getElementById('remove-file-btn');
-      
-      const uploadStage = document.getElementById('upload-stage');
-      const ocrLoaderPanel = document.getElementById('ocr-loader-panel');
-      const ocrSubtitle = document.getElementById('ocr-status-subtitle');
-      const reviewPanel = document.getElementById('review-panel');
-
-      const reviewFilename = document.getElementById('review-filename');
-      const reviewCategory = document.getElementById('review-category');
-      const reviewExtractedText = document.getElementById('review-extracted-text');
-      const reviewConfidenceBadge = document.getElementById('review-confidence-badge');
-      const reviewConfidenceLevel = document.getElementById('review-confidence-level');
-      const reviewExplanationText = document.getElementById('review-explanation-text');
-      const reviewExplanationBanner = document.getElementById('review-explanation-banner');
-
-      uploadZone.addEventListener('click', () => fileInput.click());
-      
-      uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-      });
-
-      uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
-      });
-
-      uploadZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length > 0) {
-          handleFileSelection(e.dataTransfer.files[0]);
-        }
-      });
-
-      fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-          handleFileSelection(e.target.files[0]);
-        }
-      });
-
-      removeFileBtn.addEventListener('click', () => {
-        selectedFile = null;
-        fileInput.value = '';
-        filePreviewCard.style.display = 'none';
-        uploadZone.style.display = 'flex';
-      });
-
-      function handleFileSelection(file) {
-        const allowedExtensions = ['png', 'jpg', 'jpeg', 'pdf'];
-        const extension = file.name.split('.').pop().toLowerCase();
-        
-        if (!allowedExtensions.includes(extension)) {
-          showToast('Only PNG, JPG, JPEG, and PDF documents are supported.', 'error');
-          return;
-        }
-
-        selectedFile = file;
-        fileNameEl.textContent = file.name;
-        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-        fileSizeEl.textContent = `${sizeMb} MB`;
-        
-        uploadZone.style.display = 'none';
-        filePreviewCard.style.display = 'flex';
-      }
-
-      document.getElementById('back-profile-btn').addEventListener('click', () => {
-        window.location.href = `/dashboard/patients/profile/${patientId}`;
-      });
-
-      // Submit file for temporary processing / preview suggestions
-      document.getElementById('record-upload-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!selectedFile) {
-          showToast('Please select a healthcare document file first.', 'error');
-          return;
-        }
-
-        uploadStage.style.display = 'none';
-        ocrLoaderPanel.style.display = 'flex';
-        reviewPanel.style.display = 'none';
-
-        const extension = selectedFile.name.split('.').pop().toLowerCase();
-        if (['png', 'jpg', 'jpeg'].includes(extension)) {
-          ocrSubtitle.textContent = 'Running high-accuracy Tesseract character extraction and text classification rules. This takes 3-6 seconds.';
-        } else {
-          ocrSubtitle.textContent = 'Parsing PDF structure and extracting text. This can take several seconds depending on pages.';
-        }
-
-        const formData = new FormData();
-        formData.append('patient_id', patientId);
-        formData.append('document', selectedFile);
-
-        try {
-          const csrfHeaders = await API.getCsrfHeaders();
-          const response = await fetch('/api/records/ocr-preview', {
-            method: 'POST',
-            headers: csrfHeaders,
-            body: formData
-          });
-
-          const data = await response.json();
-          if (response.status === 401) {
-            window.location.href = '/login';
-            return;
-          }
-
-          if (!response.ok) {
-            throw new Error(data.message || `OCR preview failed with status code ${response.status}`);
-          }
-
-          if (data && data.success) {
-            currentToken = data.token;
-            const preview = data.preview;
-
-            reviewFilename.value = preview.file_name;
-            reviewCategory.value = preview.suggested_category;
-            reviewExtractedText.value = preview.extracted_text || '';
-            reviewExplanationText.textContent = `${preview.classification_reason} Matched words: [${(preview.matched_terms || []).join(', ')}]`;
-
-            reviewConfidenceBadge.className = 'confidence-badge';
-            if (preview.confidence_level === 'HIGH') {
-              reviewConfidenceBadge.classList.add('confidence-high');
-              reviewConfidenceLevel.textContent = 'HIGH CONFIDENCE';
-              reviewExplanationBanner.className = 'alert-banner alert-info';
-            } else if (preview.confidence_level === 'MEDIUM') {
-              reviewConfidenceBadge.classList.add('confidence-medium');
-              reviewConfidenceLevel.textContent = 'MEDIUM CONFIDENCE';
-              reviewExplanationBanner.className = 'alert-banner alert-warning';
-            } else {
-              reviewConfidenceBadge.classList.add('confidence-low');
-              reviewConfidenceLevel.textContent = 'LOW CONFIDENCE - REVIEW CAREFULLY';
-              reviewExplanationBanner.className = 'alert-banner alert-warning';
-              showToast('Low-confidence classification. Please confirm the document category manually.', 'warning');
-            }
-
-            ocrLoaderPanel.style.display = 'none';
-            reviewPanel.style.display = 'block';
-          }
-        } catch (err) {
-          showToast(err.message || 'An error occurred during text extraction scan.', 'error');
-          ocrLoaderPanel.style.display = 'none';
-          uploadStage.style.display = 'block';
-        }
-      });
-
-      // Confirm & Save record finalized submission
-      document.getElementById('record-confirm-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const confirmSaveBtn = document.getElementById('confirm-save-btn');
-        
-        confirmSaveBtn.classList.add('loading');
-        confirmSaveBtn.disabled = true;
-
-        const payload = {
-          token: currentToken,
-          file_name: reviewFilename.value,
-          record_type: reviewCategory.value,
-          extracted_text: reviewExtractedText.value
-        };
-
-        try {
-          const res = await API.postJson('/api/records/confirm-upload', payload);
-          if (res && res.success) {
-            showToast(res.message, 'success');
-            setTimeout(() => {
-              window.location.href = `/dashboard/patients/profile/${patientId}`;
-            }, 1000);
-          } else {
-            throw new Error(res.message || 'Confirmation failed.');
-          }
-        } catch (err) {
-          showToast(err.message || 'An error occurred while confirming document upload.', 'error');
-          confirmSaveBtn.classList.remove('loading');
-          confirmSaveBtn.disabled = false;
-        }
-      });
-
-      // Cancel temporary upload session
-      document.getElementById('review-cancel-btn').addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to discard this temporary upload? The file will be deleted.')) {
-          return;
-        }
-        
-        try {
-          const res = await API.postJson('/api/records/cancel-upload', { token: currentToken });
-          if (res && res.success) {
-            showToast(res.message, 'info');
-            resetUploadStage();
-          }
-        } catch (err) {
-          showToast('Failed to clean up upload session.', 'error');
-          resetUploadStage();
-        }
-      });
-
-      document.getElementById('review-retry-btn').addEventListener('click', () => {
-        resetUploadStage();
-      });
-
-      function resetUploadStage() {
-        currentToken = '';
-        selectedFile = null;
-        fileInput.value = '';
-        filePreviewCard.style.display = 'none';
-        uploadZone.style.display = 'flex';
-        reviewPanel.style.display = 'none';
-        uploadStage.style.display = 'block';
-      }
-
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
-      });
-    });
-
-    async function loadPatientSummary() {
-      try {
-        const res = await API.fetchJson(`/api/patients/${patientId}`);
-        if (res && res.success) {
-          const patient = res.patient;
-          document.getElementById('summary-number').textContent = patient.patient_number;
-          document.getElementById('summary-name').textContent = `${patient.first_name} ${patient.middle_name || ''} ${patient.last_name}`;
-          
-          const birthDate = new Date(patient.birth_date);
-          const options = { year: 'numeric', month: 'long', day: 'numeric' };
-          document.getElementById('summary-birthdate').textContent = birthDate.toLocaleDateString('en-US', options);
-          document.getElementById('summary-sex').textContent = patient.sex;
-        }
-      } catch (err) {
-        showToast('Failed to load patient demographics.', 'error');
-      }
-    }
-
-    function injectSidebarLinks(role) {
-      const navContainer = document.getElementById('layout-nav-links');
-      let linksHtml = '';
-
-      if (role === 'RECORDS_STAFF') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/records" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/duplicates" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Duplicate Warnings
-            </a>
-          </li>
-        `;
-      }
-
-      navContainer.innerHTML = linksHtml;
-    }
-  </script>
+  <script src="/js/record-upload.js"></script>
 </body>
 </html>

@@ -186,60 +186,67 @@ const DuplicateModel = {
 
   // Delete all PENDING flags for a patient (when they are updated, so we can re-evaluate)
   async deleteFlagsForPatient(patientId) {
-    if (isSupabase) {
-      const { error } = await dbClient
-        .from('duplicate_flags')
-        .delete()
-        .eq('status', 'PENDING')
-        .or(`patient_id.eq.${patientId},possible_duplicate_patient_id.eq.${patientId}`);
+    const db = readLocalData();
+    let flags = db.duplicate_flags || [];
+    flags = flags.filter(f => 
+      !(f.status === 'PENDING' && (f.patient_id === patientId || f.possible_duplicate_patient_id === patientId))
+    );
+    db.duplicate_flags = flags;
+    writeLocalData(db);
 
-      if (error) {
-        console.error('Supabase delete duplicate flags error:', error);
-        throw error;
+    if (isSupabase) {
+      try {
+        const { error } = await dbClient
+          .from('duplicate_flags')
+          .delete()
+          .eq('status', 'PENDING')
+          .or(`patient_id.eq.${patientId},possible_duplicate_patient_id.eq.${patientId}`);
+
+        if (error) {
+          console.error('Supabase delete duplicate flags error (handled locally):', error.message || error);
+        }
+      } catch (err) {
+        console.error('Supabase delete duplicate flags catch error (handled locally):', err.message || err);
       }
-      return true;
-    } else {
-      const db = readLocalData();
-      let flags = db.duplicate_flags || [];
-      flags = flags.filter(f => 
-        !(f.status === 'PENDING' && (f.patient_id === patientId || f.possible_duplicate_patient_id === patientId))
-      );
-      db.duplicate_flags = flags;
-      writeLocalData(db);
-      return true;
     }
+    return true;
   },
 
   // Update status for all duplicate flags involving a specific patient ID (e.g. set to MERGED)
   async updateFlagsStatusForPatient(patientId, status) {
-    if (isSupabase) {
-      const { data, error } = await dbClient
-        .from('duplicate_flags')
-        .update({ status })
-        .or(`patient_id.eq.${patientId},possible_duplicate_patient_id.eq.${patientId}`)
-        .select();
-
-      if (error) {
-        console.error('Supabase updateFlagsStatusForPatient error:', error);
-        throw error;
+    const db = readLocalData();
+    const flags = db.duplicate_flags || [];
+    const updated = flags.map(f => {
+      if (f.patient_id === patientId || f.possible_duplicate_patient_id === patientId) {
+        return {
+          ...f,
+          status
+        };
       }
-      return data;
-    } else {
-      const db = readLocalData();
-      const flags = db.duplicate_flags || [];
-      const updated = flags.map(f => {
-        if (f.patient_id === patientId || f.possible_duplicate_patient_id === patientId) {
-          return {
-            ...f,
-            status
-          };
+      return f;
+    });
+    db.duplicate_flags = updated;
+    writeLocalData(db);
+
+    if (isSupabase) {
+      try {
+        const { data, error } = await dbClient
+          .from('duplicate_flags')
+          .update({ status })
+          .or(`patient_id.eq.${patientId},possible_duplicate_patient_id.eq.${patientId}`)
+          .select();
+
+        if (error) {
+          console.error('Supabase updateFlagsStatusForPatient error (handled locally):', error.message || error);
+          return null;
         }
-        return f;
-      });
-      db.duplicate_flags = updated;
-      writeLocalData(db);
-      return true;
+        return data;
+      } catch (err) {
+        console.error('Supabase updateFlagsStatusForPatient catch error (handled locally):', err.message || err);
+        return null;
+      }
     }
+    return true;
   }
 };
 

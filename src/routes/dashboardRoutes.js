@@ -61,7 +61,7 @@ router.get('/reports',
 );
 
 // Patient Management Page Routes
-const ALLOWED_READ_ROLES = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL'];
+const ALLOWED_READ_ROLES = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
 const ALLOWED_WRITE_ROLES = ['RECORDS_STAFF'];
 
 router.get('/patients', 
@@ -100,6 +100,13 @@ router.get('/records/upload/:patientId',
   }
 );
 
+router.get('/records/view/:id',
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/record-view.html'));
+  }
+);
+
 router.get('/search',
   AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
   (req, res) => {
@@ -114,4 +121,12 @@ router.get('/duplicates',
   }
 );
 
+router.get('/archives',
+  AuthMiddleware.requirePageAuth(['RHU_ADMINISTRATOR', 'RECORDS_STAFF']),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/archives.html'));
+  }
+);
+
 module.exports = router;
+

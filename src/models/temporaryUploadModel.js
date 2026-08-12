@@ -103,6 +103,48 @@ const TemporaryUploadModel = {
     return list.find(t => t.token === token) || null;
   },
 
+  // Update temporary upload by token
+  async updateByToken(token, updates) {
+    if (isSupabase) {
+      try {
+        const { data, error } = await dbClient
+          .from('temporary_uploads')
+          .update(updates)
+          .eq('token', token)
+          .select();
+
+        if (error) {
+          if (error.code === 'PGRST205' || (error.message && error.message.includes('Could not find the table'))) {
+            return this.updateLocalTempByToken(token, updates);
+          }
+          console.error('Supabase update temporary upload by token error:', error);
+          throw error;
+        }
+        return data;
+      } catch (err) {
+        if (err.code === 'PGRST205' || (err.message && err.message.includes('Could not find the table'))) {
+          return this.updateLocalTempByToken(token, updates);
+        }
+        throw err;
+      }
+    } else {
+      return this.updateLocalTempByToken(token, updates);
+    }
+  },
+
+  updateLocalTempByToken(token, updates) {
+    const db = readLocalData();
+    const list = db.temporary_uploads || [];
+    const index = list.findIndex(t => t.token === token);
+    if (index !== -1) {
+      list[index] = { ...list[index], ...updates };
+      db.temporary_uploads = list;
+      writeLocalData(db);
+      return list[index];
+    }
+    return null;
+  },
+
   // Delete temporary upload by token
   async deleteByToken(token) {
     if (isSupabase) {

@@ -1,0 +1,309 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   + KEEP UP
+   PATIENT RECORD MANAGEMENT SYSTEM
+   RURAL HEALTH UNIT OF PAETE, LAGUNA
+
+   OFFICIAL ITR PAPER DOCUMENT DESIGN SYSTEM – LIGHT MODE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Main Paper Container */
+.itr-paper {
+  background: #FFFFFF;
+  color: #25282D;
+  padding: 36px 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(37, 40, 45, 0.08), 0 0 0 1px #e2e8f0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Red Medical Brand Top Stripe */
+.itr-paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #C62828;
+}
+
+/* Official Header Section */
+.itr-paper .header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.itr-paper .sub-header {
+  font-size: 11.5px;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.itr-paper .header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #25282D;
+  margin: 6px 0;
+  letter-spacing: -0.2px;
+  text-transform: uppercase;
+}
+
+.itr-paper .header h1 {
+  font-size: 24px;
+  font-weight: 900;
+  color: #C62828;
+  margin: 8px 0 4px 0;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+.itr-paper .header h3 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #718096;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Demographics Table Layout */
+.itr-paper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background: #FFFFFF;
+}
+
+.itr-paper table,
+.itr-paper th,
+.itr-paper td {
+  border: 1px solid #cbd5e1;
+}
+
+.itr-paper td,
+.itr-paper th {
+  padding: 10px 14px;
+  vertical-align: middle;
+}
+
+.itr-paper strong {
+  color: #25282D;
+  font-weight: 700;
+}
+
+/* Inputs styling inside ITR Paper (Real Handwriting baseline feel) */
+.itr-paper input[type="text"],
+.itr-paper input[type="number"],
+.itr-paper input[type="date"],
+.itr-paper select {
+  border: none;
+  border-bottom: 1.5px dashed #718096;
+  background: #F5F7FA;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #25282D;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+
+.itr-paper input[type="text"]:focus,
+.itr-paper input[type="number"]:focus,
+.itr-paper input[type="date"]:focus,
+.itr-paper select:focus {
+  outline: none;
+  border-bottom: 2px solid #C62828;
+  background: #FCE8E8;
+  box-shadow: 0 2px 4px rgba(198, 40, 40, 0.1);
+}
+
+.itr-paper input[type="text"]::placeholder,
+.itr-paper input[type="number"]::placeholder {
+  color: #a0aec0;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Middle 2-Column Grid Section */
+.itr-paper .grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 850px) {
+  .itr-paper .grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.itr-paper .col-left,
+.itr-paper .col-right {
+  background: #F5F7FA;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+
+/* Section Header Banners */
+.itr-paper .section-header {
+  background: #25282D;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin: 16px 0 12px 0;
+}
+
+.itr-paper .section-header:first-child {
+  margin-top: 0;
+}
+
+/* Styled Custom Checkboxes */
+.itr-paper .checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 14px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: #25282D;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.itr-paper .checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #C62828;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+/* Vital Signs Highlight Card */
+.itr-paper .vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  background: #FCE8E8;
+  border: 1.5px solid #fca5a5;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  color: #25282D;
+}
+
+.itr-paper .vitals-grid strong {
+  color: #C62828;
+}
+
+/* Consultation & Clinical Findings Table */
+.itr-paper .consultation-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.itr-paper .consultation-table th {
+  background: #25282D;
+  color: #FFFFFF;
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 10px;
+  text-align: left;
+  border: 1px solid #334155;
+}
+
+.itr-paper .consultation-table td {
+  padding: 10px;
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  vertical-align: top;
+}
+
+.itr-paper .consultation-table tr:nth-child(even) td {
+  background: #F5F7FA;
+}
+
+.itr-paper .consultation-table textarea,
+.itr-paper .consultation-table input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 12.5px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #FFFFFF;
+  color: #25282D;
+}
+
+.itr-paper .consultation-table textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.itr-paper .consultation-table textarea:focus,
+.itr-paper .consultation-table input:focus {
+  outline: none;
+  border-color: #C62828;
+  box-shadow: 0 0 0 2px rgba(198, 40, 40, 0.2);
+}
+
+.itr-paper .btn-delete-row {
+  background: #FCE8E8;
+  color: #C62828;
+  border: 1px solid #fca5a5;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.itr-paper .btn-delete-row:hover {
+  background: #C62828;
+  color: #FFFFFF;
+  border-color: #b71c1c;
+}
+
+/* Print Styles for ITR Paper */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .app-container, .sidebar, .mobile-header, .vtab-btn-group, .meta-summary-card, button, a {
+    display: none !important;
+  }
+  .itr-paper {
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+}

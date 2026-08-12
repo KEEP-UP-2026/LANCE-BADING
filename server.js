@@ -65,6 +65,11 @@ app.use('/api/search', searchRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/dashboard', dashboardRoutes);
 
+// Return JSON 404 for unmatched API routes (prevents "Unexpected token '<'" on frontend)
+app.use('/api', (req, res) => {
+  res.status(404).json({ success: false, message: `API route not found: ${req.method} ${req.originalUrl}` });
+});
+
 app.use((req, res) => {
   res.redirect('/');
 });

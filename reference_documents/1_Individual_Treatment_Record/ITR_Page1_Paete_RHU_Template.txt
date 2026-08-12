@@ -1,0 +1,74 @@
+=== HEALTH FACILITY HEADER ===
+Republic of the Philippines
+Province of Laguna
+Municipality of Paete
+PAETE RURAL HEALTH UNIT
+2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna
+Individual Treatment Record
+20 Years old and above
+
+=== PATIENT DEMOGRAPHICS ===
+NAME: 
+Philhealth No.: 
+ADDRESS: 
+Civil Status: 
+BIRTHDAY: 
+Age: 
+CP No: 
+Educational Attainment: 
+BHW: 
+
+=== LIFESTYLE & RISK FACTORS ===
+Smoking Cessation Profile:
+Smokers? [ ] Current  [ ] Passive  [ ] Never  [ ] Stopped > a year  [ ] Stopped < a year
+Brand of Cigarette?: 
+How many stick per day?: 
+Age started?: 
+No of years smoking?: 
+Reason for smoking?: 
+Have you experienced side effect or illness brought by smoking?: [ ] YES  [ ] NO
+If yes, What effect?: 
+Try quitting before?: [ ] YES  [ ] NO
+If yes, why were not successful?: 
+
+Family History (does pt. have 1st degree relative with):
+[ ] Hypertension  [ ] Stroke  [ ] Heart Attack  [ ] DM  [ ] Asthma  [ ] Cancer  [ ] Kidney Disease
+Co-Morbid: 
+Allergy: 
+
+Alcohol Intake:
+[ ] Never Consumed
+[ ] Yes, drinks alcohol
+Excessive Alcohol Intake (In the past mos., had 3 drinks in one occasion): [ ] YES  [ ] NO
+
+Physical Activity:
+Does at least 2 1/2 hours a week of moderate intensity physical activity: [ ] YES  [ ] NO
+
+High Fat / High Salt Food Intake:
+Eats processed / Fast foods and inihaw weekly: [ ] YES  [ ] NO
+
+Dietary Fiber Intake:
+3 servings of vegetables daily: [ ] YES  [ ] NO
+2-3 servings of fruits daily: [ ] YES  [ ] NO
+
+=== VITAL SIGNS & PHYSICAL MEASUREMENTS ===
+BMI: 
+RAISED BP: 
+WaistLine: 
+HT: 
+1st Reading: 
+WEIGHT: 
+2nd Reading: 
+
+=== CONSULTATION & CLINICAL FINDINGS ===
+Date: 
+Subjective Findings: 
+Objective Findings:
+  Risk Level: 
+  Percentage of Risk: 
+  AGE: 
+  WT: 
+  HT: 
+  BP: 
+Assessment/Diagnosis: 
+Plan/Treatment Plan: 

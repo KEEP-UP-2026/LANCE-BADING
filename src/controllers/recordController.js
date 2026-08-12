@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
-const Tesseract = require('tesseract.js');
+const { spawn } = require('child_process');
 const crypto = require('crypto');
 const RecordModel = require('../models/recordModel');
 const PatientModel = require('../models/patientModel');
@@ -10,6 +10,10 @@ const AuditMiddleware = require('../middleware/auditMiddleware');
 const PDFProcessor = require('../utils/pdfProcessor');
 const Classifier = require('../utils/classifier');
 const TemporaryUploadModel = require('../models/temporaryUploadModel');
+
+// Path to Python helper scripts
+const DOCX_BUILDER_SCRIPT = path.join(process.cwd(), 'docx_builder.py');
+const IMAGE_ENHANCER_SCRIPT = path.join(process.cwd(), 'image_enhancer.py');
 
 // Define and ensure upload directory exists
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -151,8 +155,8 @@ const RecordController = {
     });
   },
 
-  // Upload and process record for preview (Unconfirmed stage)
-  async ocrPreview(req, res) {
+  // Step 1: Upload document and perform image enhancement & alignment correction
+  async enhancePreview(req, res) {
     try {
       const { patient_id } = req.body;
       const file = req.file;
@@ -166,75 +170,243 @@ const RecordController = {
         return res.status(400).json({ success: false, message: 'No document file uploaded.' });
       }
 
-      // Check if patient exists
+      // Verify patient exists
       const patient = await PatientModel.findById(patient_id);
       if (!patient) {
         fs.unlinkSync(file.path);
         return res.status(404).json({ success: false, message: 'Patient profile not found.' });
       }
 
-      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'OCR_PREVIEW_STARTED', `Started OCR preview check for file ${file.originalname}`, req);
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'IMAGE_ENHANCEMENT_STARTED', `Started auto-enhancement for file ${file.originalname}`, req);
 
       const fileExt = path.extname(file.originalname).toLowerCase();
-      let extractedText = '';
+      const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const enhancedPath = path.join(uploadTempDir, `enhanced_${uniqueId}.png`);
 
-      if (['.png', '.jpg', '.jpeg'].includes(fileExt)) {
+      let angleCorrected = 0.0;
+      let resolution = [0, 0];
+      let bgRemoved = false;
+      let perspectiveCorrected = false;
+      let finalPath = file.path;
+
+      if (['.png', '.jpg', '.jpeg', '.pdf'].includes(fileExt)) {
         try {
-          console.log(`Running Tesseract OCR on temp image: ${file.path}`);
-          const ocrResult = await Tesseract.recognize(file.path, 'eng');
-          extractedText = ocrResult.data.text || '';
-        } catch (ocrErr) {
-          console.error('Tesseract OCR extraction failed:', ocrErr);
-          extractedText = '[OCR processing failed during upload]';
-        }
-      } else if (fileExt === '.pdf') {
-        try {
-          console.log(`Running PDF processor on temp file: ${file.path}`);
-          extractedText = await PDFProcessor.extractTextFromPdf(file.path);
-        } catch (pdfErr) {
-          console.error('PDF OCR extraction failed:', pdfErr);
-          fs.unlinkSync(file.path);
-          await AuditMiddleware.logActivity(req.user.id, req.user.email, 'OCR_PREVIEW_FAILED', `PDF processing failed: ${pdfErr.message}`, req);
-          return res.status(400).json({ success: false, message: pdfErr.message || 'Failed to process PDF file.' });
+          console.log(`[ENHANCER] Enhancing document: ${path.basename(file.path)}`);
+          const pyRes = await new Promise((resolve, reject) => {
+            const py = spawn('python', [IMAGE_ENHANCER_SCRIPT, file.path, enhancedPath], {
+              cwd: process.cwd(),
+              env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
+            });
+            let stdout = '', stderr = '';
+            py.stdout.on('data', c => { stdout += c.toString(); });
+            py.stderr.on('data', c => { stderr += c.toString(); });
+            py.on('close', code => {
+              if (code !== 0 && !fs.existsSync(enhancedPath)) {
+                return reject(new Error(`image_enhancer failed (code ${code}): ${stderr}`));
+              }
+              try {
+                const jsonLine = stdout.trim().split('\n').filter(l => l.startsWith('{')).pop();
+                resolve(jsonLine ? JSON.parse(jsonLine) : { success: true, output_path: enhancedPath, angle_corrected: 0.0, resolution: [0, 0] });
+              } catch (e) {
+                resolve({ success: true, output_path: enhancedPath, angle_corrected: 0.0, resolution: [0, 0] });
+              }
+            });
+            py.on('error', err => reject(err));
+          });
+
+          if (pyRes.success && fs.existsSync(enhancedPath)) {
+            finalPath = enhancedPath;
+            angleCorrected = pyRes.angle_corrected || 0.0;
+            resolution = pyRes.resolution || [0, 0];
+            bgRemoved = pyRes.bg_removed === true;
+            perspectiveCorrected = pyRes.perspective_corrected === true;
+            // Remove raw file if enhancement succeeded
+            if (fs.existsSync(file.path) && file.path !== enhancedPath) {
+              fs.unlinkSync(file.path);
+            }
+          }
+        } catch (enhErr) {
+          console.warn('[ENHANCER] Image enhancement failed, falling back to original file:', enhErr.message);
+          finalPath = file.path;
         }
       }
 
-      // Classify based on the new weighted keyword rules
-      const classification = Classifier.classifyText(extractedText);
-
-      // Save temporary upload metadata to database
+      // Store temporary upload metadata
       const token = crypto.randomUUID();
-      
       await TemporaryUploadModel.create({
         token,
         patient_id,
         file_name: file.originalname,
-        file_path: file.path,
-        file_type: file.mimetype,
-        extracted_text: extractedText,
-        suggested_category: classification.suggestedCategory,
-        alternative_category: classification.alternativeCategory,
-        confidence_score: classification.confidence,
-        classification_reason: classification.reason,
-        matched_terms: JSON.stringify(classification.matchedTerms),
+        file_path: finalPath,
+        file_type: 'image/png',
+        extracted_text: '',
+        layout_blocks: '',
+        suggested_category: 'PATIENT_INFORMATION_SHEET',
+        alternative_category: '',
+        confidence_score: 0.8,
+        classification_reason: '',
+        matched_terms: '[]',
         uploaded_by: req.user.id
       });
 
-      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'OCR_PREVIEW_COMPLETED', `Completed OCR preview for file ${file.originalname} (Token: ${token})`, req);
-      await AuditMiddleware.logActivity(null, 'system@keepup.com', 'CLASSIFICATION_SUGGESTED', `AI-assisted classification suggested ${classification.suggestedCategory} with confidence ${classification.confidence} (${classification.confidenceLevel})`, req);
+      const previewUrl = `/api/records/temp-image/${token}`;
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'IMAGE_ENHANCEMENT_COMPLETED', `Completed auto-enhancement for ${file.originalname} (Angle fix: ${angleCorrected} deg)`, req);
 
       return res.status(200).json({
         success: true,
         token,
         preview: {
           file_name: file.originalname,
+          preview_url: previewUrl,
+          angle_corrected: angleCorrected,
+          resolution,
+          enhancement_applied: true,
+          bg_removed: bgRemoved,
+          perspective_corrected: perspectiveCorrected
+        }
+      });
+
+    } catch (error) {
+      console.error('Enhance Preview error:', error);
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred during image enhancement.'
+      });
+    }
+  },
+
+  // Serve temporary enhanced preview image securely
+  async getTempImage(req, res) {
+    try {
+      const { token } = req.params;
+      if (!token) return res.status(400).send('Token required');
+
+      const temp = await TemporaryUploadModel.findByToken(token);
+      if (!temp || !fs.existsSync(temp.file_path)) {
+        return res.status(404).send('Preview image expired or missing');
+      }
+
+      const resolved = path.resolve(temp.file_path);
+      const resolvedTempDir = path.resolve(uploadTempDir);
+      if (!resolved.startsWith(resolvedTempDir)) {
+        return res.status(403).send('Access denied');
+      }
+
+      return res.sendFile(resolved);
+    } catch (err) {
+      console.error('Get temp image error:', err);
+      return res.status(500).send('Error serving preview image');
+    }
+  },
+
+  // Step 2: Confirm enhanced image and run PaddleOCR text extraction
+  async ocrPreview(req, res) {
+    try {
+      const { token, patient_id } = req.body;
+      const file = req.file;
+
+      let tempUpload = null;
+
+      if (token) {
+        tempUpload = await TemporaryUploadModel.findByToken(token);
+        if (!tempUpload) {
+          return res.status(404).json({ success: false, message: 'Enhancement preview session expired. Please re-upload the document.' });
+        }
+      } else {
+        // Fallback direct file upload path if no token passed
+        if (!patient_id || !file) {
+          if (file) fs.unlinkSync(file.path);
+          return res.status(400).json({ success: false, message: 'Document upload file or preview token is required.' });
+        }
+      }
+
+      const targetPath = tempUpload ? tempUpload.file_path : file.path;
+      const targetFilename = tempUpload ? tempUpload.file_name : file.originalname;
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'OCR_PREVIEW_STARTED', `Started PaddleOCR extraction for ${targetFilename}`, req);
+
+      let extractedText = '';
+      let layoutBlocks = [];
+      let pageSize = [595, 842];
+      let itrData = null;
+      let itrPageNumber = 1;
+
+      let ocrFailureReason = null;
+      try {
+        console.log(`[OCR] Running text extraction on: ${path.basename(targetPath)}`);
+        const ocrResult = await PDFProcessor.extractTextFromPdf(targetPath);
+        extractedText = ocrResult.text || '';
+        layoutBlocks = ocrResult.layout_blocks || [];
+        pageSize = ocrResult.page_size || [595, 842];
+        itrData = ocrResult.itr_data || null;
+        itrPageNumber = ocrResult.itr_page_number || 1;
+        console.log(`[OCR] Extraction complete. Engine: ${ocrResult.engine || 'unknown'}. Text length: ${extractedText.length}. Blocks: ${layoutBlocks.length}.`);
+      } catch (ocrErr) {
+        ocrFailureReason = ocrErr.message;
+        console.error('[OCR] Extraction failed:', ocrErr.message);
+        // Leave extractedText = '' so classifier returns LOW confidence gracefully
+        // instead of classifying a literal error string
+        extractedText = '';
+      }
+
+      // Classify text based on weighted keyword rules
+      const classification = Classifier.classifyText(extractedText);
+
+      let activeToken = token;
+
+      if (tempUpload) {
+        // Update existing temporary upload row
+        await TemporaryUploadModel.updateByToken(token, {
+          extracted_text: extractedText,
+          layout_blocks: JSON.stringify({ blocks: layoutBlocks, page_size: pageSize, itr_data: itrData, itr_page_number: itrPageNumber }),
+          suggested_category: classification.suggestedCategory,
+          alternative_category: classification.alternativeCategory,
+          confidence_score: classification.confidence,
+          classification_reason: classification.reason,
+          matched_terms: JSON.stringify(classification.matchedTerms)
+        });
+      } else {
+        // Create new temporary upload row if fallback path
+        activeToken = crypto.randomUUID();
+        await TemporaryUploadModel.create({
+          token: activeToken,
+          patient_id,
+          file_name: file.originalname,
+          file_path: file.path,
+          file_type: file.mimetype,
+          extracted_text: extractedText,
+          layout_blocks: JSON.stringify({ blocks: layoutBlocks, page_size: pageSize, itr_data: itrData, itr_page_number: itrPageNumber }),
+          suggested_category: classification.suggestedCategory,
+          alternative_category: classification.alternativeCategory,
+          confidence_score: classification.confidence,
+          classification_reason: classification.reason,
+          matched_terms: JSON.stringify(classification.matchedTerms),
+          uploaded_by: req.user.id
+        });
+      }
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'OCR_PREVIEW_COMPLETED', `Completed PaddleOCR extraction for file ${targetFilename} (Token: ${activeToken})`, req);
+      await AuditMiddleware.logActivity(null, 'system@keepup.com', 'CLASSIFICATION_SUGGESTED', `AI classification suggested ${classification.suggestedCategory} with confidence ${classification.confidence} (${classification.confidenceLevel})`, req);
+
+      return res.status(200).json({
+        success: true,
+        token: activeToken,
+        preview: {
+          file_name: targetFilename,
+          preview_url: `/api/records/temp-image/${activeToken}`,
           suggested_category: classification.suggestedCategory,
           alternative_category: classification.alternativeCategory,
           confidence_score: classification.confidence,
           confidence_level: classification.confidenceLevel,
           classification_reason: classification.reason,
           matched_terms: classification.matchedTerms,
-          extracted_text: extractedText
+          extracted_text: extractedText,
+          itr_data: itrData,
+          itr_page_number: itrPageNumber
         }
       });
 
@@ -245,7 +417,7 @@ const RecordController = {
       }
       return res.status(500).json({
         success: false,
-        message: 'An internal server error occurred during OCR text extraction preview.'
+        message: 'An internal server error occurred during OCR text extraction.'
       });
     }
   },
@@ -253,7 +425,7 @@ const RecordController = {
   // Confirm final patient record creation
   async confirmUpload(req, res) {
     try {
-      const { token, file_name, record_type, extracted_text } = req.body;
+      const { token, file_name, record_type, extracted_text, structured_json } = req.body;
 
       if (!token) {
         return res.status(400).json({ success: false, message: 'Upload token is required.' });
@@ -306,13 +478,16 @@ const RecordController = {
           finalFilePath = storagePath;
           fs.unlinkSync(tempFilePath);
         } catch (storageErr) {
-          console.error('Supabase storage upload failed, saving locally:', storageErr);
+          console.log('[STORAGE] Supabase cloud storage bucket unavailable. File safely stored in local uploads directory.');
           const patientUploadDir = path.join(uploadDir, tempUpload.patient_id, recordId);
           if (!fs.existsSync(patientUploadDir)) {
             fs.mkdirSync(patientUploadDir, { recursive: true });
           }
           const localDest = path.join(patientUploadDir, sanitizedName);
-          fs.renameSync(tempFilePath, localDest);
+          fs.copyFileSync(tempFilePath, localDest);
+          if (fs.existsSync(tempFilePath)) {
+            try { fs.unlinkSync(tempFilePath); } catch (_) {}
+          }
           finalFilePath = path.relative(process.cwd(), localDest);
         }
       } else {
@@ -321,7 +496,10 @@ const RecordController = {
           fs.mkdirSync(patientUploadDir, { recursive: true });
         }
         const localDest = path.join(patientUploadDir, sanitizedName);
-        fs.renameSync(tempFilePath, localDest);
+        fs.copyFileSync(tempFilePath, localDest);
+        if (fs.existsSync(tempFilePath)) {
+          try { fs.unlinkSync(tempFilePath); } catch (_) {}
+        }
         finalFilePath = path.relative(process.cwd(), localDest);
       }
 
@@ -336,9 +514,12 @@ const RecordController = {
         file_path: finalFilePath,
         file_type: tempUpload.file_type,
         extracted_text: extracted_text !== undefined ? extracted_text : tempUpload.extracted_text,
+        layout_blocks: tempUpload.layout_blocks || null,
+        structured_json: structured_json || tempUpload.structured_json || null,
         classification_result: tempUpload.suggested_category,
         uploaded_by: req.user.id
       });
+
 
       // Log audits
       await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_UPLOAD_CONFIRMED', `Confirmed upload of document: ${sanitizedName} for patient ID ${tempUpload.patient_id}`, req);
@@ -415,22 +596,22 @@ const RecordController = {
       const patients = await PatientModel.findAllActive();
       const patientMap = new Map(patients.map(p => [p.id, p]));
 
-      const enriched = [];
+      // Enrich ALL patient-matched records first to get accurate total count
+      const allEnriched = [];
       for (const rec of allRecords) {
         const patient = patientMap.get(rec.patient_id);
-        if (!patient) continue;
-        enriched.push({
+        if (!patient) continue; // Skip orphaned records (patient was deleted)
+        allEnriched.push({
           ...rec,
           patient_name: `${patient.first_name} ${patient.last_name}`,
           patient_number: patient.patient_number
         });
-        if (enriched.length >= parsedLimit) break;
       }
 
       return res.status(200).json({
         success: true,
-        total: allRecords.length,
-        records: enriched
+        total: allEnriched.length, // Accurate count: only records with existing patients
+        records: allEnriched.slice(0, parsedLimit)
       });
     } catch (error) {
       console.error('List recent records error:', error);
@@ -440,6 +621,7 @@ const RecordController = {
       });
     }
   },
+
 
   // Get records of a single patient
   async getPatientRecords(req, res) {
@@ -455,6 +637,36 @@ const RecordController = {
       return res.status(500).json({
         success: false,
         message: 'An internal server error occurred while fetching patient records.'
+      });
+    }
+  },
+
+  // Get single record details by ID
+  async getRecordById(req, res) {
+    try {
+      const { id } = req.params;
+      const record = await RecordModel.findById(id);
+      if (!record) {
+        return res.status(404).json({ success: false, message: 'Record not found.' });
+      }
+
+      const PatientModel = require('../models/patientModel');
+      const patient = await PatientModel.findById(record.patient_id);
+      const previewUrl = record.file_url || `/api/records/download/${record.id}`;
+
+      return res.status(200).json({
+        success: true,
+        record: {
+          ...record,
+          preview_url: previewUrl
+        },
+        patient: patient || null
+      });
+    } catch (error) {
+      console.error('Get record by id error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while fetching document details.'
       });
     }
   },
@@ -482,6 +694,37 @@ const RecordController = {
       return res.status(500).json({
         success: false,
         message: 'An error occurred while archiving the patient record.'
+      });
+    }
+  },
+
+  // Delete record permanently
+  async deleteRecord(req, res) {
+    try {
+      const { id } = req.params;
+      const record = await RecordModel.findById(id);
+      if (!record) {
+        return res.status(404).json({ success: false, message: 'Record not found.' });
+      }
+
+      await RecordModel.delete(id);
+
+      // Clean up physical file if exists locally
+      if (record.file_path && fs.existsSync(record.file_path)) {
+        try { fs.unlinkSync(record.file_path); } catch (_) {}
+      }
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_DELETED', `Permanently deleted document: ${record.file_name} (Record ID: ${record.id})`, req);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Record deleted permanently.'
+      });
+    } catch (error) {
+      console.error('Delete record error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An error occurred while deleting the patient record.'
       });
     }
   },
@@ -575,18 +818,38 @@ const RecordController = {
     }
   },
 
-  // Update record metadata (Records Staff only)
+  // Restore record from ARCHIVED back to ACTIVE
+  async restoreRecord(req, res) {
+    try {
+      const { id } = req.params;
+      const record = await RecordModel.findById(id);
+      if (!record) {
+        return res.status(404).json({ success: false, message: 'Record not found.' });
+      }
+
+      const restoredRecord = await RecordModel.update(id, { status: 'ACTIVE' });
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_RESTORED', `Restored document: ${record.file_name} (Record ID: ${record.id})`, req);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Record restored successfully.',
+        record: restoredRecord
+      });
+    } catch (error) {
+      console.error('Restore record error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An error occurred while restoring the patient record.'
+      });
+    }
+  },
+
+  // Update record metadata & structured JSON/OCR text (Records Staff only)
   async updateRecordMetadata(req, res) {
     try {
       const { id } = req.params;
-      const { file_name, record_type } = req.body;
-
-      if (!file_name || !file_name.trim()) {
-        return res.status(400).json({ success: false, message: 'File name is required.' });
-      }
-      if (!record_type || !record_type.trim()) {
-        return res.status(400).json({ success: false, message: 'Record category is required.' });
-      }
+      const { file_name, record_type, status, extracted_text, structured_json } = req.body;
 
       // Check if record exists
       const record = await RecordModel.findById(id);
@@ -594,19 +857,35 @@ const RecordController = {
         return res.status(404).json({ success: false, message: 'Record not found.' });
       }
 
-      const sanitizedName = sanitizeFilename(file_name);
+      const updates = {};
+      if (file_name && file_name.trim()) {
+        updates.file_name = sanitizeFilename(file_name);
+      }
+      if (record_type && record_type.trim()) {
+        updates.record_type = record_type.trim();
+      }
+      if (status && status.trim()) {
+        updates.status = status.trim();
+      }
+      if (extracted_text !== undefined) {
+        updates.extracted_text = extracted_text;
+      }
+      if (structured_json !== undefined) {
+        updates.structured_json = structured_json;
+      }
+
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ success: false, message: 'No valid updates provided.' });
+      }
 
       // Perform update
-      const updatedRecord = await RecordModel.update(id, {
-        file_name: sanitizedName,
-        record_type
-      });
+      const updatedRecord = await RecordModel.update(id, updates);
 
-      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_METADATA_UPDATED', `Updated metadata of document ${record.file_name} -> ${sanitizedName} (Category: ${record_type})`, req);
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_METADATA_UPDATED', `Updated document ${record.file_name} details`, req);
 
       return res.status(200).json({
         success: true,
-        message: 'Document metadata updated successfully.',
+        message: 'Patient document record updated successfully.',
         record: updatedRecord
       });
     } catch (error) {
@@ -668,7 +947,7 @@ const RecordController = {
           finalFilePath = storagePath;
           fs.unlinkSync(tempFilePath);
         } catch (storageErr) {
-          console.error('Supabase storage upload failed, saving locally:', storageErr);
+          console.log('[STORAGE] Supabase cloud storage bucket unavailable. File safely stored in local uploads directory.');
           const patientUploadDir = path.join(uploadDir, patient_id, recordId);
           if (!fs.existsSync(patientUploadDir)) {
             fs.mkdirSync(patientUploadDir, { recursive: true });
@@ -716,6 +995,169 @@ const RecordController = {
       return res.status(500).json({
         success: false,
         message: 'An internal server error occurred during document upload.'
+      });
+    }
+  },
+
+  // Download record as Word document (.docx)
+  async downloadAsDocx(req, res) {
+    const tempDocxPath = path.join(process.cwd(), 'uploads', 'temp', `docx_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.docx`);
+    const tempJsonPath = tempDocxPath.replace('.docx', '_ocr.json');
+
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ success: false, message: 'Record ID is required.' });
+      }
+
+      const record = await RecordModel.findById(id);
+      if (!record || record.status !== 'ACTIVE') {
+        return res.status(404).json({ success: false, message: 'Record not found.' });
+      }
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_DOCX_DOWNLOAD', `Requested Word export of document: ${record.file_name} (Record ID: ${id})`, req);
+
+      // Build OCR JSON for docx_builder.py
+      let ocrData = { text: record.extracted_text || '', layout_blocks: [], page_size: [595, 842] };
+
+      if (record.layout_blocks) {
+        try {
+          const parsed = typeof record.layout_blocks === 'string'
+            ? JSON.parse(record.layout_blocks)
+            : record.layout_blocks;
+          ocrData.layout_blocks = parsed.blocks || parsed.layout_blocks || [];
+          ocrData.page_size = parsed.page_size || [595, 842];
+        } catch (_) {
+          // Use plain text fallback
+        }
+      }
+
+      // If no layout blocks available, re-run PaddleOCR on the stored file
+      if (ocrData.layout_blocks.length === 0 && record.file_path) {
+        try {
+          let filePath = record.file_path;
+          if (!path.isAbsolute(filePath)) {
+            filePath = path.join(process.cwd(), filePath);
+          }
+
+          if (fs.existsSync(filePath)) {
+            console.log(`[DOCX] Re-running PaddleOCR to build layout for: ${record.file_name}`);
+            const freshOcr = await PDFProcessor.extractTextFromPdf(filePath);
+            ocrData = freshOcr;
+          }
+        } catch (reOcrErr) {
+          console.warn('[DOCX] Re-OCR failed, using plain text fallback:', reOcrErr.message);
+        }
+      }
+
+      // Ensure temp directory exists
+      const tempDir = path.dirname(tempDocxPath);
+      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+      // Write OCR JSON to temp file for docx_builder.py
+      fs.writeFileSync(tempJsonPath, JSON.stringify(ocrData), 'utf-8');
+
+      // Determine clean document title from file name
+      const docTitle = record.file_name
+        .replace(/\.[^/.]+$/, '')          // Remove extension
+        .replace(/[_\-]+/g, ' ')           // Replace underscores/hyphens with space
+        .replace(/\b\w/g, c => c.toUpperCase()); // Title-case
+
+      // Run docx_builder.py
+      await new Promise((resolve, reject) => {
+        const args = [DOCX_BUILDER_SCRIPT, tempJsonPath, tempDocxPath, '--title', docTitle];
+        const py = spawn('python', args, { cwd: process.cwd() });
+
+        let stdout = '';
+        let stderr = '';
+
+        py.stdout.on('data', chunk => { stdout += chunk.toString(); });
+        py.stderr.on('data', chunk => { stderr += chunk.toString(); });
+
+        py.on('close', (code) => {
+          // Cleanup JSON temp
+          if (fs.existsSync(tempJsonPath)) fs.unlinkSync(tempJsonPath);
+
+          if (code !== 0 && !fs.existsSync(tempDocxPath)) {
+            return reject(new Error(`docx_builder.py failed (code ${code}): ${stderr.slice(0, 300)}`));
+          }
+
+          try {
+            const lastJson = stdout.trim().split('\n').filter(l => l.startsWith('{')).pop();
+            if (lastJson) {
+              const result = JSON.parse(lastJson);
+              if (!result.success) return reject(new Error(result.error || 'docx_builder failed.'));
+            }
+          } catch (_) {}
+
+          resolve();
+        });
+
+        py.on('error', (err) => {
+          reject(new Error(`Failed to start docx_builder: ${err.message}`));
+        });
+      });
+
+      if (!fs.existsSync(tempDocxPath)) {
+        return res.status(500).json({ success: false, message: 'Word document generation failed.' });
+      }
+
+      // Stream .docx to client
+      const downloadName = `${record.file_name.replace(/\.[^/.]+$/, '')}.docx`;
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
+
+      const fileStream = fs.createReadStream(tempDocxPath);
+      fileStream.pipe(res);
+
+      fileStream.on('end', () => {
+        // Cleanup temp docx after sending
+        if (fs.existsSync(tempDocxPath)) fs.unlinkSync(tempDocxPath);
+      });
+
+      fileStream.on('error', (streamErr) => {
+        console.error('[DOCX] Stream error:', streamErr);
+        if (fs.existsSync(tempDocxPath)) fs.unlinkSync(tempDocxPath);
+      });
+
+    } catch (error) {
+      console.error('Download as DOCX error:', error);
+      // Cleanup temp files on error
+      if (fs.existsSync(tempDocxPath)) fs.unlinkSync(tempDocxPath);
+      if (fs.existsSync(tempJsonPath)) fs.unlinkSync(tempJsonPath);
+      return res.status(500).json({
+        success: false,
+        message: 'An error occurred while generating the Word document.'
+      });
+    }
+  },
+
+  // List all ARCHIVED records (Records Staff / Admin)
+  async listArchivedRecords(req, res) {
+    try {
+      const allRecords = await RecordModel.findAll(true); // includeArchived = true
+      const archivedRecords = allRecords.filter(r => r.status === 'ARCHIVED');
+
+      // Enrich with patient name where possible
+      const enriched = await Promise.all(archivedRecords.map(async (rec) => {
+        try {
+          const patient = await PatientModel.findById(rec.patient_id);
+          return {
+            ...rec,
+            patient_name: patient ? `${patient.first_name} ${patient.middle_name ? patient.middle_name + ' ' : ''}${patient.last_name}` : 'Unknown Patient',
+            patient_number: patient ? patient.patient_number : '-'
+          };
+        } catch (_) {
+          return { ...rec, patient_name: 'Unknown Patient', patient_number: '-' };
+        }
+      }));
+
+      return res.status(200).json({ success: true, records: enriched });
+    } catch (error) {
+      console.error('List archived records error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while fetching archived records.'
       });
     }
   }

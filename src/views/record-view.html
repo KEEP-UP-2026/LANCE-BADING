@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Document Record - KEEP UP System</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/itr-paper.css">
+  <style>
+    .vtab-btn-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .vtab-btn {
+      background: #F5F7FA;
+      border: 1px solid #cbd5e1;
+      color: #25282D;
+      padding: 12px 22px;
+      border-radius: var(--border-radius-sm);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+    .vtab-btn:hover {
+      background: #FCE8E8;
+      color: #C62828;
+      border-color: #fca5a5;
+    }
+    .vtab-btn.active {
+      background: #C62828;
+      border-color: #C62828;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(198, 40, 40, 0.3);
+    }
+    .vtab-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .vtab-content {
+      animation: fadeIn 0.35s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .extracted-text-area {
+      width: 100%;
+      min-height: 520px;
+      background: #FFFFFF;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--border-radius-sm);
+      padding: 20px;
+      color: #25282D;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    .extracted-text-area:focus {
+      outline: none;
+      border-color: #C62828;
+      box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15);
+    }
+    .meta-summary-card {
+      background: #F5F7FA;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--border-radius-md);
+      padding: 18px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .patient-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #FCE8E8;
+      border: 1px solid #fca5a5;
+      padding: 10px 20px;
+      border-radius: 30px;
+      color: #C62828;
+      font-size: 14px;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar Drawer -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <!-- Dynamic navigation links based on role -->
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically by JS -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <!-- Main Container Card -->
+      <div class="content-card glass-panel" style="margin-top: 20px; max-width: 1200px;" id="main-content-card">
+        
+        <!-- Header Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <a href="#" id="back-to-profile-link" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+            <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            Back to Patient Profile
+          </a>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <span class="badge badge-active" id="record-status-badge">ACTIVE</span>
+          </div>
+        </div>
+
+        <!-- Patient Demographics Summary Bar -->
+        <div class="meta-summary-card">
+          <div class="patient-pill">
+            <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+            <span id="summary-patient-number">PAT-XXXX-XXXX</span> •
+            <span id="summary-patient-name" style="color: #25282D; font-weight: 800;">Loading Patient...</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text-secondary);">
+            <strong>Sex:</strong> <span id="summary-sex">-</span> &nbsp;|&nbsp;
+            <strong>Birthdate:</strong> <span id="summary-birthdate">-</span>
+          </div>
+        </div>
+
+        <form id="record-update-form">
+          <!-- Document Metadata Controls -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="review-filename">Document Filename</label>
+              <input type="text" class="form-control" id="review-filename" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="review-category">Record Category Binder</label>
+              <select class="form-select" id="review-category" required>
+                <option value="PATIENT_INFORMATION_SHEET">Individual Treatment Record</option>
+                <option value="CONSULTATION_RECORD">Consultation Records</option>
+                <option value="IMMUNIZATION_RECORD">Immunizations</option>
+                <option value="MATERNAL_CARE_RECORD">Maternal Care</option>
+                <option value="OTHER">Other Health Records</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tab Switcher -->
+          <div class="vtab-btn-group">
+            <button type="button" class="vtab-btn active" id="vtab-btn-form" onclick="switchVerificationTab('form')">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              Verification Form (Structured ITR)
+            </button>
+            <button type="button" class="vtab-btn" id="vtab-btn-scan" onclick="switchVerificationTab('scan')">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              Original Document File / Scan
+            </button>
+            <button type="button" class="vtab-btn" id="vtab-btn-text" onclick="switchVerificationTab('text')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              Extracted Digital Text (OCR Result)
+            </button>
+          </div>
+
+          <!-- TAB CONTENT 1: STRUCTURED INFORMATION FORM (OFFICIAL ITR PAPER LAYOUT) -->
+          <div id="vtab-content-form" class="vtab-content" style="display: block;">
+            <div class="itr-paper">
+              <!-- HEADER -->
+              <div class="header">
+                  <div class="sub-header">Republic of the Philippines</div>
+                  <div class="sub-header">Province of Laguna</div>
+                  <div class="sub-header">Municipality of Paete</div>
+                  <h2>PAETE RURAL HEALTH UNIT</h2>
+                  <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                  <h1>Individual Treatment Record</h1>
+                  <h3>20 Years old and above</h3>
+              </div>
+
+              <!-- DEMOGRAPHICS TABLE -->
+              <table>
+                  <tr>
+                      <td style="width: 60%;">
+                          <strong>NAME:</strong> <input type="text" id="itr-field-name" style="width: 75%;" placeholder="">
+                      </td>
+                      <td style="width: 40%;">
+                          <strong>Philhealth No.:</strong> <input type="text" id="itr-field-philhealth" style="width: 60%;" placeholder="">
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <strong>ADDRESS:</strong> <input type="text" id="itr-field-address" style="width: 75%;" placeholder="">
+                      </td>
+                      <td>
+                          <strong>Civil Status:</strong> <input type="text" id="itr-field-civilstatus" style="width: 60%;" placeholder="">
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <div style="display: flex; justify-content: space-between; align-items: center;">
+                              <div><strong>BIRTHDAY:</strong> <input type="text" id="itr-field-birthday" style="width: 130px;" placeholder=""></div>
+                              <div style="margin-right: 20px;"><strong>Age:</strong> <input type="number" id="itr-field-age" style="width: 50px;" placeholder=""></div>
+                          </div>
+                      </td>
+                      <td>
+                          <strong>CP No:</strong> <input type="text" id="itr-field-cpno" style="width: 70%;" placeholder="">
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>
+                          <strong>Educational Attainment:</strong> <input type="text" id="itr-field-education" style="width: 50%;" placeholder="">
+                      </td>
+                      <td>
+                          <strong>BHW:</strong> <input type="text" id="itr-field-bhw" style="width: 75%;" placeholder="">
+                      </td>
+                  </tr>
+              </table>
+
+              <!-- MIDDLE LIFESTYLE & RISK FACTORS SECTION -->
+              <div class="grid-2col">
+                  <!-- LEFT COLUMN -->
+                  <div class="col-left">
+                      <div class="section-header">Smoking Cessation Profile:</div>
+                      <div style="margin-bottom: 8px;">
+                          <strong>Smokers?</strong><br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-current"> Current</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-passive"> Passive</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-never"> Never</label><br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-gt1yr"> Stopped &gt; a year</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-lt1yr"> Stopped &lt; a year</label>
+                      </div>
+
+                      <div style="margin-bottom: 6px;">
+                          <strong>Brand of Cigarette?</strong> <input type="text" id="itr-field-smoking-brand" style="width: 50%;">
+                      </div>
+                      <div style="margin-bottom: 6px;">
+                          <strong>How many stick per day?</strong> <input type="text" id="itr-field-smoking-sticks" style="width: 40%;">
+                      </div>
+                      <div style="margin-bottom: 6px;">
+                          <strong>Age started?</strong> <input type="text" id="itr-field-smoking-agestarted" style="width: 55%;">
+                      </div>
+                      <div style="margin-bottom: 10px;">
+                          <strong>No of years smoking?</strong> <input type="text" id="itr-field-smoking-years" style="width: 45%;">
+                      </div>
+
+                      <div style="margin-bottom: 6px;">
+                          <strong>Reason for smoking?</strong> <input type="text" id="itr-field-smoking-reason" style="width: 50%;">
+                      </div>
+                      <div style="margin-bottom: 6px;">
+                          <strong>Have you experienced side effect or illness brought by smoking?</strong><br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-sideeffect-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-sideeffect-no"> NO</label>
+                      </div>
+                      <div style="margin-bottom: 6px;">
+                          <strong>If yes What effect?</strong> <input type="text" id="itr-field-smoking-effect" style="width: 60%;">
+                      </div>
+                      <div style="margin-bottom: 6px;">
+                          <strong>Try quitting before?</strong>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-quit-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-smk-quit-no"> NO</label>
+                      </div>
+                      <div style="margin-bottom: 14px;">
+                          <strong>If yes why were not successful?</strong> <input type="text" id="itr-field-smoking-unsuccessful" style="width: 40%;">
+                      </div>
+
+                      <div class="section-header">Physical Activity</div>
+                      <div>
+                          <strong>Does at least 2 ½ hours a week of moderate intensity physical activity</strong><br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-pa-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-pa-no"> NO</label>
+                      </div>
+                  </div>
+
+                  <!-- RIGHT COLUMN -->
+                  <div class="col-right">
+                      <div class="section-header">Family History: * does pt. have 1<sup>st</sup> degree relative with</div>
+                      <div style="margin-bottom: 10px;">
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-htn"> Hypertension</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-stroke"> Stroke</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-heart"> Heart Attack</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-dm"> DM</label><br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-asthma"> Asthma</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-cancer"> Cancer</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fh-kidney"> Kidney Disease</label>
+                      </div>
+
+                      <div style="margin-bottom: 6px;">
+                          <strong>Co-Morbid:</strong> <input type="text" id="itr-field-comorbid" style="width: 70%;">
+                      </div>
+                      <div style="margin-bottom: 14px;">
+                          <strong>Allergy:</strong> <input type="text" id="itr-field-allergy" style="width: 75%;">
+                      </div>
+
+                      <div class="section-header">Alcohol Intake:</div>
+                      <div style="margin-left: 10px; margin-bottom: 6px;">
+                          <label class="checkbox-label"><input type="checkbox" id="itr-alc-never"> Never Consumed</label><br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-alc-yes"> Yes, drinks alcohol</label>
+                      </div>
+                      <div style="margin-left: 20px; margin-bottom: 14px;">
+                          <strong>Excessive Alcohol Intake:</strong><br>
+                          In the past mos., had 3 drinks in one occasion<br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-alc-excess-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-alc-excess-no"> NO</label>
+                      </div>
+
+                      <div class="section-header">High Fat / High Salt Food Intake</div>
+                      <div style="margin-bottom: 14px;">
+                          Eats processed / Fast foods and inihaw weekly<br>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fat-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fat-no"> NO</label>
+                      </div>
+
+                      <div class="section-header">Dietary Fiber Intake:</div>
+                      <div>
+                          3 servings of vegetables daily
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fiber-veg-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fiber-veg-no"> NO</label><br>
+                          2-3 servings of fruits daily
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fiber-fruit-yes"> YES</label>
+                          <label class="checkbox-label"><input type="checkbox" id="itr-fiber-fruit-no"> NO</label>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- VITAL SIGNS SECTION -->
+              <div class="vitals-grid">
+                  <div>
+                      <strong>BMI:</strong> <input type="text" id="itr-field-bmi" style="width: 55px;"> &nbsp;&nbsp;
+                      <strong>WaistLine:</strong> <input type="text" id="itr-field-waist" style="width: 45px;"> Cm<br>
+                      <strong>HT:</strong> <input type="text" id="itr-field-ht" style="width: 45px;"> Cm &nbsp;&nbsp;
+                      <strong>WEIGHT:</strong> <input type="text" id="itr-field-wt" style="width: 45px;"> KG
+                  </div>
+                  <div>
+                      <strong>RAISED BP:</strong> <input type="text" id="itr-field-raisedbp" style="width: 70px;" placeholder="No">
+                  </div>
+                  <div>
+                      <strong>1<sup>ST</sup> READING:</strong> <input type="text" id="itr-field-bp1" style="width: 75px;"> mmHg<br>
+                      <strong>2<sup>ND</sup> READING:</strong> <input type="text" id="itr-field-bp2" style="width: 75px;"> mmHg
+                  </div>
+              </div>
+
+              <!-- CONSULTATION TABLE -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; margin-bottom: 8px;">
+                  <h4 style="margin: 0; color: #0f172a; font-size: 13.5px; text-transform: uppercase; font-weight: 800;">Consultation &amp; Clinical Findings Table</h4>
+                  <button type="button" class="btn btn-secondary" id="add-consultation-row-btn" style="font-size: 12px; padding: 6px 12px; border-radius: 4px; background: #4f46e5; color: #ffffff; border: none; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                      <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                      Add Consultation Record Row
+                  </button>
+              </div>
+              <table class="consultation-table" style="margin-top: 6px; width: 100%;">
+                  <thead>
+                      <tr>
+                          <th style="width: 12%;">Date</th>
+                          <th style="width: 25%;">Subjective Findings</th>
+                          <th style="width: 22%;">Objective Findings</th>
+                          <th style="width: 20%;">Assessment Diagnosis</th>
+                          <th style="width: 16%;">Plan/ Treatment Plan</th>
+                          <th style="width: 5%; text-align: center;">Action</th>
+                      </tr>
+                  </thead>
+                  <tbody id="consultation-table-body">
+                      <!-- Dynamic Consultation Rows inserted here -->
+                  </tbody>
+              </table>
+
+            </div>
+          </div>
+
+          <!-- TAB CONTENT 2: ORIGINAL DOCUMENT SCAN -->
+          <div id="vtab-content-scan" class="vtab-content" style="display: none;">
+            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--border-radius-md); padding: 16px; text-align: center;">
+              <div style="margin-bottom: 12px; font-size: 12px; color: var(--text-muted);">Scanned &amp; Uploaded Original File Preview</div>
+              <div style="max-height: 650px; overflow: auto; background: #0b1120; border-radius: var(--border-radius-sm); padding: 10px; display: inline-block; width: 100%;">
+                <img id="review-original-image" src="" alt="Original Document Preview" style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB CONTENT 3: EXTRACTED TEXT VERSION -->
+          <div id="vtab-content-text" class="vtab-content" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="review-extracted-text">Extracted Digital Text (Full Text Version)</label>
+              <textarea class="extracted-text-area" id="review-extracted-text" placeholder="No text extracted. You can type here to insert text manually."></textarea>
+            </div>
+          </div>
+
+          <!-- Bottom Action Footer -->
+          <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; flex-wrap: wrap; gap: 12px;">
+
+            <!-- Edit, Archive, Delete Action Buttons -->
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button type="button" class="btn btn-secondary" id="archive-record-btn" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); font-weight: 600;">
+                Archive Document
+              </button>
+              <button type="button" class="btn btn-danger" id="delete-record-btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); font-weight: 600;">
+                Delete Permanently
+              </button>
+              <button type="submit" class="btn btn-primary" id="save-changes-btn" style="font-weight: 700; padding: 10px 24px;">
+                <span class="btn-text">Save Changes (Edit)</span>
+                <span class="spinner"></span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentUser = null;
+    let recordId = null;
+    let currentRecord = null;
+    let currentPatient = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Parse record ID from URL path: /dashboard/records/view/:id
+      const pathParts = window.location.pathname.split('/');
+      recordId = pathParts[pathParts.length - 1];
+
+      if (!recordId) {
+        showToast('Missing record identifier.', 'error');
+        setTimeout(() => { window.location.href = '/dashboard/patients'; }, 2000);
+        return;
+      }
+
+      // 2. Load user profile
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      }
+
+      // 3. Fetch record details
+      await loadRecordDetails();
+
+      // Logout handler
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    // Convert Extracted Digital Text to Structured JSON
+    function convertExtractedTextToAccurateJson(txt) {
+      if (!txt || typeof txt !== 'string') return {};
+
+      function splitSections(str) {
+        const pattern = /===\s*(.*?)\s*===([\s\S]*?)(?====|$)/g;
+        const sections = {};
+        let match;
+        while ((match = pattern.exec(str)) !== null) {
+          sections[match[1].trim()] = match[2].trim();
+        }
+        return sections;
+      }
+
+      function getValue(block, label) {
+        if (!block) return '';
+        const cleanLabel = label.replace(/[?: ]+$/, '').trim();
+        const escaped = cleanLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('^[ \\t]*' + escaped + '[?: \\t]*([^\\n]*)$', 'im');
+        const match = block.match(regex);
+        return match && match[1] ? match[1].trim() : '';
+      }
+
+      function getNumber(val) {
+        if (!val) return null;
+        const match = String(val).match(/[\d.]+/);
+        if (!match) return null;
+        const num = parseFloat(match[0]);
+        return isNaN(num) ? null : num;
+      }
+
+      function checkbox(block, label) {
+        if (!block) return false;
+        const escaped = label.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('\\[X\\]\\s*' + escaped, 'i');
+        return regex.test(block);
+      }
+
+      function parseHeader(block) {
+        if (!block) return {};
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        return {
+          country: lines[0] || '',
+          province: lines[1] || '',
+          municipality: lines[2] || '',
+          facility: lines[3] || '',
+          facility_address: lines[4] || '',
+          form_title: lines[5] || '',
+          age_group: lines[6] || ''
+        };
+      }
+
+      function parsePatient(block) {
+        if (!block) return {};
+        const ageVal = getNumber(getValue(block, 'Age'));
+        return {
+          name: getValue(block, 'NAME'),
+          philhealth_no: getValue(block, 'Philhealth No.'),
+          address: getValue(block, 'ADDRESS'),
+          civil_status: getValue(block, 'Civil Status'),
+          birthday: getValue(block, 'BIRTHDAY'),
+          age: ageVal !== null ? Math.round(ageVal) : 0,
+          cp_no: getValue(block, 'CP No'),
+          educational_attainment: getValue(block, 'Educational Attainment'),
+          bhw: getValue(block, 'BHW')
+        };
+      }
+
+      const sections = splitSections(txt);
+
+      const header_block = sections['HEALTH FACILITY HEADER'] || '';
+      const patient_block = sections['PATIENT DEMOGRAPHICS'] || '';
+
+      const lifestyleKey = Object.keys(sections).find(k => k.includes('LIFESTYLE') || k.includes('SMOKING')) || 'LIFESTYLE & RISK FACTORS';
+      const lifestyle_risk_block = sections[lifestyleKey] || '';
+
+      const vitalsKey = Object.keys(sections).find(k => k.includes('VITAL')) || 'VITAL SIGNS & PHYSICAL MEASUREMENTS';
+      const vitals_block = sections[vitalsKey] || '';
+
+      const consultKey = Object.keys(sections).find(k => k.includes('CONSULTATION')) || 'CONSULTATION & CLINICAL FINDINGS';
+      const consult_block = sections[consultKey] || '';
+      const smk_st = checkbox(lifestyle_risk_block, 'Never') ? 'Never' : (checkbox(lifestyle_risk_block, 'Current') ? 'Current' : (checkbox(lifestyle_risk_block, 'Passive') ? 'Passive' : (checkbox(lifestyle_risk_block, 'Stopped > a year') ? 'Stopped > 1 year' : (checkbox(lifestyle_risk_block, 'Stopped < a year') ? 'Stopped < 1 year' : ''))));
+      const hasSmkCheck = checkbox(lifestyle_risk_block, 'Current') || checkbox(lifestyle_risk_block, 'Passive') || checkbox(lifestyle_risk_block, 'Never') || checkbox(lifestyle_risk_block, 'Stopped > a year') || checkbox(lifestyle_risk_block, 'Stopped < a year');
+
+      const exp_yes = lifestyle_risk_block.includes('Have you experienced side effect') && checkbox(lifestyle_risk_block.split('Have you experienced side effect')[1].split('\n')[0], 'YES');
+      const exp_no  = lifestyle_risk_block.includes('Have you experienced side effect') && checkbox(lifestyle_risk_block.split('Have you experienced side effect')[1].split('\n')[0], 'NO');
+
+      const quit_yes = lifestyle_risk_block.includes('Try quitting before') && checkbox(lifestyle_risk_block.split('Try quitting before')[1].split('\n')[0], 'YES');
+      const quit_no  = lifestyle_risk_block.includes('Try quitting before') && checkbox(lifestyle_risk_block.split('Try quitting before')[1].split('\n')[0], 'NO');
+
+      const smoking = {
+        smoker_status: smk_st,
+        options: {
+          current: checkbox(lifestyle_risk_block, 'Current') ? true : (hasSmkCheck ? false : null),
+          passive: checkbox(lifestyle_risk_block, 'Passive') ? true : (hasSmkCheck ? false : null),
+          never: checkbox(lifestyle_risk_block, 'Never') ? true : (hasSmkCheck ? false : null),
+          stopped_gt_1_year: checkbox(lifestyle_risk_block, 'Stopped > a year') ? true : (hasSmkCheck ? false : null),
+          stopped_lt_1_year: checkbox(lifestyle_risk_block, 'Stopped < a year') ? true : (hasSmkCheck ? false : null)
+        },
+        brand_of_cigarette: getValue(lifestyle_risk_block, 'Brand of Cigarette'),
+        sticks_per_day: getNumber(getValue(lifestyle_risk_block, 'How many stick per day')),
+        age_started: getNumber(getValue(lifestyle_risk_block, 'Age started')),
+        years_smoking: getNumber(getValue(lifestyle_risk_block, 'No of years smoking')),
+        reason_for_smoking: getValue(lifestyle_risk_block, 'Reason for smoking'),
+        experienced_side_effects: exp_yes ? true : (exp_no ? false : null),
+        side_effect_details: getValue(lifestyle_risk_block, 'If yes, What effect'),
+        tried_quitting_before: quit_yes ? true : (quit_no ? false : null),
+        quit_attempt_success: null,
+        reason_not_successful: getValue(lifestyle_risk_block, 'If yes, why were not successful')
+      };
+
+      const hasFhCheck = checkbox(lifestyle_risk_block, 'Hypertension') || checkbox(lifestyle_risk_block, 'Stroke') || checkbox(lifestyle_risk_block, 'Heart Attack') || checkbox(lifestyle_risk_block, 'DM') || checkbox(lifestyle_risk_block, 'Asthma') || checkbox(lifestyle_risk_block, 'Cancer') || checkbox(lifestyle_risk_block, 'Kidney Disease');
+
+      const family = {
+        has_1st_degree_relative: hasFhCheck ? true : null,
+        hypertension: checkbox(lifestyle_risk_block, 'Hypertension') ? true : (hasFhCheck ? false : null),
+        stroke: checkbox(lifestyle_risk_block, 'Stroke') ? true : (hasFhCheck ? false : null),
+        heart_attack: checkbox(lifestyle_risk_block, 'Heart Attack') ? true : (hasFhCheck ? false : null),
+        dm: checkbox(lifestyle_risk_block, 'DM') ? true : (hasFhCheck ? false : null),
+        asthma: checkbox(lifestyle_risk_block, 'Asthma') ? true : (hasFhCheck ? false : null),
+        cancer: checkbox(lifestyle_risk_block, 'Cancer') ? true : (hasFhCheck ? false : null),
+        kidney_disease: checkbox(lifestyle_risk_block, 'Kidney Disease') ? true : (hasFhCheck ? false : null)
+      };
+
+      const clinical = {
+        co_morbid: getValue(lifestyle_risk_block, 'Co-Morbid'),
+        allergy: getValue(lifestyle_risk_block, 'Allergy')
+      };
+
+      const excMatch = lifestyle_risk_block.match(/Excessive Alcohol Intake.*/i);
+      const excText = excMatch ? excMatch[0] : '';
+      const excDefMatch = excText.match(/\((.*?)\)/);
+
+      const hasAlcCheck = checkbox(lifestyle_risk_block, 'Never Consumed') || checkbox(lifestyle_risk_block, 'Yes, drinks alcohol');
+      const hasExcCheck = checkbox(excText, 'YES') || checkbox(excText, 'NO');
+
+      const alcohol_intake = {
+        never_consumed: checkbox(lifestyle_risk_block, 'Never Consumed') ? true : (hasAlcCheck ? false : null),
+        drinks_alcohol: checkbox(lifestyle_risk_block, 'Yes, drinks alcohol') ? true : (hasAlcCheck ? false : null),
+        excessive_alcohol_intake: {
+          definition: excDefMatch ? excDefMatch[1] : 'In the past mos., had 5 drinks in one occasion',
+          yes: checkbox(excText, 'YES') ? true : (hasExcCheck ? false : null),
+          no: checkbox(excText, 'NO') ? true : (hasExcCheck ? false : null)
+        }
+      };
+
+      const paMatch = lifestyle_risk_block.match(/Does at least 2 1\/2 hours.*/i);
+      const paText = paMatch ? paMatch[0] : '';
+
+      const fatMatch = lifestyle_risk_block.match(/Eats processed.*/i);
+      const fatText = fatMatch ? fatMatch[0] : '';
+
+      const vegMatch = lifestyle_risk_block.match(/3 servings of vegetables daily.*/i);
+      const vegText = vegMatch ? vegMatch[0] : '';
+
+      const fruitMatch = lifestyle_risk_block.match(/2-3 servings of fruits daily.*/i);
+
+      const diet_and_lifestyle = {
+        physical_activity: {
+          meets_2_5_hours_per_week: checkbox(paText, 'YES') ? true : (checkbox(paText, 'NO') ? false : null)
+        },
+        high_fat_high_salt_food_intake: {
+          weekly_processed_fastfood: checkbox(fatText, 'YES') ? true : (checkbox(fatText, 'NO') ? false : null)
+        },
+        dietary_fiber_intake: {
+          vegetables_3_servings_daily: checkbox(vegText, 'YES') ? true : (checkbox(vegText, 'NO') ? false : null),
+          fruits_2_3_servings_daily: checkbox(fruitMatch ? fruitMatch[0] : '', 'YES') ? true : (checkbox(fruitMatch ? fruitMatch[0] : '', 'NO') ? false : null)
+        }
+      };
+
+      function parseVitals(block) {
+        if (!block) return {};
+        const raisedBpText = getValue(block, 'RAISED BP').toLowerCase();
+        const raisedBp = raisedBpText.includes('yes') ? true : (raisedBpText.includes('no') ? false : null);
+        return {
+          bmi: getNumber(getValue(block, 'BMI')),
+          waistline_cm: getNumber(getValue(block, 'WaistLine')),
+          height_cm: getNumber(getValue(block, 'HT')),
+          weight_kg: getNumber(getValue(block, 'WEIGHT')),
+          raised_bp: raisedBp,
+          blood_pressure_readings: {
+            first: getValue(block, '1ST READING') || getValue(block, '1st Reading'),
+            second: getValue(block, '2ND READING') || getValue(block, '2nd Reading')
+          }
+        };
+      }
+
+      function parseConsultation(block) {
+        if (!block) return [];
+        const entries = block.split(/Date:/i).slice(1);
+        const results = [];
+
+        for (const entry of entries) {
+          const lines = entry.trim().split('\n');
+          const date = lines[0] ? lines[0].trim() : '';
+
+          const subj = getValue(entry, 'Subjective Findings');
+
+          const ageMatch = entry.match(/AGE:\s*(\d+)/i);
+          const wtMatch  = entry.match(/WT:\s*(\d+)/i);
+          const htMatch  = entry.match(/HT:\s*(\d+)/i);
+          const bpMatch  = entry.match(/BP:\s*([\d/]+\s*mmHg)/i);
+
+          const age = ageMatch ? getNumber(ageMatch[1]) : null;
+          const wt  = wtMatch ? getNumber(wtMatch[1]) : null;
+          const ht  = htMatch ? getNumber(htMatch[1]) : null;
+          const bp  = bpMatch ? bpMatch[1] : '';
+
+          const diagMatch = entry.match(/Assessment Diagnosis:\s*([\s\S]*?)Plan\//i) || entry.match(/Assessment\/Diagnosis:\s*([\s\S]*?)Plan\//i);
+          let diagnosis = [];
+          if (diagMatch && diagMatch[1]) {
+            diagnosis = diagMatch[1]
+              .split('\n')
+              .map(d => d.replace(/^[-,\s]+/, '').trim())
+              .filter(Boolean);
+          }
+
+          const planMatch = entry.match(/Plan\/\s*Treatment Plan:\s*([\s\S]*)/i) || entry.match(/Plan\/Treatment Plan:\s*([\s\S]*)/i);
+          let plan = [];
+          if (planMatch && planMatch[1]) {
+            plan = planMatch[1]
+              .split('\n')
+              .map(p => p.replace(/^[-,\s]+/, '').trim())
+              .filter(Boolean);
+          }
+
+          results.push({
+            date: date,
+            subjective_findings: subj,
+            objective_findings: {
+              age: age !== null ? Math.round(age) : null,
+              weight_kg: wt !== null ? Math.round(wt) : null,
+              height_cm: ht !== null ? Math.round(ht) : null,
+              blood_pressure: bp
+            },
+            assessment_diagnosis: diagnosis,
+            plan_treatment: plan
+          });
+        }
+
+        return results;
+      }
+
+      return {
+        header: parseHeader(header_block),
+        patient_demographics: parsePatient(patient_block),
+        smoking_cessation_profile: smoking,
+        family_history: family,
+        clinical_background: clinical,
+        alcohol_intake: alcohol_intake,
+        diet_and_lifestyle: diet_and_lifestyle,
+        vital_signs: parseVitals(vitals_block),
+        consultation_records: parseConsultation(consult_block)
+      };
+    }
+
+    async function loadRecordDetails() {
+      try {
+        const res = await API.fetchJson(`/api/records/detail/${recordId}`);
+        if (!res || !res.success || !res.record) {
+          throw new Error(res ? res.message : 'Record not found.');
+        }
+
+        currentRecord = res.record;
+        currentPatient = res.patient;
+
+        // Set back link
+        const backBtn = document.getElementById('back-to-profile-link');
+        if (currentRecord.patient_id) {
+          backBtn.href = `/dashboard/patients/profile/${currentRecord.patient_id}`;
+        } else {
+          backBtn.href = '/dashboard/patients';
+        }
+
+        // Set status badge
+        const badge = document.getElementById('record-status-badge');
+        badge.textContent = currentRecord.status || 'ACTIVE';
+        if (currentRecord.status === 'ARCHIVED') {
+          badge.className = 'badge badge-inactive';
+          badge.style.background = 'rgba(245, 158, 11, 0.2)';
+          badge.style.color = '#f59e0b';
+        }
+
+        // Fill patient info summary
+        if (currentPatient) {
+          document.getElementById('summary-patient-number').textContent = currentPatient.patient_number || '-';
+          document.getElementById('summary-patient-name').textContent = `${currentPatient.first_name} ${currentPatient.middle_name || ''} ${currentPatient.last_name}`;
+          document.getElementById('summary-sex').textContent = currentPatient.sex || '-';
+          
+          let ageStr = '';
+          if (currentPatient.birth_date) {
+            const bd = new Date(currentPatient.birth_date);
+            const today = new Date();
+            let age = today.getFullYear() - bd.getFullYear();
+            const m = today.getMonth() - bd.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+            if (age >= 0) ageStr = ` (${age} yrs old)`;
+            document.getElementById('summary-birthdate').textContent = `${bd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}${ageStr}`;
+          }
+        }
+
+        // Fill metadata controls
+        document.getElementById('review-filename').value = currentRecord.file_name || '';
+        document.getElementById('review-category').value = currentRecord.record_type || 'PATIENT_INFORMATION_SHEET';
+
+        // Set scan image preview
+        const scanImg = document.getElementById('review-original-image');
+        if (scanImg && currentRecord.preview_url) {
+          scanImg.src = currentRecord.preview_url;
+        }
+
+        // Set Extracted Digital Text
+        const textArea = document.getElementById('review-extracted-text');
+        textArea.value = currentRecord.extracted_text || '';
+
+        // Populate Form Fields (either from saved structured_json or converted from text)
+        let structuredJson = currentRecord.structured_json;
+        if (!structuredJson && currentRecord.extracted_text) {
+          structuredJson = convertExtractedTextToAccurateJson(currentRecord.extracted_text);
+        }
+        if (structuredJson) {
+          populateFormFieldsFromJson(structuredJson);
+        }
+
+        // Hide edit/archive/delete controls if not RECORDS_STAFF
+        if (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'RHU_ADMINISTRATOR') {
+          document.getElementById('save-changes-btn').style.display = 'none';
+          document.getElementById('archive-record-btn').style.display = 'none';
+          document.getElementById('delete-record-btn').style.display = 'none';
+          document.getElementById('review-filename').disabled = true;
+          document.getElementById('review-category').disabled = true;
+        }
+
+        // Live Sync: When editing form inputs, checkboxes, or table rows -> instantly update JSON & formatted text
+        const formTabContainer = document.getElementById('vtab-content-form');
+        if (formTabContainer) {
+          const updateFromForm = () => {
+            const editedJson = collectStructuredJsonFromForm();
+            const formattedText = formatItrToStandardTemplate(editedJson);
+            if (formattedText.trim()) {
+              document.getElementById('review-extracted-text').value = formattedText;
+            }
+          };
+          formTabContainer.addEventListener('input', updateFromForm);
+          formTabContainer.addEventListener('change', updateFromForm);
+        }
+
+      } catch (err) {
+        showToast(err.message || 'Failed to load record details.', 'error');
+        setTimeout(() => { window.location.href = '/dashboard/patients'; }, 2000);
+      }
+    }
+
+    // Tab Switcher
+    window.switchVerificationTab = function(tabName) {
+      document.querySelectorAll('.vtab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.vtab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetContent = document.getElementById(`vtab-content-${tabName}`);
+      const targetBtn     = document.getElementById(`vtab-btn-${tabName}`);
+
+      if (targetContent) targetContent.style.display = 'block';
+      if (targetBtn)     targetBtn.classList.add('active');
+    };
+
+    // Create consultation row HTML
+    function createConsultationRowHtml(rec) {
+      rec = rec || {};
+      const date = rec.date || '';
+      const subj = rec.subjective_findings || '';
+      const obj  = rec.objective_findings || {};
+      const age  = obj.age !== undefined && obj.age !== null ? obj.age : '';
+      const wt   = obj.weight_kg !== undefined && obj.weight_kg !== null ? obj.weight_kg : '';
+      const ht   = obj.height_cm !== undefined && obj.height_cm !== null ? obj.height_cm : '';
+      const bp   = obj.blood_pressure || '';
+
+      const diagList = Array.isArray(rec.assessment_diagnosis) ? rec.assessment_diagnosis.join(', ') : (rec.assessment_diagnosis || '');
+      const planList = Array.isArray(rec.plan_treatment) ? rec.plan_treatment.join('\n') : (rec.plan_treatment || '');
+
+      return `
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 8px; vertical-align: top;">
+            <input type="text" class="consult-row-date" value="${date}" placeholder="e.g. May 20, 2024" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 6px; font-size: 12px; box-sizing: border-box;">
+          </td>
+          <td style="padding: 8px; vertical-align: top;">
+            <textarea class="consult-row-subj" rows="4" placeholder="Subjective Findings..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 12px; font-family: inherit; box-sizing: border-box;">${subj}</textarea>
+          </td>
+          <td style="padding: 8px; vertical-align: top; font-size: 11px;">
+            <div style="font-size: 11px; line-height: 1.7; color: #0f172a;">
+              <strong>AGE:</strong> <input type="text" class="consult-row-age" value="${age}" style="width: 40px; font-weight: bold;"><br>
+              <strong>WT:</strong> <input type="text" class="consult-row-wt" value="${wt}" style="width: 55px; font-weight: bold;"><br>
+              <strong>HT:</strong> <input type="text" class="consult-row-ht" value="${ht}" style="width: 55px; font-weight: bold;"><br>
+              <strong>BP:</strong> <input type="text" class="consult-row-bp" value="${bp}" style="width: 75px; font-weight: bold;">
+            </div>
+          </td>
+          <td style="padding: 8px; vertical-align: top;">
+            <textarea class="consult-row-diag" rows="4" placeholder="Assessment / Diagnosis..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 12px; font-family: inherit; box-sizing: border-box;">${diagList}</textarea>
+          </td>
+          <td style="padding: 8px; vertical-align: top;">
+            <textarea class="consult-row-plan" rows="4" placeholder="Plan / Treatment..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 4px; padding: 6px; font-size: 12px; font-family: inherit; box-sizing: border-box;">${planList}</textarea>
+          </td>
+          <td style="padding: 8px; vertical-align: top; text-align: center;">
+            <button type="button" class="remove-consult-row-btn" onclick="this.closest('tr').remove()" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 6px; border-radius: 4px;" title="Remove Row">
+              <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderConsultationTableRows(records) {
+      records = records || [];
+      const tbody = document.getElementById('consultation-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (!records || records.length === 0) {
+        tbody.innerHTML = createConsultationRowHtml({});
+        return;
+      }
+      records.forEach(rec => {
+        tbody.insertAdjacentHTML('beforeend', createConsultationRowHtml(rec));
+      });
+    }
+
+    document.getElementById('add-consultation-row-btn').addEventListener('click', () => {
+      const tbody = document.getElementById('consultation-table-body');
+      if (tbody) {
+        tbody.insertAdjacentHTML('beforeend', createConsultationRowHtml({}));
+      }
+    });
+
+    // Populate Form fields from structured JSON
+    function populateFormFieldsFromJson(data) {
+      if (!data || typeof data !== 'object') return;
+
+      function setField(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.value = (val !== undefined && val !== null) ? val : '';
+      }
+
+      function setCheck(id, boolVal) {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!boolVal;
+      }
+
+      // Demographics
+      const d = data.patient_demographics || {};
+      setField('itr-field-name', d.name || '');
+      setField('itr-field-philhealth', d.philhealth_no || '');
+      setField('itr-field-address', d.address || '');
+      setField('itr-field-civilstatus', d.civil_status || '');
+      setField('itr-field-birthday', d.birthday || '');
+      setField('itr-field-age', d.age !== undefined && d.age !== null ? d.age : '');
+      setField('itr-field-cpno', d.cp_no || '');
+      setField('itr-field-education', d.educational_attainment || '');
+      setField('itr-field-bhw', d.bhw || '');
+
+      // Smoking Profile
+      const sc = data.smoking_cessation_profile || {};
+      const opts = sc.options || {};
+      const smkSt = sc.smoker_status || '';
+      setCheck('itr-smk-current', opts.current || smkSt === 'Current');
+      setCheck('itr-smk-passive', opts.passive || smkSt === 'Passive');
+      setCheck('itr-smk-never', opts.never || smkSt === 'Never');
+      setCheck('itr-smk-gt1yr', opts.stopped_gt_1_year || (typeof smkSt === 'string' && smkSt.includes('>')));
+      setCheck('itr-smk-lt1yr', opts.stopped_lt_1_year || (typeof smkSt === 'string' && smkSt.includes('<')));
+      setField('itr-field-smoking-brand', sc.brand_of_cigarette || '');
+      setField('itr-field-smoking-sticks', sc.sticks_per_day !== undefined && sc.sticks_per_day !== null ? sc.sticks_per_day : '');
+      setField('itr-field-smoking-agestarted', sc.age_started !== undefined && sc.age_started !== null ? sc.age_started : '');
+      setField('itr-field-smoking-years', sc.years_smoking !== undefined && sc.years_smoking !== null ? sc.years_smoking : '');
+      setField('itr-field-smoking-reason', sc.reason_for_smoking || '');
+      setCheck('itr-smk-sideeffect-yes', sc.experienced_side_effects === true);
+      setCheck('itr-smk-sideeffect-no', sc.experienced_side_effects === false);
+      setField('itr-field-smoking-effect', sc.side_effect_details || '');
+      setCheck('itr-smk-quit-yes', sc.tried_quitting_before === true);
+      setCheck('itr-smk-quit-no', sc.tried_quitting_before === false);
+      setField('itr-field-smoking-unsuccessful', sc.reason_not_successful || '');
+
+      // Physical Activity
+      const dl = data.diet_and_lifestyle || {};
+      const pa = dl.physical_activity || {};
+      setCheck('itr-pa-yes', pa.meets_2_5_hours_per_week === true);
+      setCheck('itr-pa-no', pa.meets_2_5_hours_per_week === false);
+
+      // Family History
+      const fh = data.family_history || {};
+      setCheck('itr-fh-htn', fh.hypertension === true);
+      setCheck('itr-fh-stroke', fh.stroke === true);
+      setCheck('itr-fh-heart', fh.heart_attack === true);
+      setCheck('itr-fh-dm', fh.dm === true);
+      setCheck('itr-fh-asthma', fh.asthma === true);
+      setCheck('itr-fh-cancer', fh.cancer === true);
+      setCheck('itr-fh-kidney', fh.kidney_disease === true);
+
+      const cb = data.clinical_background || {};
+      setField('itr-field-comorbid', cb.co_morbid || '');
+      setField('itr-field-allergy', cb.allergy || '');
+
+      // Alcohol
+      const alc = data.alcohol_intake || {};
+      const alcExc = alc.excessive_alcohol_intake || {};
+      setCheck('itr-alc-never', alc.never_consumed === true);
+      setCheck('itr-alc-yes', alc.drinks_alcohol === true);
+      setCheck('itr-alc-excess-yes', alcExc.yes === true);
+      setCheck('itr-alc-excess-no', alcExc.no === true);
+
+      // High Fat & Fiber
+      const fat = dl.high_fat_high_salt_food_intake || {};
+      setCheck('itr-fat-yes', fat.weekly_processed_fastfood === true);
+      setCheck('itr-fat-no', fat.weekly_processed_fastfood === false);
+
+      const fiber = dl.dietary_fiber_intake || {};
+      setCheck('itr-fiber-veg-yes', fiber.vegetables_3_servings_daily === true);
+      setCheck('itr-fiber-veg-no', fiber.vegetables_3_servings_daily === false);
+      setCheck('itr-fiber-fruit-yes', fiber.fruits_2_3_servings_daily === true);
+      setCheck('itr-fiber-fruit-no', fiber.fruits_2_3_servings_daily === false);
+
+      // Vitals
+      const vs = data.vital_signs || {};
+      const bpr = vs.blood_pressure_readings || {};
+      setField('itr-field-bmi', vs.bmi !== undefined && vs.bmi !== null ? vs.bmi : '');
+      setField('itr-field-raisedbp', vs.raised_bp === true ? 'Yes' : (vs.raised_bp === false ? 'No' : ''));
+      setField('itr-field-waist', vs.waistline_cm !== undefined && vs.waistline_cm !== null ? vs.waistline_cm : '');
+      setField('itr-field-ht', vs.height_cm !== undefined && vs.height_cm !== null ? vs.height_cm : '');
+      setField('itr-field-wt', vs.weight_kg !== undefined && vs.weight_kg !== null ? vs.weight_kg : '');
+      setField('itr-field-bp1', bpr.first || '');
+      setField('itr-field-bp2', bpr.second || '');
+
+      // Consultation Table
+      const consults = data.consultation_records || [];
+      renderConsultationTableRows(consults);
+    }
+
+    // Collect edited DOM values into structured JSON
+    function collectStructuredJsonFromForm() {
+      function getVal(id) {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : '';
+      }
+
+      function getNumVal(id) {
+        const v = getVal(id);
+        if (!v) return null;
+        const n = parseFloat(v);
+        return isNaN(n) ? null : n;
+      }
+
+      function getChk(id) {
+        const el = document.getElementById(id);
+        return el ? !!el.checked : false;
+      }
+
+      const hasSmkCheck = getChk('itr-smk-current') || getChk('itr-smk-passive') || getChk('itr-smk-never') || getChk('itr-smk-gt1yr') || getChk('itr-smk-lt1yr');
+      const smokerStatus = getChk('itr-smk-current') ? 'Current'
+        : getChk('itr-smk-passive') ? 'Passive'
+        : getChk('itr-smk-never') ? 'Never'
+        : getChk('itr-smk-gt1yr') ? 'Stopped > 1 year'
+        : getChk('itr-smk-lt1yr') ? 'Stopped < 1 year' : '';
+
+      const hasFhCheck = getChk('itr-fh-htn') || getChk('itr-fh-stroke') || getChk('itr-fh-heart') || getChk('itr-fh-dm') || getChk('itr-fh-asthma') || getChk('itr-fh-cancer') || getChk('itr-fh-kidney');
+      const hasAlcCheck = getChk('itr-alc-never') || getChk('itr-alc-yes');
+      const hasExcCheck = getChk('itr-alc-excess-yes') || getChk('itr-alc-excess-no');
+
+      const raisedBpVal = getVal('itr-field-raisedbp').toLowerCase();
+      const raisedBp = raisedBpVal.includes('yes') || raisedBpVal === 'true' ? true : (raisedBpVal.includes('no') || raisedBpVal === 'false' ? false : null);
+
+      const consultRows = [];
+      document.querySelectorAll('#consultation-table-body tr').forEach(tr => {
+        const dateEl = tr.querySelector('.consult-row-date');
+        const subjEl = tr.querySelector('.consult-row-subj');
+        const ageEl  = tr.querySelector('.consult-row-age');
+        const wtEl   = tr.querySelector('.consult-row-wt');
+        const htEl   = tr.querySelector('.consult-row-ht');
+        const bpEl   = tr.querySelector('.consult-row-bp');
+        const diagEl = tr.querySelector('.consult-row-diag');
+        const planEl = tr.querySelector('.consult-row-plan');
+
+        const date = dateEl ? dateEl.value.trim() : '';
+        const subj = subjEl ? subjEl.value.trim() : '';
+        const age  = ageEl ? parseFloat(ageEl.value) : null;
+        const wt   = wtEl ? parseFloat(wtEl.value) : null;
+        const ht   = htEl ? parseFloat(htEl.value) : null;
+        const bp   = bpEl ? bpEl.value.trim() : '';
+        const diag = diagEl ? diagEl.value.trim() : '';
+        const plan = planEl ? planEl.value.trim() : '';
+
+        if (date || subj || diag || plan || bp) {
+          consultRows.push({
+            date: date,
+            subjective_findings: subj,
+            objective_findings: {
+              risk_table_present: null,
+              age: !isNaN(age) ? Math.round(age) : null,
+              weight_kg: !isNaN(wt) ? wt : null,
+              height_cm: !isNaN(ht) ? ht : null,
+              blood_pressure: bp
+            },
+            assessment_diagnosis: diag ? diag.split(',').map(s => s.trim()).filter(Boolean) : [],
+            plan_treatment: plan ? plan.split('\n').map(s => s.trim()).filter(Boolean) : []
+          });
+        }
+      });
+
+      return {
+        header: {
+          country: 'Republic of the Philippines',
+          province: 'Province of Laguna',
+          municipality: 'Municipality of Paete',
+          facility: 'PAETE RURAL HEALTH UNIT',
+          facility_address: '2436 F. Sano Street, Brgy. Maylong, Paete, Laguna',
+          form_title: 'Individual Treatment Record',
+          age_group: '20 Years old and above'
+        },
+        patient_demographics: {
+          name: getVal('itr-field-name'),
+          philhealth_no: getVal('itr-field-philhealth'),
+          address: getVal('itr-field-address'),
+          civil_status: getVal('itr-field-civilstatus'),
+          birthday: getVal('itr-field-birthday'),
+          age: getNumVal('itr-field-age'),
+          cp_no: getVal('itr-field-cpno'),
+          educational_attainment: getVal('itr-field-education'),
+          bhw: getVal('itr-field-bhw')
+        },
+        smoking_cessation_profile: {
+          smoker_status: smokerStatus,
+          options: {
+            current: getChk('itr-smk-current') ? true : (hasSmkCheck ? false : null),
+            passive: getChk('itr-smk-passive') ? true : (hasSmkCheck ? false : null),
+            never: getChk('itr-smk-never') ? true : (hasSmkCheck ? false : null),
+            stopped_gt_1_year: getChk('itr-smk-gt1yr') ? true : (hasSmkCheck ? false : null),
+            stopped_lt_1_year: getChk('itr-smk-lt1yr') ? true : (hasSmkCheck ? false : null)
+          },
+          brand_of_cigarette: getVal('itr-field-smoking-brand'),
+          sticks_per_day: getNumVal('itr-field-smoking-sticks'),
+          age_started: getNumVal('itr-field-smoking-agestarted'),
+          years_smoking: getNumVal('itr-field-smoking-years'),
+          reason_for_smoking: getVal('itr-field-smoking-reason'),
+          experienced_side_effects: getChk('itr-smk-sideeffect-yes') ? true : (getChk('itr-smk-sideeffect-no') ? false : null),
+          side_effect_details: getVal('itr-field-smoking-effect'),
+          tried_quitting_before: getChk('itr-smk-quit-yes') ? true : (getChk('itr-smk-quit-no') ? false : null),
+          quit_attempt_success: null,
+          reason_not_successful: getVal('itr-field-smoking-unsuccessful')
+        },
+        family_history: {
+          has_1st_degree_relative: hasFhCheck ? true : null,
+          hypertension: getChk('itr-fh-htn') ? true : (hasFhCheck ? false : null),
+          stroke: getChk('itr-fh-stroke') ? true : (hasFhCheck ? false : null),
+          heart_attack: getChk('itr-fh-heart') ? true : (hasFhCheck ? false : null),
+          dm: getChk('itr-fh-dm') ? true : (hasFhCheck ? false : null),
+          asthma: getChk('itr-fh-asthma') ? true : (hasFhCheck ? false : null),
+          cancer: getChk('itr-fh-cancer') ? true : (hasFhCheck ? false : null),
+          kidney_disease: getChk('itr-fh-kidney') ? true : (hasFhCheck ? false : null)
+        },
+        clinical_background: {
+          co_morbid: getVal('itr-field-comorbid'),
+          allergy: getVal('itr-field-allergy')
+        },
+        alcohol_intake: {
+          never_consumed: getChk('itr-alc-never') ? true : (hasAlcCheck ? false : null),
+          drinks_alcohol: getChk('itr-alc-yes') ? true : (hasAlcCheck ? false : null),
+          excessive_alcohol_intake: {
+            definition: 'In the past mos., had 5 drinks in one occasion',
+            yes: getChk('itr-alc-excess-yes') ? true : (hasExcCheck ? false : null),
+            no: getChk('itr-alc-excess-no') ? true : (hasExcCheck ? false : null)
+          }
+        },
+        diet_and_lifestyle: {
+          physical_activity: {
+            meets_2_5_hours_per_week: getChk('itr-pa-yes') ? true : (getChk('itr-pa-no') ? false : null)
+          },
+          high_fat_high_salt_food_intake: {
+            weekly_processed_fastfood: getChk('itr-fat-yes') ? true : (getChk('itr-fat-no') ? false : null)
+          },
+          dietary_fiber_intake: {
+            vegetables_3_servings_daily: getChk('itr-fiber-veg-yes') ? true : (getChk('itr-fiber-veg-no') ? false : null),
+            fruits_2_3_servings_daily: getChk('itr-fiber-fruit-yes') ? true : (getChk('itr-fiber-fruit-no') ? false : null)
+          }
+        },
+        vital_signs: {
+          bmi: getNumVal('itr-field-bmi'),
+          waistline_cm: getNumVal('itr-field-waist'),
+          height_cm: getNumVal('itr-field-ht'),
+          weight_kg: getNumVal('itr-field-wt'),
+          raised_bp: raisedBp,
+          blood_pressure_readings: {
+            first: getVal('itr-field-bp1'),
+            second: getVal('itr-field-bp2')
+          }
+        },
+        consultation_records: consultRows
+      };
+    }
+
+    function formatItrToStandardTemplate(data) {
+      if (!data || typeof data !== 'object') return "";
+      const h = data.header || {};
+      const d = data.patient_demographics || {};
+      const sc = data.smoking_cessation_profile || {};
+      const fh = data.family_history || {};
+      const cb = data.clinical_background || {};
+      const alc = data.alcohol_intake || {};
+      const alc_exc = alc.excessive_alcohol_intake || {};
+      const dl = data.diet_and_lifestyle || {};
+      const pa = dl.physical_activity || {};
+      const fat = dl.high_fat_high_salt_food_intake || {};
+      const fiber = dl.dietary_fiber_intake || {};
+      const vs = data.vital_signs || {};
+      const bpr = vs.blood_pressure_readings || {};
+      const crs = data.consultation_records || [];
+
+      function chk(val) { return val === true ? '[x]' : '[ ]'; }
+      function opt(status, target) { return status === target ? '[x]' : '[ ]'; }
+
+      const lines = [];
+      lines.push('=== HEALTH FACILITY HEADER ===');
+      lines.push(h.country || 'Republic of the Philippines');
+      lines.push(h.province || 'Province of Laguna');
+      lines.push(h.municipality || 'Municipality of Paete');
+      lines.push(h.facility || 'PAETE RURAL HEALTH UNIT');
+      lines.push(h.facility_address || '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna');
+      lines.push(h.form_title || 'Individual Treatment Record');
+      lines.push(h.age_group || '20 Years old and above');
+      lines.push('');
+
+      lines.push('=== PATIENT DEMOGRAPHICS ===');
+      lines.push(`NAME: ${d.name || ''}`);
+      lines.push(`Philhealth No.: ${d.philhealth_no || ''}`);
+      lines.push(`ADDRESS: ${d.address || ''}`);
+      lines.push(`Civil Status: ${d.civil_status || ''}`);
+      lines.push(`BIRTHDAY: ${d.birthday || ''}`);
+      lines.push(`Age: ${d.age !== undefined && d.age !== null ? d.age : ''}`);
+      lines.push(`CP No: ${d.cp_no || ''}`);
+      lines.push(`Educational Attainment: ${d.educational_attainment || ''}`);
+      lines.push(`BHW: ${d.bhw || ''}`);
+      lines.push('');
+
+      lines.push('=== LIFESTYLE & RISK FACTORS ===');
+      lines.push('Smoking Cessation Profile:');
+      const smk_st = sc.smoker_status || '';
+      lines.push(`Smokers? ${opt(smk_st, 'Current')} Current  ${opt(smk_st, 'Passive')} Passive  ${opt(smk_st, 'Never')} Never  ${opt(smk_st, 'Stopped > 1 year')} Stopped > a year  ${opt(smk_st, 'Stopped < 1 year')} Stopped < a year`);
+      lines.push(`Brand of Cigarette?: ${sc.brand_of_cigarette || ''}`);
+      lines.push(`How many stick per day?: ${sc.sticks_per_day !== undefined && sc.sticks_per_day !== null ? sc.sticks_per_day : ''}`);
+      lines.push(`Age started?: ${sc.age_started !== undefined && sc.age_started !== null ? sc.age_started : ''}`);
+      lines.push(`No of years smoking?: ${sc.years_smoking !== undefined && sc.years_smoking !== null ? sc.years_smoking : ''}`);
+      lines.push(`Reason for smoking?: ${sc.reason_for_smoking || ''}`);
+      lines.push(`Have you experienced side effect or illness brought by smoking?: ${chk(sc.experienced_side_effects === true)} YES  ${chk(sc.experienced_side_effects === false)} NO`);
+      lines.push(`If yes, What effect?: ${sc.side_effect_details || ''}`);
+      lines.push(`Try quitting before?: ${chk(sc.tried_quitting_before === true)} YES  ${chk(sc.tried_quitting_before === false)} NO`);
+      lines.push(`If yes, why were not successful?: ${sc.reason_not_successful || ''}`);
+      lines.push('');
+
+      lines.push('Family History (does pt. have 1st degree relative with):');
+      lines.push(`${chk(fh.hypertension)} Hypertension  ${chk(fh.stroke)} Stroke  ${chk(fh.heart_attack)} Heart Attack  ${chk(fh.dm)} DM  ${chk(fh.asthma)} Asthma  ${chk(fh.cancer)} Cancer  ${chk(fh.kidney_disease)} Kidney Disease`);
+      lines.push(`Co-Morbid: ${cb.co_morbid || ''}`);
+      lines.push(`Allergy: ${cb.allergy || ''}`);
+      lines.push('');
+
+      lines.push('Alcohol Intake:');
+      lines.push(`${chk(alc.never_consumed)} Never Consumed`);
+      lines.push(`${chk(alc.drinks_alcohol)} Yes, drinks alcohol`);
+      lines.push(`Excessive Alcohol Intake (In the past mos., had 3 drinks in one occasion): ${chk(alc_exc.yes)} YES  ${chk(alc_exc.no)} NO`);
+      lines.push('');
+
+      lines.push('Physical Activity:');
+      lines.push(`Does at least 2 1/2 hours a week of moderate intensity physical activity: ${chk(pa.meets_2_5_hours_per_week === true)} YES  ${chk(pa.meets_2_5_hours_per_week === false)} NO`);
+      lines.push('');
+
+      lines.push('High Fat / High Salt Food Intake:');
+      lines.push(`Eats processed / Fast foods and inihaw weekly: ${chk(fat.weekly_processed_fastfood === true)} YES  ${chk(fat.weekly_processed_fastfood === false)} NO`);
+      lines.push('');
+
+      lines.push('Dietary Fiber Intake:');
+      lines.push(`3 servings of vegetables daily: ${chk(fiber.vegetables_3_servings_daily === true)} YES  ${chk(fiber.vegetables_3_servings_daily === false)} NO`);
+      lines.push(`2-3 servings of fruits daily: ${chk(fiber.fruits_2_3_servings_daily === true)} YES  ${chk(fiber.fruits_2_3_servings_daily === false)} NO`);
+      lines.push('');
+
+      lines.push('=== VITAL SIGNS & PHYSICAL MEASUREMENTS ===');
+      lines.push(`BMI: ${vs.bmi !== undefined && vs.bmi !== null ? vs.bmi : ''}`);
+      const rbp = vs.raised_bp;
+      lines.push(`RAISED BP: ${rbp === true ? 'Yes' : (rbp === false ? 'No' : '')}`);
+      lines.push(`WaistLine: ${vs.waistline_cm !== undefined && vs.waistline_cm !== null ? vs.waistline_cm : ''}`);
+      lines.push(`HT: ${vs.height_cm !== undefined && vs.height_cm !== null ? vs.height_cm : ''}`);
+      lines.push(`1st Reading: ${bpr.first || ''}`);
+      lines.push(`WEIGHT: ${vs.weight_kg !== undefined && vs.weight_kg !== null ? vs.weight_kg : ''}`);
+      lines.push(`2nd Reading: ${bpr.second || ''}`);
+      lines.push('');
+
+      lines.push('=== CONSULTATION & CLINICAL FINDINGS ===');
+      for (const c of crs) {
+        const obj = c.objective_findings || {};
+        lines.push(`Date: ${c.date || ''}`);
+        lines.push(`Subjective Findings: ${c.subjective_findings || ''}`);
+        lines.push('Objective Findings:');
+        lines.push(`  Risk Level: ${obj.risk_level || ''}`);
+        lines.push(`  Percentage of Risk: ${obj.percentage_of_risk || ''}`);
+        lines.push(`  AGE: ${obj.age !== undefined && obj.age !== null ? obj.age : ''}`);
+        lines.push(`  WT: ${obj.weight_kg !== undefined && obj.weight_kg !== null ? obj.weight_kg : ''}`);
+        lines.push(`  HT: ${obj.height_cm !== undefined && obj.height_cm !== null ? obj.height_cm : ''}`);
+        lines.push(`  BP: ${obj.blood_pressure || ''}`);
+        const diagStr = Array.isArray(c.assessment_diagnosis) ? c.assessment_diagnosis.join(', ') : (c.assessment_diagnosis || '');
+        lines.push(`Assessment/Diagnosis: ${diagStr}`);
+        const planStr = Array.isArray(c.plan_treatment) ? c.plan_treatment.join(', ') : (c.plan_treatment || '');
+        lines.push(`Plan/Treatment Plan: ${planStr}`);
+        lines.push('');
+      }
+
+      return lines.join('\n');
+    }
+
+    // ── Save / Update Record ──
+    document.getElementById('record-update-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById('save-changes-btn');
+      saveBtn.classList.add('loading');
+      saveBtn.disabled = true;
+
+      try {
+        const editedJson = collectStructuredJsonFromForm();
+        const formattedText = formatItrToStandardTemplate(editedJson);
+
+        const textInput = document.getElementById('review-extracted-text');
+        const finalText = formattedText.trim() || textInput.value.trim();
+        textInput.value = finalText;
+
+        const payload = {
+          file_name: document.getElementById('review-filename').value,
+          record_type: document.getElementById('review-category').value,
+          extracted_text: finalText,
+          structured_json: editedJson
+        };
+
+        const res = await API.fetchJson(`/api/records/${recordId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res && res.success) {
+          showToast(res.message || 'Record updated successfully.', 'success');
+          await loadRecordDetails();
+        } else {
+          throw new Error(res ? res.message : 'Update failed.');
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to update record.', 'error');
+      } finally {
+        saveBtn.classList.remove('loading');
+        saveBtn.disabled = false;
+      }
+    });
+
+
+    // ── Archive Record ──
+    document.getElementById('archive-record-btn').addEventListener('click', async () => {
+      if (!confirm(`Archive this document record (${currentRecord.file_name})?\n\nIt can be viewed and restored at any time in the Archives section.`)) {
+        return;
+      }
+      try {
+        const res = await API.fetchJson(`/api/records/${recordId}/archive`, { method: 'PUT' });
+        if (res && res.success) {
+          showToast(res.message || 'Document archived successfully.', 'success');
+          setTimeout(() => {
+            window.location.href = currentRecord.patient_id ? `/dashboard/patients/profile/${currentRecord.patient_id}` : '/dashboard/patients';
+          }, 1000);
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to archive document.', 'error');
+      }
+    });
+
+    // ── Delete Record Permanently ──
+    document.getElementById('delete-record-btn').addEventListener('click', async () => {
+      if (!confirm(`⚠️ PERMANENTLY DELETE document "${currentRecord.file_name}"?\n\nThis action CANNOT be undone.`)) {
+        return;
+      }
+      if (!confirm(`Final confirmation: Are you completely sure you want to erase "${currentRecord.file_name}"?`)) {
+        return;
+      }
+      try {
+        const res = await API.fetchJson(`/api/records/${recordId}`, { method: 'DELETE' });
+        if (res && res.success) {
+          showToast(res.message || 'Document deleted permanently.', 'success');
+          setTimeout(() => {
+            window.location.href = currentRecord.patient_id ? `/dashboard/patients/profile/${currentRecord.patient_id}` : '/dashboard/patients';
+          }, 1000);
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to delete document.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

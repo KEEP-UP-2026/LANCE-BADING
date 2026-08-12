@@ -6,16 +6,199 @@
   <title>Edit Patient - KEEP UP</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+    .card-section {
+      background: var(--card-bg, rgba(20, 24, 36, 0.75));
+      border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08));
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary, #ffffff);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-icon {
+      width: 20px;
+      height: 20px;
+      fill: var(--color-primary, #6366f1);
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 992px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+
     @media (max-width: 576px) {
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .required-star {
+      color: #ef4444;
+      font-weight: bold;
+      margin-left: 3px;
+    }
+
+    .read-only-badge {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      color: var(--text-muted, #9ca3af) !important;
+      font-weight: 600;
+      cursor: not-allowed;
+    }
+
+    .patient-id-container {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .patient-id-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary, #94a3b8);
+    }
+
+    .patient-id-input {
+      font-family: monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-primary, #6366f1);
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 6px 14px;
+      border-radius: 6px;
+      width: 220px;
+      text-align: center;
+    }
+
+    .input-prefix-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .input-prefix-badge {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-right: none;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      padding: 0 12px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      color: var(--text-secondary, #94a3b8);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .input-prefix-group input {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 42px;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-primary, #f3f4f6);
+      user-select: none;
+    }
+
+    .radio-label input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--color-primary, #6366f1);
+      cursor: pointer;
+    }
+
+    .form-actions-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 16px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-cancel:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: #ef4444;
+      color: #f87171;
     }
   </style>
 </head>
@@ -72,74 +255,268 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <!-- Content Section -->
-      <div class="content-card glass-panel" style="margin-top: 20px; max-width: 800px;">
-        <div class="card-title-section">
-          <div>
-            <h2 class="card-title">Edit Patient Record</h2>
-            <p class="card-subtitle">Modify and correct demographic details for <strong style="color: var(--color-primary);" id="patient-number-title">PAT-XXXX</strong>.</p>
+      <!-- Main Form Container -->
+      <div style="margin-top: 20px; max-width: 1000px;">
+        <div class="content-card glass-panel" style="margin-bottom: 20px; padding: 20px 24px;">
+          <div class="card-title-section" style="margin-bottom: 0;">
+            <div>
+              <h2 class="card-title">Edit Patient Record</h2>
+              <p class="card-subtitle">Modify patient details for <strong style="color: var(--color-primary);" id="patient-number-title">PAT-XXXX</strong>.</p>
+            </div>
           </div>
         </div>
 
-        <form id="edit-patient-form" style="margin-top: 20px;">
-          <!-- Name fields -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="first_name">First Name *</label>
-              <input class="form-input" style="padding-left: 14px;" type="text" id="first_name" required>
+        <form id="edit-patient-form" style="margin-top: 10px;">
+          
+          <!-- CARD A: PATIENT IDENTIFICATION -->
+          <div class="card-section">
+            <div class="section-header">
+              <svg class="section-icon" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+              <h3 class="section-title">A. Patient Identification</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="middle_name">Middle Name</label>
-              <input class="form-input" style="padding-left: 14px;" type="text" id="middle_name">
+
+            <div class="patient-id-container">
+              <span class="patient-id-label">Patient ID / Record No.:</span>
+              <input type="text" id="patient_number" class="patient-id-input read-only-badge" readonly tabindex="-1">
+            </div>
+
+            <!-- Row 2: Pangalan (4 Columns) -->
+            <div class="grid-4">
+              <div class="form-group">
+                <label class="form-label" for="first_name">First Name<span class="required-star">*</span></label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="first_name" required tabindex="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="middle_name">Middle Name</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="middle_name" tabindex="2">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="last_name">Last Name<span class="required-star">*</span></label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="last_name" required tabindex="3">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="suffix">Suffix</label>
+                <select class="form-select" id="suffix" tabindex="4">
+                  <option value="">None</option>
+                  <option value="Jr.">Jr.</option>
+                  <option value="Sr.">Sr.</option>
+                  <option value="II">II</option>
+                  <option value="III">III</option>
+                  <option value="IV">IV</option>
+                  <option value="V">V</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Row 3: Personal Info (4 Columns) -->
+            <div class="grid-4">
+              <div class="form-group">
+                <label class="form-label" for="birth_date">Date of Birth<span class="required-star">*</span></label>
+                <input class="form-input" style="padding-left: 14px; cursor: pointer;" type="date" id="birth_date" required tabindex="5">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="age">Age</label>
+                <input class="form-input read-only-badge" style="padding-left: 14px;" type="text" id="age" placeholder="Auto-calculated" readonly tabindex="-1">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="sex">Sex<span class="required-star">*</span></label>
+                <select class="form-select" id="sex" required tabindex="6">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="civil_status">Civil Status</label>
+                <select class="form-select" id="civil_status" tabindex="7">
+                  <option value="">Select Status</option>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
+                  <option value="Widowed">Widowed</option>
+                  <option value="Separated">Separated</option>
+                  <option value="Divorced">Divorced</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Row 4: Background (3 Columns) -->
+            <div class="grid-3">
+              <div class="form-group">
+                <label class="form-label" for="place_of_birth">Place of Birth</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="place_of_birth" tabindex="8">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="religion">Religion</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="religion" tabindex="9">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="nationality">Nationality</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="nationality" value="Filipino" tabindex="10">
+              </div>
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="last_name">Last Name *</label>
-              <input class="form-input" style="padding-left: 14px;" type="text" id="last_name" required>
+
+          <!-- CARD B: CONTACT & ADDRESS -->
+          <div class="card-section">
+            <div class="section-header">
+              <svg class="section-icon" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <h3 class="section-title">B. Contact & Address</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="birth_date">Birth Date *</label>
-              <input class="form-input" style="padding-left: 14px; cursor: pointer;" type="date" id="birth_date" required>
+
+            <!-- Row 1: Lokal na Address (2 Columns) -->
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="house_street_purok">House No. / Street / Purok</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="house_street_purok" tabindex="11">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="barangay">Barangay</label>
+                <select class="form-select" id="barangay" tabindex="12">
+                  <option value="" disabled selected>Select Barangay</option>
+                </select>
+                <input type="text" class="form-input" id="custom_barangay" placeholder="Type Barangay name" style="display:none; margin-top: 8px;">
+              </div>
+            </div>
+
+            <!-- Row 2: Lungsod at Probinsya (2 Columns) -->
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="city_municipality">Municipality / City</label>
+                <select class="form-select" id="city_municipality" tabindex="13">
+                  <option value="" disabled selected>Select City / Municipality</option>
+                </select>
+                <input type="text" class="form-input" id="custom_city" placeholder="Type Municipality / City name" style="display:none; margin-top: 8px;">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="province">Province</label>
+                <select class="form-select" id="province" tabindex="14">
+                  <option value="" disabled selected>Select Province</option>
+                </select>
+                <input type="text" class="form-input" id="custom_province" placeholder="Type Province name" style="display:none; margin-top: 8px;">
+              </div>
+            </div>
+
+            <!-- Row 3: Contact (1 Column) -->
+            <div class="grid-1">
+              <div class="form-group">
+                <label class="form-label" for="contact_number">Contact Number<span class="required-star">*</span></label>
+                <div class="input-prefix-group">
+                  <div class="input-prefix-badge">+63</div>
+                  <input class="form-input" style="padding-left: 14px;" type="text" id="contact_number" required tabindex="15" maxlength="11">
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Sex and contact info -->
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="sex">Sex *</label>
-              <select class="form-select" id="sex" required>
-                <option value="" disabled>Select sex</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
+
+          <!-- CARD C: SOCIO-ECONOMIC DATA -->
+          <div class="card-section">
+            <div class="section-header">
+              <svg class="section-icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+              </svg>
+              <h3 class="section-title">C. Socio-economic Data</h3>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="contact_number">Contact Number</label>
-              <input class="form-input" style="padding-left: 14px;" type="text" id="contact_number">
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="occupation">Occupation</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="occupation" tabindex="16">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="philhealth_number">PhilHealth Number</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="philhealth_number" tabindex="17" maxlength="14">
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="philhealth_category">PhilHealth Category</label>
+                <select class="form-select" id="philhealth_category" tabindex="18">
+                  <option value="">Select Category</option>
+                  <option value="Direct Contributor">Direct Contributor</option>
+                  <option value="Indirect Contributor">Indirect Contributor</option>
+                  <option value="Senior Citizen">Senior Citizen</option>
+                  <option value="PWD">PWD (Person with Disability)</option>
+                  <option value="Indigent">Indigent</option>
+                  <option value="Dependent">Dependent</option>
+                  <option value="N/A">N/A / Non-Member</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">4Ps Beneficiary</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="is_4ps_beneficiary" value="Yes" id="4ps_yes" tabindex="19">
+                    <span>Yes</span>
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="is_4ps_beneficiary" value="No" id="4ps_no" checked tabindex="20">
+                    <span>No</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Address and Philhealth -->
-          <div class="form-group">
-            <label class="form-label" for="address">Residential Address *</label>
-            <textarea class="form-input" style="padding-left: 14px; height: 80px; resize: vertical;" id="address" required></textarea>
+
+          <!-- CARD D: EMERGENCY CONTACT -->
+          <div class="card-section" style="border-color: rgba(99, 102, 241, 0.25);">
+            <div class="section-header">
+              <svg class="section-icon" viewBox="0 0 24 24">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              <h3 class="section-title">D. Emergency Contact</h3>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label" for="emergency_contact_name">Emergency Contact Name</label>
+                <input class="form-input" style="padding-left: 14px;" type="text" id="emergency_contact_name" tabindex="21">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="emergency_relationship">Relationship to Patient</label>
+                <select class="form-select" id="emergency_relationship" tabindex="22">
+                  <option value="">Select Relationship</option>
+                  <option value="Parent">Parent</option>
+                  <option value="Spouse">Spouse</option>
+                  <option value="Child">Child</option>
+                  <option value="Sibling">Sibling</option>
+                  <option value="Guardian">Guardian</option>
+                  <option value="Relative">Relative</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-1">
+              <div class="form-group">
+                <label class="form-label" for="emergency_contact_number">Emergency Contact Number</label>
+                <div class="input-prefix-group">
+                  <div class="input-prefix-badge">+63</div>
+                  <input class="form-input" style="padding-left: 14px;" type="text" id="emergency_contact_number" tabindex="23" maxlength="11">
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="philhealth_number">PhilHealth Number</label>
-            <input class="form-input" style="padding-left: 14px;" type="text" id="philhealth_number">
-          </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
-            <a href="/dashboard/patients" class="btn btn-secondary">Cancel</a>
-            <button class="btn btn-primary" type="submit" id="save-btn">
+          <!-- Bottom Right Actions -->
+          <div class="form-actions-bar">
+            <a href="/dashboard/patients" class="btn-cancel" tabindex="24">Cancel</a>
+            <button class="btn btn-primary" type="submit" id="save-btn" tabindex="25">
+              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor; margin-right: 6px;">
+                <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+              </svg>
               <span class="btn-text">Save Changes</span>
               <span class="spinner"></span>
             </button>
           </div>
+
         </form>
       </div>
     </main>
@@ -149,11 +526,91 @@
   <script src="/js/toast.js"></script>
   <script src="/js/api.js"></script>
   <script>
+    const ALL_PROVINCES = [
+      "Abra", "Agusan del Norte", "Agusan del Sur", "Aklan", "Albay", "Antique", "Apayao", "Aurora", 
+      "Basilan", "Bataan", "Batanes", "Batangas", "Benguet", "Biliran", "Bohol", "Bukidnon", "Bulacan", 
+      "Cagayan", "Camarines Norte", "Camarines Sur", "Camiguin", "Capiz", "Catanduanes", "Cavite", "Cebu", 
+      "Cotabato (North Cotabato)", "Davao de Oro (Compostela Valley)", "Davao del Norte", "Davao del Sur", 
+      "Davao Occidental", "Davao Oriental", "Dinagat Islands", "Eastern Samar", "Guimaras", "Ifugao", 
+      "Ilocos Norte", "Ilocos Sur", "Iloilo", "Isabela", "Kalinga", "La Union", "Laguna", "Lanao del Norte", 
+      "Lanao del Sur", "Leyte", "Maguindanao del Norte", "Maguindanao del Sur", "Marinduque", "Masbate", 
+      "Metro Manila (NCR)", "Misamis Occidental", "Misamis Oriental", "Mountain Province", "Negros Occidental", 
+      "Negros Oriental", "Northern Samar", "Nueva Ecija", "Nueva Vizcaya", "Occidental Mindoro", "Oriental Mindoro", 
+      "Palawan", "Pampanga", "Pangasinan", "Quezon", "Quirino", "Rizal", "Romblon", "Samar (Western Samar)", 
+      "Sarangani", "Siquijor", "Sorsogon", "South Cotabato", "Southern Leyte", "Sultan Kudarat", "Sulu", 
+      "Surigao del Norte", "Surigao del Sur", "Tarlac", "Tawi-Tawi", "Zambales", "Zamboanga del Norte", 
+      "Zamboanga del Sur", "Zamboanga Sibugay"
+    ];
+
+    const PSGC_DATA = {
+      "Laguna": {
+        "Alaminos": ["San Agustin", "San Andres", "San Fernando", "San Francisco", "San Juan", "San Miguel", "San Pedro", "Santa Rosa", "Poblacion I", "Poblacion II", "Poblacion III", "Poblacion IV", "Palma", "San Jose", "San Nicolas"],
+        "Bay": ["Bitin", "Calo", "Dila", "Maitim", "Masaya", "Paciano Rizal", "Poblacion", "Puypuy", "Rizal", "San Agustin", "San Antonio", "San Isidro", "San Nicolas", "Santa Cruz", "Santo Domingo", "Tranca"],
+        "Biñan City": ["Canlalay", "Casile", "De La Paz", "Ganado", "Inosluban", "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", "Poblacion", "Santo Tomas", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Tubigan", "Zapote"],
+        "Cabuyao City": ["Baclaran", "Banaybanay", "Banlic", "Bigaa", "Butong", "Casile", "Diemo", "Gulod", "Mamatid", "Marinig", "Niugan", "Poblacion I", "Poblacion II", "Poblacion III", "Pulo", "Sala", "San Isidro"],
+        "Calamba City": ["Bagong Kalsada", "Bañadero", "Banlic", "Barandal", "Batino", "Bubuyan", "Bucal", "Bunggo", "Burol", "Camaligan", "Canlubang", "Halang", "La Mesa", "Lawa", "Lecheria", "Lingga", "Looc", "Mapagong", "Mayapa", "Paciano Rizal", "Palingon", "Pansol", "Parian", "Poblacion 1", "Poblacion 2", "Real", "San Cristobal", "San Jose", "Turbina", "Uwisan"],
+        "Calauan": ["Balayhangin", "Bangias", "Dayap", "Hanggan", "Imok", "Lamot 1", "Lamot 2", "Limao", "Mabacan", "Masiit", "Paliparan", "Perez", "Poblacion 1", "Poblacion 2", "San Isidro", "Santo Tomas"],
+        "Cavinti": ["Anglas", "Bangco", "Bukal", "Bulajo", "Cansuso", "Duhat", "Labayo", "Layasin", "Layug", "Magdapio", "Poblacion El Salvador", "Poblacion Palo", "Poblacion Sumucab", "Sawang", "Tibi"],
+        "Famy": ["Asufena", "Bagong Pag-Asa", "Balitoc", "Banaba", "Batuhan", "Cabalan", "Calumpang", "Cuevas", "Katumpapan", "Kapatalan", "Liyang", "Maquling", "Mayatba", "Minayutan", "Salingcob", "San Ramon"],
+        "Kalayaan": ["Longos", "San Antonio", "San Juan (Poblacion)"],
+        "Liliw": ["Bagong Formacion", "Bayate", "Bongkol", "Cabuyew", "Calumpang", "Daniw", "Ilayang Palina", "Ilayang San Roque", "Ilayang Sungi", "Ibabang Palina", "Ibabang San Roque", "Ibabang Sungi", "Luquin", "Malabo-Kaloti", "Maslun", "Mojon", "Novaliches", "Oples", "Pag-asa", "Palayan", "Rizal", "San Isidro", "Tushang"],
+        "Los Baños": ["Anos", "Bagong Silang", "Bambang", "Batong Malake", "Bayog", "Lalakay", "Maahas", "Malinta", "Mayondon", "Poblacion", "Putho Tuntungin", "San Antonio", "Tadlac"],
+        "Luisiana": ["De La Paz", "Barangay Zone 1", "Barangay Zone 2", "Barangay Zone 3", "Barangay Zone 4", "Barangay Zone 5", "Barangay Zone 6", "Barangay Zone 7", "Barangay Zone 8", "San Antonio", "San Buenaventura", "San Diego", "San Jose", "San Juan", "San Luis", "San Pablo", "San Pedro", "San Rafael", "San Roque", "Santo Domingo", "Santo Tomas", "San Isidro"],
+        "Lumban": ["Bagong Silang", "Balmis", "Cawayan", "Concepcion", "Lewin", "Maracta", "Maytalang I", "Maytalang II", "Pagsanjan", "Poblacion", "Salac", "Santo Niño"],
+        "Mabitac": ["Amuyong", "Bayanihan", "Luang", "Matalatala", "Nanguma", "Pag-Asa", "Poblacion", "San Antonio", "San Jose", "San Miguel", "San Pedro", "San Vicente", "Sinagtala"],
+        "Magdalena": ["Alipit", "Baanan", "Balanac", "Bucal", "Buenavista", "Bungkol", "Burol", "Ibabang Atingay", "Ibabang Butnong", "Ilayang Atingay", "Ilayang Butnong", "Ilog", "Malaking Ambling", "Malinao", "Maravilla", "Moluco", "Poblacion", "Pagsawitan", "Salasad", "San Antonio", "Santa Maria"],
+        "Majayjay": ["Ameca", "Bakia", "Balanac", "Balayhangin", "Banilad", "Banti", "Bitaoy", "Botocan", "Bucal", "Burgos", "Burol", "Coralao", "Gagalot", "Ibabang Banga", "Ilayang Banga", "Isabang", "Malinao", "Mayit", "Moluco", "Olla", "Oobi", "Origuel", "Panglan", "Pangil", "Piit", "Poblacion", "Pujoc", "San Francisco", "San Isidro", "San Miguel", "San Roque", "Suba", "Talortor", "Tanawan", "Taytay"],
+        "Nagcarlan": ["Abo", "Alibungbungan", "Allagao", "Balayhangin", "Balimbing", "Balinacon", "Bambang", "Banago", "Banca-banca", "Bangcuro", "Banilad", "Bayaitos", "Bikol", "Bongbongan", "Buboy", "Buenavista", "Bunga", "Cabaguin", "Cabuyao", "Calumpang", "Kanluran Kabubuhayan", "Labangan", "Lawaguin", "Luria", "Malaya", "Malinao", "Manaol", "Maravilla", "Nagcalbang", "Oples", "Palayan", "Palina", "Poblacion I", "Poblacion II", "Poblacion III", "Sabang", "San Francisco", "Santa Lucia", "Talahib", "Talangan", "Taytay", "Yukos"],
+        "Paete": ["Ermita", "Ibaba del Sur", "Ibaba del Norte", "Ilaya del Sur", "Ilaya del Norte", "Maytoong", "Quinale", "Bagumbayan", "Bangkusay"],
+        "Pagsanjan": ["Anibong", "Biñan", "Buboy", "Cabuyao", "Calusiche", "Dingin", "Lambac", "Layugan", "Magdapio", "Maulawin", "Pinagsanjan", "Poblacion Uno", "Poblacion Dos", "Sabang", "Sampaloc"],
+        "Pakil": ["Baño", "Banilan", "Burgos", "Casa Real", "Casinsin", "Dorado", "Gonzalez", "Kabulusan", "Matikiw", "Rizal", "Tavera", "West Poblacion", "Sarreal"],
+        "Pangil": ["Balian", "Isla", "Natividad", "Poblacion Sulib", "Poblacion San Jose", "Sulib", "Galalan", "Dambo"],
+        "Pila": ["Aplaya", "Bagong Pook", "Bukal", "Bulilan Sur", "Bulilan Norte", "Concepcion", "Labuin", "Lingga", "Masico", "Mojon", "Pansol", "Pinagbayanan", "Poblacion", "San Antonio", "San Lorenzo", "Santa Clara Sur", "Santa Clara Norte", "Tubuan"],
+        "Rizal": ["Antipolo", "Entablado", "Laguan", "Paule 1", "Paule 2", "Poblacion", "Pook", "Tala", "Talaga", "Tiaong", "Vittoria"],
+        "San Pablo City": ["Bagong Bayan", "Bagong Pook", "Barangay I-A", "Barangay I-B", "Barangay II-A", "Barangay II-B", "Barangay III-A", "Barangay III-B", "Barangay IV-A", "Barangay IV-B", "Barangay V-A", "Barangay V-B", "Barangay VI-A", "Barangay VI-B", "Barangay VII-A", "Barangay VII-B", "Del Remedio", "San Bartolome", "San Crispin", "San Cristobal", "San Diego", "San Francisco", "San Gabriel", "San Gregorio", "San Ignacio", "San Isidro", "San Jose", "San Juan", "San Lucas 1", "San Lucas 2", "San Marcos", "San Mateo", "San Miguel", "San Nicolas", "San Pedro", "San Rafael", "San Roque", "San Vicente", "Santa Ana", "Santa Cruz", "Santa Filomena", "Santa Isabel", "Santa Maria", "Santa Veronica", "Santiago"],
+        "San Pedro City": ["Chrysanthemum", "Cuyab", "Estrella", "Fatima", "GSIS", "Landayan", "Laram", "Magsaysay", "Maharlika", "Nueva", "Pacita 1", "Pacita 2", "Poblacion", "Riverside", "Rosario", "Sampaguita Village", "San Antonio", "San Lorenzo", "San Roque", "San Vicente", "Santo Niño", "United Bayanihan"],
+        "Santa Cruz": ["Bagumbayan", "Bubukal", "Calios", "Duhat", "Gatid", "Labuin", "Oogong", "Pagsawitan", "Palasan", "Patimbao", "Poblacion I", "Poblacion II", "Poblacion III", "Poblacion IV", "San Jose", "San Juan", "San Pablo Norte", "San Pablo Sur", "Santisima Cruz", "Santo Angel Central", "Santo Angel Norte", "Santo Angel Sur"],
+        "Santa Maria": ["Bagong Pook", "Bagumbayan", "Bubucal", "Cabooan", "Calangay", "Cambuja", "Coralan", "Cansuso", "Inocencio", "J. Santiago", "Kayhakat", "Macasipac", "Masinao", "Matalinting", "Pao-o", "Poblacion I", "Poblacion II", "Poblacion III", "Poblacion IV", "Real", "San Antonio", "San Jose"],
+        "Santa Rosa City": ["Aplaya", "Balibago", "Cainginto", "Dila", "Dita", "Don Jose", "Ibaba", "Kanluran", "Labas", "Macabling", "Malitlit", "Market Area", "Pooc", "Pulai", "Sinalhan", "Tagapo"],
+        "Siniloan": ["Acevida", "Bagumbarangay", "G. Redor", "Halayhayin", "I. Castro", "L. De Leon", "Laguio", "Liyang", "Lunas", "M. Pandeño", "Macatad", "Maybo", "P. Burgos", "Pandeño", "Salubungan", "Valderrama"],
+        "Victoria": ["Banca-banca", "Daniw", "Masapang", "Nanhaya", "Pagalangan", "San Benito", "San Francisco", "San Roque", "Santa Cruz"]
+      },
+      "Cavite": {
+        "Imus City": ["Anabu I-A", "Anabu I-B", "Anabu II-A", "Anabu II-B", "Bayan Luma I", "Bayan Luma II", "Bucandala I", "Bucandala II", "Malagasang I-A", "Malagasang II-A", "Poblacion I-A"],
+        "Bacoor City": ["Alima", "Anaban", "Bayanan", "Digman", "Habay I", "Ligas I", "Mambog I", "Niog I", "Panapaan I", "Poblacion", "Real I", "Salawag", "Zapote I"],
+        "Dasmariñas City": ["Burol I", "Burol II", "Datu Esmael", "Fatima I", "Langkaan I", "Paliparan I", "Paliparan II", "Paliparan III", "Poblacion I", "Salitran I", "Sampaloc I"],
+        "Tagaytay City": ["Asisan", "Bagong Tubig", "Calabuso", "Iruhin East", "Mendez Crossing East", "Patutong Malaki", "Poblacion", "San Jose", "Sungay North"],
+        "General Trias City": ["Arnaldo", "Bacao I", "Bagumbayan", "Bambang", "Governor Ferrer", "Manggahan", "Navarro", "Pasong Camachile I", "Poblacion", "San Francisco"],
+        "Trece Martires City": ["Agapito Del Rosario", "Cabuco", "Concepcion", "De Ocampo", "Inocencio", "Lallana", "Lapidario", "Lucucian", "Osorio", "Perez", "San Agustin"],
+        "Kawit": ["Balsahan-Bisita", "Batong Dalig", "Binakayan", "Gahak", "Kaingen", "Magdalo", "Poblacion", "San Sebastian", "Tabon 1", "Tabon 2", "Wakas 1"],
+        "Silang": ["Acacia", "Anahaw 1", "Biga 1", "Biluso", "Buctao", "Bulihan", "Cabangaan", "Carmen", "Iba", "Kaong", "Lalaan 1", "Lalaan 2", "Lucsuhin", "Maguyam", "Poblacion 1"]
+      },
+      "Metro Manila (NCR)": {
+        "Manila": ["Binondo", "Ermita", "Intramuros", "Malate", "Paco", "Pandacan", "Port Area", "Quiapo", "Sampaloc", "San Andres", "San Miguel", "San Nicolas", "Santa Cruz", "Santa Ana", "Tondo I", "Tondo II"],
+        "Quezon City": ["Alicia", "Amihan", "Bagong Pag-asa", "Batasan Hills", "Commonwealth", "Cubao", "Diliman", "Fairview", "Holy Spirit", "Kamuning", "Novaliches", "Payatas", "Tandang Sora"],
+        "Makati": ["Bel-Air", "Carmona", "Dasmariñas", "Forbes Park", "Guadalupe Nuevo", "Guadalupe Viejo", "Kasilawan", "Magallanes", "Olympia", "Poblacion", "San Antonio", "Urdaneta"],
+        "Pasig": ["Bagong Ilog", "Bambang", "Caniogan", "Kapitolyo", "Manggahan", "Pinagbuhatan", "Rosario", "San Antonio", "San Joaquin", "Santa Lucia", "Ugong"],
+        "Taguig": ["Bagumbayan", "Bambang", "Calzada", "Central Signal Village", "Fort Bonifacio", "Lower Bicutan", "Maharlika Village", "Pinagsama", "Upper Bicutan", "Ususan"]
+      },
+      "Batangas": {
+        "Batangas City": ["Alangilan", "Bolbok", "Calicanto", "Cuta", "Kumintang Ibaba", "Kumintang Ilaya", "Poblacion", "San Isidro", "Santa Clara"],
+        "Lipa City": ["Balintawak", "Bugtong na Pulo", "Dagatan", "Lodlod", "Mataas na Lupa", "Poblacion Barangay 1", "Sabang", "Tambo"],
+        "Tanauan City": ["Bagumbayan", "Darasa", "Natatas", "Poblacion Barangay 1", "Poblacion Barangay 2", "Sambat", "Trapiche"]
+      },
+      "Bulacan": {
+        "Malolos City": ["Atlag", "Barihan", "Bulihan", "Canalate", "Catmon", "Dakila", "Guinhawa", "Lugam", "Mabolo", "Mojon", "Panasahan", "San Gabriel"],
+        "Meycauayan City": ["Banga", "Bayugo", "Calvario", "Camalig", "Iba", "Lawa", "Libtong", "Malhacan", "Poblacion", "Saluysoy"]
+      },
+      "Rizal": {
+        "Antipolo City": ["Bagong Nayon", "Beverly Hills", "Calawis", "Cupang", "Dalig", "Dela Paz", "Inarawan", "Mambugan", "Mayamot", "Muntindilaw", "San Isidro", "San Jose", "San Juan", "San Luis", "San Roque", "Santa Cruz"],
+        "Cainta": ["San Andres", "San Isidro", "San Juan", "San Roque", "Santa Rosa", "Santo Domingo", "Santo Niño"]
+      }
+    };
+
     let currentUser = null;
     let patientId = null;
 
     document.addEventListener('DOMContentLoaded', async () => {
-      // 1. Get patient ID from URL path
       const pathParts = window.location.pathname.split('/');
       patientId = pathParts[pathParts.length - 1];
 
@@ -163,17 +620,14 @@
         return;
       }
 
-      // 2. Load user profile details
       currentUser = await loadUserProfile();
       if (!currentUser) return;
 
-      // Restrict access on frontend
       if (currentUser.role !== 'RECORDS_STAFF') {
         window.location.href = '/dashboard/patients?error=unauthorized';
         return;
       }
 
-      // 3. Set mobile header initials
       const mobileInitials = document.getElementById('mobile-user-initials');
       if (mobileInitials && currentUser.full_name) {
         mobileInitials.textContent = currentUser.full_name
@@ -184,13 +638,19 @@
           .toUpperCase();
       }
 
-      // 4. Inject Navigation Links
       injectSidebarLinks(currentUser.role);
-
-      // 5. Pre-fill patient details
+      setupInputMasks();
+      setupAddressSelectDropdowns();
       await loadPatientData();
 
-      // 6. Form submission handler
+      const birthDateInput = document.getElementById('birth_date');
+      const ageInput = document.getElementById('age');
+
+      birthDateInput.addEventListener('change', () => {
+        const age = calculateAge(birthDateInput.value);
+        ageInput.value = age !== '' ? `${age} yrs old` : '';
+      });
+
       const editForm = document.getElementById('edit-patient-form');
       const saveBtn = document.getElementById('save-btn');
 
@@ -200,11 +660,52 @@
         const first_name = document.getElementById('first_name').value;
         const middle_name = document.getElementById('middle_name').value;
         const last_name = document.getElementById('last_name').value;
+        const suffix = document.getElementById('suffix').value;
         const birth_date = document.getElementById('birth_date').value;
         const sex = document.getElementById('sex').value;
-        const address = document.getElementById('address').value;
-        const contact_number = document.getElementById('contact_number').value;
+        const civil_status = document.getElementById('civil_status').value;
+        const place_of_birth = document.getElementById('place_of_birth').value;
+        const religion = document.getElementById('religion').value;
+        const nationality = document.getElementById('nationality').value;
+
+        const house_street_purok = document.getElementById('house_street_purok').value;
+        
+        const provSelect = document.getElementById('province').value;
+        const province = (provSelect === 'Other') 
+          ? document.getElementById('custom_province').value 
+          : provSelect;
+
+        const citySelect = document.getElementById('city_municipality').value;
+        const city_municipality = (citySelect === 'Other' || provSelect === 'Other') 
+          ? document.getElementById('custom_city').value 
+          : citySelect;
+
+        const brgySelect = document.getElementById('barangay').value;
+        const barangay = (brgySelect === 'Other' || citySelect === 'Other' || provSelect === 'Other') 
+          ? document.getElementById('custom_barangay').value 
+          : brgySelect;
+
+        const rawContact = document.getElementById('contact_number').value.trim();
+        const contact_number = rawContact ? `+63${rawContact}` : '';
+
+        const occupation = document.getElementById('occupation').value;
         const philhealth_number = document.getElementById('philhealth_number').value;
+        const philhealth_category = document.getElementById('philhealth_category').value;
+        
+        const beneficiaryRadio = document.querySelector('input[name="is_4ps_beneficiary"]:checked');
+        const is_4ps_beneficiary = beneficiaryRadio ? beneficiaryRadio.value : 'No';
+
+        const emergency_contact_name = document.getElementById('emergency_contact_name').value;
+        const emergency_relationship = document.getElementById('emergency_relationship').value;
+        
+        const rawEmergencyContact = document.getElementById('emergency_contact_number').value.trim();
+        const emergency_contact_number = rawEmergencyContact ? `+63${rawEmergencyContact}` : '';
+
+        const constructedAddress = [house_street_purok, barangay, city_municipality, province]
+          .filter(Boolean)
+          .map(s => s.trim())
+          .join(', ');
+        const address = constructedAddress || 'N/A';
 
         saveBtn.classList.add('loading');
         saveBtn.disabled = true;
@@ -216,16 +717,31 @@
               first_name,
               middle_name,
               last_name,
+              suffix,
               birth_date,
               sex,
+              civil_status,
+              place_of_birth,
+              religion,
+              nationality,
+              house_street_purok,
+              barangay,
+              city_municipality,
+              province,
               address,
               contact_number,
-              philhealth_number
+              occupation,
+              philhealth_number,
+              philhealth_category,
+              is_4ps_beneficiary,
+              emergency_contact_name,
+              emergency_relationship,
+              emergency_contact_number
             })
           });
 
           if (res && res.success) {
-            showToast(res.message, 'success');
+            showToast(res.message || 'Patient record updated successfully.', 'success');
             setTimeout(() => {
               window.location.href = '/dashboard/patients';
             }, 1000);
@@ -237,7 +753,6 @@
         }
       });
 
-      // 7. Logout handler
       document.getElementById('logout-btn').addEventListener('click', async () => {
         if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
           await API.logout();
@@ -245,75 +760,236 @@
       });
     });
 
-    // Fetch existing patient details and map to form inputs
     async function loadPatientData() {
       try {
         const res = await API.fetchJson(`/api/patients/${patientId}`);
-        if (res && res.success) {
+        if (res && res.success && res.patient) {
           const p = res.patient;
-          
           document.getElementById('patient-number-title').textContent = p.patient_number;
-          document.getElementById('first_name').value = p.first_name;
+          document.getElementById('patient_number').value = p.patient_number;
+
+          document.getElementById('first_name').value = p.first_name || '';
           document.getElementById('middle_name').value = p.middle_name || '';
-          document.getElementById('last_name').value = p.last_name;
-          document.getElementById('sex').value = p.sex;
-          document.getElementById('address').value = p.address;
-          document.getElementById('contact_number').value = p.contact_number || '';
-          document.getElementById('philhealth_number').value = p.philhealth_number || '';
-          
-          // Format date for inputs (YYYY-MM-DD)
+          document.getElementById('last_name').value = p.last_name || '';
+          document.getElementById('suffix').value = p.suffix || '';
+
           if (p.birth_date) {
-            const dateObj = new Date(p.birth_date);
-            if (!isNaN(dateObj.getTime())) {
-              const y = dateObj.getFullYear();
-              const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-              const d = String(dateObj.getDate()).padStart(2, '0');
-              document.getElementById('birth_date').value = `${y}-${m}-${d}`;
+            const bDateStr = new Date(p.birth_date).toISOString().split('T')[0];
+            document.getElementById('birth_date').value = bDateStr;
+            const age = calculateAge(bDateStr);
+            document.getElementById('age').value = age !== '' ? `${age} yrs old` : '';
+          }
+
+          document.getElementById('sex').value = p.sex || '';
+          document.getElementById('civil_status').value = p.civil_status || '';
+          document.getElementById('place_of_birth').value = p.place_of_birth || '';
+          document.getElementById('religion').value = p.religion || '';
+          document.getElementById('nationality').value = p.nationality || 'Filipino';
+
+          document.getElementById('house_street_purok').value = p.house_street_purok || '';
+          
+          // Populate Province select
+          const provSelect = document.getElementById('province');
+          const citySelect = document.getElementById('city_municipality');
+          const brgySelect = document.getElementById('barangay');
+
+          if (p.province) {
+            let foundProv = Array.from(provSelect.options).some(opt => opt.value === p.province);
+            if (foundProv) {
+              provSelect.value = p.province;
+              provSelect.dispatchEvent(new Event('change'));
+            } else {
+              provSelect.value = 'Other';
+              provSelect.dispatchEvent(new Event('change'));
+              document.getElementById('custom_province').value = p.province;
             }
           }
+
+          if (p.city_municipality) {
+            let foundCity = Array.from(citySelect.options).some(opt => opt.value === p.city_municipality);
+            if (foundCity) {
+              citySelect.value = p.city_municipality;
+              citySelect.dispatchEvent(new Event('change'));
+            } else {
+              citySelect.value = 'Other';
+              citySelect.dispatchEvent(new Event('change'));
+              document.getElementById('custom_city').value = p.city_municipality;
+            }
+          }
+
+          if (p.barangay) {
+            let foundBrgy = Array.from(brgySelect.options).some(opt => opt.value === p.barangay);
+            if (foundBrgy) {
+              brgySelect.value = p.barangay;
+            } else {
+              brgySelect.value = 'Other';
+              brgySelect.dispatchEvent(new Event('change'));
+              document.getElementById('custom_barangay').value = p.barangay;
+            }
+          }
+
+          if (p.contact_number) {
+            document.getElementById('contact_number').value = p.contact_number.replace(/^\+63/, '');
+          }
+
+          document.getElementById('occupation').value = p.occupation || '';
+          document.getElementById('philhealth_number').value = p.philhealth_number || '';
+          document.getElementById('philhealth_category').value = p.philhealth_category || '';
+
+          if (p.is_4ps_beneficiary === 'Yes') {
+            document.getElementById('4ps_yes').checked = true;
+          } else {
+            document.getElementById('4ps_no').checked = true;
+          }
+
+          document.getElementById('emergency_contact_name').value = p.emergency_contact_name || '';
+          document.getElementById('emergency_relationship').value = p.emergency_relationship || '';
+          if (p.emergency_contact_number) {
+            document.getElementById('emergency_contact_number').value = p.emergency_contact_number.replace(/^\+63/, '');
+          }
         }
-      } catch (error) {
-        showToast('Error loading patient demographics.', 'error');
-        setTimeout(() => { window.location.href = '/dashboard/patients'; }, 2000);
+      } catch (err) {
+        showToast('Failed to load patient data.', 'error');
       }
     }
 
-    // Write navigation links
-    function injectSidebarLinks(role) {
-      const navContainer = document.getElementById('layout-nav-links');
-      let linksHtml = '';
-
-      if (role === 'RECORDS_STAFF') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/records" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/duplicates" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Duplicate Warnings
-            </a>
-          </li>
-        `;
+    function calculateAge(birthDateString) {
+      if (!birthDateString) return '';
+      const birthDate = new Date(birthDateString);
+      if (isNaN(birthDate.getTime())) return '';
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
       }
-
-      navContainer.innerHTML = linksHtml;
+      return age >= 0 ? age : 0;
     }
+
+    function setupAddressSelectDropdowns() {
+      const provSelect = document.getElementById('province');
+      const citySelect = document.getElementById('city_municipality');
+      const brgySelect = document.getElementById('barangay');
+
+      const customProv = document.getElementById('custom_province');
+      const customCity = document.getElementById('custom_city');
+      const customBrgy = document.getElementById('custom_barangay');
+
+      provSelect.innerHTML = '<option value="" disabled selected>Select Province</option>';
+      ALL_PROVINCES.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        provSelect.appendChild(opt);
+      });
+      const optOtherProv = document.createElement('option');
+      optOtherProv.value = 'Other';
+      optOtherProv.textContent = 'Other / Type Custom Location';
+      provSelect.appendChild(optOtherProv);
+
+      provSelect.addEventListener('change', () => {
+        const selProv = provSelect.value;
+        citySelect.innerHTML = '<option value="" disabled selected>Select City / Municipality</option>';
+        brgySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+
+        if (selProv === 'Other') {
+          customProv.style.display = 'block';
+          customCity.style.display = 'block';
+          customBrgy.style.display = 'block';
+          citySelect.value = '';
+          brgySelect.value = '';
+          citySelect.disabled = true;
+          brgySelect.disabled = true;
+          return;
+        }
+
+        customProv.style.display = 'none';
+        customCity.style.display = 'none';
+        customBrgy.style.display = 'none';
+        citySelect.disabled = false;
+        brgySelect.disabled = false;
+
+        if (PSGC_DATA[selProv]) {
+          const cities = Object.keys(PSGC_DATA[selProv]);
+          cities.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            citySelect.appendChild(opt);
+          });
+        }
+
+        const optOtherCity = document.createElement('option');
+        optOtherCity.value = 'Other';
+        optOtherCity.textContent = 'Other / Type Custom Municipality';
+        citySelect.appendChild(optOtherCity);
+      });
+
+      citySelect.addEventListener('change', () => {
+        const selProv = provSelect.value;
+        const selCity = citySelect.value;
+
+        brgySelect.innerHTML = '<option value="" disabled selected>Select Barangay</option>';
+
+        if (selCity === 'Other') {
+          customCity.style.display = 'block';
+          customBrgy.style.display = 'block';
+          brgySelect.value = '';
+          brgySelect.disabled = true;
+          return;
+        }
+
+        customCity.style.display = 'none';
+        customBrgy.style.display = 'none';
+        brgySelect.disabled = false;
+
+        if (selProv && selCity && PSGC_DATA[selProv] && PSGC_DATA[selProv][selCity]) {
+          const barangays = PSGC_DATA[selProv][selCity];
+          barangays.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b;
+            opt.textContent = b;
+            brgySelect.appendChild(opt);
+          });
+        }
+
+        const optOtherBrgy = document.createElement('option');
+        optOtherBrgy.value = 'Other';
+        optOtherBrgy.textContent = 'Other / Type Custom Barangay';
+        brgySelect.appendChild(optOtherBrgy);
+      });
+
+      brgySelect.addEventListener('change', () => {
+        if (brgySelect.value === 'Other') {
+          customBrgy.style.display = 'block';
+        } else {
+          customBrgy.style.display = 'none';
+        }
+      });
+    }
+
+    function setupInputMasks() {
+      const contactInput = document.getElementById('contact_number');
+      const emergencyContactInput = document.getElementById('emergency_contact_number');
+      const philhealthInput = document.getElementById('philhealth_number');
+
+      [contactInput, emergencyContactInput].forEach(input => {
+        input.addEventListener('input', (e) => {
+          e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        });
+      });
+
+      philhealthInput.addEventListener('input', (e) => {
+        const rawDigits = e.target.value.replace(/\D/g, '').slice(0, 12);
+        let formatted = '';
+        if (rawDigits.length > 0) formatted += rawDigits.slice(0, 2);
+        if (rawDigits.length > 2) formatted += '-' + rawDigits.slice(2, 11);
+        if (rawDigits.length > 11) formatted += '-' + rawDigits.slice(11, 12);
+        e.target.value = formatted;
+      });
+    }
+
+
   </script>
 </body>
 </html>

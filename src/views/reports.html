@@ -33,28 +33,30 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 25px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 2px solid #e2e8f0;
       padding-bottom: 15px;
     }
     .tab-btn {
-      padding: 10px 18px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: var(--border-radius-sm);
-      color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 600;
+      padding: 10px 22px;
+      background: #F5F7FA;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 24px;
+      color: #25282D;
+      font-size: 13.5px;
+      font-weight: 700;
       cursor: pointer;
       transition: var(--transition);
     }
     .tab-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
+      background: #FCE8E8;
+      color: #C62828;
+      border-color: #fca5a5;
     }
     .tab-btn.active {
-      background: rgba(99, 102, 241, 0.1);
-      border-color: var(--color-primary);
-      color: #fff;
+      background: #C62828;
+      border-color: #C62828;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(198, 40, 40, 0.3);
     }
     .report-card-grid {
       display: grid;
@@ -77,13 +79,13 @@
     .percentage-bar-container {
       flex: 1;
       height: 8px;
-      background: rgba(255, 255, 255, 0.05);
+      background: #e2e8f0;
       border-radius: 4px;
       overflow: hidden;
     }
     .percentage-bar-fill {
       height: 100%;
-      background: var(--color-primary);
+      background: #C62828;
       border-radius: 4px;
       width: 0%;
       transition: width 0.5s ease-out;
@@ -95,17 +97,17 @@
       margin-bottom: 25px;
     }
     .summary-block-card {
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.03);
+      background: #F5F7FA;
+      border: 1px solid #e2e8f0;
       border-radius: var(--border-radius-sm);
       padding: 20px;
     }
     .summary-block-title {
       font-size: 14px;
-      font-weight: 700;
-      color: var(--color-primary);
+      font-weight: 800;
+      color: #C62828;
       margin-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid #e2e8f0;
       padding-bottom: 6px;
     }
     .summary-metric-item {
@@ -114,7 +116,8 @@
       align-items: center;
       padding: 6px 0;
       font-size: 13px;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.02);
+      color: #25282D;
+      border-bottom: 1px dashed #e2e8f0;
     }
     .summary-metric-item:last-child {
       border-bottom: none;
@@ -232,7 +235,6 @@
           <button class="tab-btn" onclick="switchTab('patients')">Patient Records</button>
           <button class="tab-btn" onclick="switchTab('consultations')">Consultation</button>
           <button class="tab-btn" onclick="switchTab('immunizations')">Immunization</button>
-          <button class="tab-btn" onclick="switchTab('anti-rabies')">Anti-Rabies</button>
           <button class="tab-btn" onclick="switchTab('maternal-care')">Maternal Care</button>
           <button class="tab-btn" onclick="switchTab('duplicates')">Duplicates Warning</button>
           <button class="tab-btn" onclick="switchTab('summary')">Healthcare Summary</button>
@@ -271,6 +273,12 @@
           <div class="report-card-grid">
             <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
               <div class="stats-info">
+                <span class="stats-label">Individual Treatment Records</span>
+                <span class="stats-value" id="overview-itr">0</span>
+              </div>
+            </div>
+            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
+              <div class="stats-info">
                 <span class="stats-label">Consultations</span>
                 <span class="stats-value" id="overview-consultations">0</span>
               </div>
@@ -279,12 +287,6 @@
               <div class="stats-info">
                 <span class="stats-label">Immunizations</span>
                 <span class="stats-value" id="overview-immunizations">0</span>
-              </div>
-            </div>
-            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
-              <div class="stats-info">
-                <span class="stats-label">Anti-Rabies</span>
-                <span class="stats-value" id="overview-anti-rabies">0</span>
               </div>
             </div>
             <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
@@ -298,8 +300,8 @@
 
         <!-- TAB 2: PATIENT RECORD SUMMARY -->
         <div id="section-patients" class="report-section">
-          <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
-            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Patient Status Metrics</h4>
+          <div style="background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
+            <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #25282D;">Patient Status Metrics</h4>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;">
               <div>
                 <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Patients</span>
@@ -346,7 +348,7 @@
         <!-- TAB 3: CONSULTATIONS REPORT -->
         <div id="section-consultations" class="report-section">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Consultations count: <strong id="consultations-count-badge" style="color: #fff;">0</strong></h4>
+            <h4 style="margin: 0; font-size: 13px; color: #334155;">Consultations count: <strong id="consultations-count-badge" style="color: #C62828;">0</strong></h4>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -368,7 +370,7 @@
         <!-- TAB 4: IMMUNIZATIONS REPORT -->
         <div id="section-immunizations" class="report-section">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Immunizations count: <strong id="immunizations-count-badge" style="color: #fff;">0</strong></h4>
+            <h4 style="margin: 0; font-size: 13px; color: #334155;">Immunizations count: <strong id="immunizations-count-badge" style="color: #C62828;">0</strong></h4>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -390,7 +392,7 @@
         <!-- TAB 5: ANTI-RABIES REPORT -->
         <div id="section-anti-rabies" class="report-section">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Anti-Rabies count: <strong id="anti-rabies-count-badge" style="color: #fff;">0</strong></h4>
+            <h4 style="margin: 0; font-size: 13px; color: #334155;">Anti-Rabies count: <strong id="anti-rabies-count-badge" style="color: #C62828;">0</strong></h4>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -412,7 +414,7 @@
         <!-- TAB 6: MATERNAL CARE REPORT -->
         <div id="section-maternal-care" class="report-section">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: var(--text-secondary);">Maternal Care count: <strong id="maternal-care-count-badge" style="color: #fff;">0</strong></h4>
+            <h4 style="margin: 0; font-size: 13px; color: #334155;">Maternal Care count: <strong id="maternal-care-count-badge" style="color: #C62828;">0</strong></h4>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -433,8 +435,8 @@
 
         <!-- TAB 7: DUPLICATE RECORD REPORT -->
         <div id="section-duplicates" class="report-section">
-          <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
-            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Duplicate Demographic Conflict States</h4>
+          <div style="background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
+            <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #25282D;">Duplicate Demographic Conflict States</h4>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 15px;">
               <div>
                 <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Detected</span>
@@ -1066,97 +1068,7 @@
         .replace(/'/g, "&#039;");
     }
 
-    function injectSidebarLinks(role) {
-      const navContainer = document.getElementById('layout-nav-links');
-      let linksHtml = '';
 
-      if (role === 'RHU_ADMINISTRATOR') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/admin" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/admin/users" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-              User Accounts
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/duplicates" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Duplicate Warnings
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/reports" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Reports Dashboard
-            </a>
-          </li>
-        `;
-      } 
-      else if (role === 'ADMINISTRATIVE_STAFF') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/reports" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Reports Dashboard
-            </a>
-          </li>
-        `;
-      }
-      else if (role === 'RECORDS_STAFF') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/records" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/duplicates" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Duplicate Warnings
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/reports" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Reports Dashboard
-            </a>
-          </li>
-        `;
-      }
-
-      navContainer.innerHTML = linksHtml;
-    }
   </script>
 </body>
 </html>

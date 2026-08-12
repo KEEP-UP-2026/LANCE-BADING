@@ -6,81 +6,110 @@
   <title>Patient Profile - KEEP UP</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
+    /* =============================================
+       PATIENT PROFILE - STACKED VERTICAL LAYOUT
+    ============================================= */
+
     .category-card.active-binder {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
-      background: rgba(99, 102, 241, 0.05);
+      border-color: #C62828;
+      box-shadow: 0 0 15px rgba(198, 40, 40, 0.2);
+      background: #FCE8E8;
     }
+
+    /* Full-width stacked layout (no more side-by-side grid) */
     .profile-layout {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 30px;
-    }
-    
-    .demographics-panel {
-      padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 20px;
+    }
+    
+    /* Horizontal profile card: avatar + info grid side by side */
+    .demographics-panel {
+      padding: 22px 28px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .profile-avatar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      min-width: 130px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 28px;
+    }
+
+    .profile-fields-col {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px 24px;
+      align-items: start;
+    }
+
+    .profile-actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+      min-width: 170px;
+      border-left: 1px solid #e2e8f0;
+      padding-left: 24px;
     }
 
     .demo-info-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      padding-bottom: 12px;
-    }
-
-    .demo-info-group:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
+      gap: 4px;
     }
 
     .demo-label {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
     .demo-value {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-primary);
       font-weight: 600;
+      line-height: 1.4;
     }
 
-    .categories-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
+    /* Binder category cards: 5 across in one row */
     .category-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-top: 20px;
     }
 
     .category-card {
-      padding: 20px;
+      padding: 16px;
       display: flex;
-      align-items: center;
-      gap: 15px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
       position: relative;
       overflow: hidden;
-      min-height: 100px;
       transition: var(--transition);
+      cursor: pointer;
     }
 
     .category-card:hover {
       border-color: var(--card-border-focus);
+      transform: translateY(-2px);
     }
 
     .category-icon {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
       border-radius: var(--border-radius-sm);
       background: rgba(99, 102, 241, 0.1);
       color: var(--color-primary);
@@ -91,34 +120,30 @@
     }
 
     .category-icon svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       fill: currentColor;
     }
 
-    .category-info {
-      flex: 1;
-    }
+    .category-info { width: 100%; }
 
     .category-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 4px;
+      line-height: 1.3;
     }
 
     .category-status {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
       font-weight: 600;
     }
 
     .category-lock-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(8, 10, 16, 0.85);
       backdrop-filter: blur(4px);
       display: flex;
@@ -151,13 +176,56 @@
       fill: currentColor;
     }
 
-    @media (max-width: 992px) {
-      .profile-layout {
-        grid-template-columns: 1fr;
+    /* Binder details panel: full width table */
+    #binder-details-panel .data-table th,
+    #binder-details-panel .data-table td {
+      white-space: nowrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .profile-fields-col {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .category-grid {
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
-    @media (max-width: 576px) {
+    @media (max-width: 768px) {
+      .demographics-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .profile-avatar-col {
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-right: 0;
+        padding-bottom: 16px;
+        flex-direction: row;
+        gap: 16px;
+        align-items: center;
+      }
+      .profile-actions-col {
+        border-left: none;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        padding-left: 0;
+        padding-top: 16px;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .profile-fields-col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .profile-fields-col {
+        grid-template-columns: 1fr;
+      }
       .category-grid {
         grid-template-columns: 1fr;
       }
@@ -217,166 +285,173 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <!-- Profile Layout Content -->
+      <!-- Profile Layout Content: stacked vertical -->
       <div class="profile-layout" style="margin-top: 20px;">
-        
-        <!-- Left: Demographics Panel -->
+
+        <!-- ─── 1. HORIZONTAL PROFILE CARD ─── -->
         <div class="content-card glass-panel demographics-panel">
-          <div style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px;">
-            <div class="user-avatar" style="width: 80px; height: 80px; font-size: 28px; margin: 0 auto 15px; border-color: var(--color-primary);" id="patient-initials">--</div>
-            <h3 class="card-title" id="patient-fullname">Loading...</h3>
-            <span class="badge badge-active" style="margin-top: 8px;" id="patient-status-badge">ACTIVE</span>
+
+          <!-- Avatar + name + badge -->
+          <div class="profile-avatar-col">
+            <div class="user-avatar" style="width: 72px; height: 72px; font-size: 26px; border-color: var(--color-primary);" id="patient-initials">--</div>
+            <div style="text-align: center;">
+              <div class="card-title" style="font-size: 15px; margin: 0 0 6px;" id="patient-fullname">Loading...</div>
+              <span class="badge badge-active" id="patient-status-badge">ACTIVE</span>
+            </div>
           </div>
 
-          <div class="demo-info-group">
-            <span class="demo-label">Patient Number</span>
-            <span class="demo-value" style="color: var(--color-primary);" id="patient-number">PAT-XXXX</span>
+          <!-- Demographic fields grid -->
+          <div class="profile-fields-col">
+            <div class="demo-info-group">
+              <span class="demo-label">Patient Number</span>
+              <span class="demo-value" style="color: var(--color-primary);" id="patient-number">PAT-XXXX</span>
+            </div>
+            <div class="demo-info-group">
+              <span class="demo-label">Birth Date &amp; Age</span>
+              <span class="demo-value" id="patient-birthdate">-</span>
+            </div>
+            <div class="demo-info-group">
+              <span class="demo-label">Sex &amp; Civil Status</span>
+              <span class="demo-value" id="patient-sex-status">-</span>
+            </div>
+            <div class="demo-info-group">
+              <span class="demo-label">Contact Info</span>
+              <span class="demo-value" id="patient-contact">-</span>
+            </div>
+            <div class="demo-info-group">
+              <span class="demo-label">Residential Address</span>
+              <span class="demo-value" id="patient-address" style="line-height: 1.4;">-</span>
+            </div>
+            <div class="demo-info-group">
+              <span class="demo-label">PhilHealth &amp; 4Ps</span>
+              <span class="demo-value" id="patient-philhealth">-</span>
+            </div>
+            <div class="demo-info-group">
+              <span class="demo-label">Emergency Contact</span>
+              <span class="demo-value" id="patient-emergency">-</span>
+            </div>
           </div>
 
-          <div class="demo-info-group">
-            <span class="demo-label">Birth Date</span>
-            <span class="demo-value" id="patient-birthdate">-</span>
-          </div>
-
-          <div class="demo-info-group">
-            <span class="demo-label">Sex</span>
-            <span class="demo-value" id="patient-sex">-</span>
-          </div>
-
-          <div class="demo-info-group">
-            <span class="demo-label">Contact Info</span>
-            <span class="demo-value" id="patient-contact">-</span>
-          </div>
-
-          <div class="demo-info-group">
-            <span class="demo-label">Residential Address</span>
-            <span class="demo-value" id="patient-address" style="line-height: 1.4;">-</span>
-          </div>
-
-          <div class="demo-info-group">
-            <span class="demo-label">PhilHealth Number</span>
-            <span class="demo-value" id="patient-philhealth">-</span>
-          </div>
-
-          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
-            <a href="/dashboard/patients" class="btn btn-secondary btn-block">Back to Directory</a>
-            <!-- Records staff actions: Scan / Upload & Edit -->
-            <a href="#" id="scan-document-action-btn" class="btn btn-primary btn-block" style="display: none; background: linear-gradient(135deg, var(--color-success), #059669); border: none; font-weight: 700; align-items: center; justify-content: center; gap: 8px;">
-              <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-              + Scan / Upload File
+          <!-- Action buttons column -->
+          <div class="profile-actions-col">
+            <a href="/dashboard/patients" class="btn btn-secondary" style="text-align: center;">Back to Directory</a>
+            <a href="#" id="scan-document-action-btn" class="btn btn-primary" style="display: none; font-weight: 700; align-items: center; justify-content: center; gap: 8px;">
+              <svg style="width: 16px; height: 16px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              + Scan / Upload
             </a>
-            <a href="#" id="edit-patient-action-btn" class="btn btn-block" style="display: none; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: center;">
+            <a href="#" id="edit-patient-action-btn" class="btn btn-secondary" style="display: none; text-align: center;">
               Edit Demographics
             </a>
-            <button type="button" id="restore-patient-action-btn" class="btn btn-primary btn-block" style="display: none; background: linear-gradient(135deg, var(--color-primary), #4338ca); border: none; font-weight: 700;">
+            <button type="button" id="restore-patient-action-btn" class="btn btn-primary" style="display: none; font-weight: 700;">
               Restore Patient Profile
             </button>
           </div>
         </div>
 
-        <!-- Right: Medical Record Categories Panel -->
-        <div class="categories-panel">
-          
-          <div class="content-card glass-panel" style="margin-bottom: 0;">
-            <h3 class="card-title" style="margin-bottom: 4px;">RHU Centralized Record Binder</h3>
-            <p class="card-subtitle">Central health files and scanned attachments associated with this patient record. Select a category binder to view documents.</p>
-            
-            <div class="category-grid" style="margin-top: 24px;">
-              
-              <!-- Category 1: Patient Information Sheet -->
-              <div class="category-card glass-panel" id="card-PATIENT_INFORMATION_SHEET" style="cursor: pointer;" onclick="selectCategory('PATIENT_INFORMATION_SHEET')">
-                <div class="category-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                </div>
-                <div class="category-info">
-                  <h4 class="category-title">Patient Info Sheets</h4>
-                  <span class="category-status" id="count-PATIENT_INFORMATION_SHEET">0 documents filed</span>
-                </div>
-              </div>
-
-              <!-- Category 2: Consultation Records -->
-              <div class="category-card glass-panel" id="card-CONSULTATION_RECORD" style="cursor: pointer;" onclick="selectCategory('CONSULTATION_RECORD')">
-                <div class="category-icon">
-                  <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                </div>
-                <div class="category-info">
-                  <h4 class="category-title">Consultation Records</h4>
-                  <span class="category-status" id="count-CONSULTATION_RECORD">0 documents filed</span>
-                </div>
-              </div>
-
-              <!-- Category 3: Childhood Immunization Records -->
-              <div class="category-card glass-panel" id="card-IMMUNIZATION_RECORD" style="cursor: pointer;" onclick="selectCategory('IMMUNIZATION_RECORD')">
-                <div class="category-icon">
-                  <svg viewBox="0 0 24 24"><path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/></svg>
-                </div>
-                <div class="category-info">
-                  <h4 class="category-title">Childhood Immunization</h4>
-                  <span class="category-status" id="count-IMMUNIZATION_RECORD">0 documents filed</span>
-                </div>
-              </div>
-
-              <!-- Category 4: Anti-Rabies Vaccination -->
-              <div class="category-card glass-panel" id="card-ANTI_RABIES_RECORD" style="cursor: pointer;" onclick="selectCategory('ANTI_RABIES_RECORD')">
-                <div class="category-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-                </div>
-                <div class="category-info">
-                  <h4 class="category-title">Anti-Rabies Vaccination</h4>
-                  <span class="category-status" id="count-ANTI_RABIES_RECORD">0 documents filed</span>
-                </div>
-              </div>
-
-              <!-- Category 5: Maternal Care Records -->
-              <div class="category-card glass-panel" id="card-MATERNAL_CARE_RECORD" style="cursor: pointer; grid-column: span 2;" onclick="selectCategory('MATERNAL_CARE_RECORD')">
-                <div class="category-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                </div>
-                <div class="category-info">
-                  <h4 class="category-title">Maternal Care Records</h4>
-                  <span class="category-status" id="count-MATERNAL_CARE_RECORD">0 documents filed</span>
-                </div>
-              </div>
-
+        <!-- ─── 2. RHU CENTRALIZED RECORD BINDER ─── -->
+        <div class="content-card glass-panel" style="margin-bottom: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3 class="card-title" style="margin-bottom: 4px;">RHU Centralized Record Binder</h3>
+              <p class="card-subtitle" style="margin: 0;">Select a category binder to view its filed documents.</p>
             </div>
           </div>
 
-          <!-- Binder Documents Sub-Panel Details -->
-          <div class="content-card glass-panel" id="binder-details-panel" style="display: none; margin-bottom: 0;">
-            <div class="card-title-section" style="margin-bottom: 16px;">
-              <div>
-                <h3 class="card-title" id="selected-binder-title">Selected Binder Documents</h3>
-                <p class="card-subtitle">Scanned demographic registries, consultation sheets, or vaccinations filed under this category.</p>
+          <div class="category-grid">
+
+            <!-- Category 1: Individual Treatment Record -->
+            <div class="category-card glass-panel" id="card-PATIENT_INFORMATION_SHEET" onclick="selectCategory('PATIENT_INFORMATION_SHEET')">
+              <div class="category-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
               </div>
-              <a href="#" class="btn btn-primary" id="add-document-btn" style="display: none;">+ Add Document</a>
+              <div class="category-info">
+                <h4 class="category-title">Individual Treatment Record</h4>
+                <span class="category-status" id="count-PATIENT_INFORMATION_SHEET">0 documents filed</span>
+              </div>
             </div>
 
-            <div class="table-responsive" id="records-table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>File Name</th>
-                    <th>Classification Mode</th>
-                    <th>Filing Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="records-table-body">
-                  <!-- Dynamic rows -->
-                </tbody>
-              </table>
+            <!-- Category 2: Consultation Records -->
+            <div class="category-card glass-panel" id="card-CONSULTATION_RECORD" onclick="selectCategory('CONSULTATION_RECORD')">
+              <div class="category-icon" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              </div>
+              <div class="category-info">
+                <h4 class="category-title">Consultation Records</h4>
+                <span class="category-status" id="count-CONSULTATION_RECORD">0 documents filed</span>
+              </div>
             </div>
 
-            <!-- Empty binder state -->
-            <div id="empty-binder-state" style="display: none; padding: 40px; text-align: center; border: 2px dashed rgba(255,255,255,0.05); border-radius: 8px; margin-top: 10px;">
-              <span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 10px;">No files registered in this binder yet.</span>
-              <p class="card-subtitle" style="font-size: 12px; margin: 0;">Records Staff can click "+ Add Document" above to digitize physical records via OCR.</p>
+            <!-- Category 3: Immunizations -->
+            <div class="category-card glass-panel" id="card-IMMUNIZATION_RECORD" onclick="selectCategory('IMMUNIZATION_RECORD')">
+              <div class="category-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/></svg>
+              </div>
+              <div class="category-info">
+                <h4 class="category-title">Immunizations</h4>
+                <span class="category-status" id="count-IMMUNIZATION_RECORD">0 documents filed</span>
+              </div>
             </div>
+
+            <!-- Category 4: Maternal Care -->
+            <div class="category-card glass-panel" id="card-MATERNAL_CARE_RECORD" onclick="selectCategory('MATERNAL_CARE_RECORD')">
+              <div class="category-icon" style="background: rgba(236,72,153,0.1); color: #ec4899;">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+              <div class="category-info">
+                <h4 class="category-title">Maternal Care</h4>
+                <span class="category-status" id="count-MATERNAL_CARE_RECORD">0 documents filed</span>
+              </div>
+            </div>
+
+            <!-- Category 5: Other Health Records -->
+            <div class="category-card glass-panel" id="card-OTHER" onclick="selectCategory('OTHER')">
+              <div class="category-icon" style="background: rgba(107,114,128,0.15); color: #9ca3af;">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+              </div>
+              <div class="category-info">
+                <h4 class="category-title">Other Health Records</h4>
+                <span class="category-status" id="count-OTHER">0 documents filed</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ─── 3. BINDER DETAILS TABLE PANEL — full width ─── -->
+        <div class="content-card glass-panel" id="binder-details-panel" style="display: none; margin-bottom: 0;">
+          <div class="card-title-section" style="margin-bottom: 16px;">
+            <div>
+              <h3 class="card-title" id="selected-binder-title">Selected Binder Documents</h3>
+              <p class="card-subtitle">Scanned demographic registries, consultation sheets, or vaccinations filed under this category.</p>
+            </div>
+            <a href="#" class="btn btn-primary" id="add-document-btn" style="display: none;">+ Add Document</a>
           </div>
 
+          <div class="table-responsive" id="records-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>JSON Data (Extracted Form)</th>
+                  <th>Filing Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="records-table-body">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty binder state -->
+          <div id="empty-binder-state" style="display: none; padding: 50px; text-align: center; border: 2px dashed rgba(255,255,255,0.05); border-radius: 10px; margin-top: 10px;">
+            <svg style="width:48px;height:48px;fill:rgba(255,255,255,0.08);margin-bottom:14px;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 8px;">No files registered in this binder yet.</span>
+            <p class="card-subtitle" style="font-size: 12px; margin: 0;">Records Staff can click "+ Add Document" above to digitize physical records via OCR.</p>
+          </div>
         </div>
 
-        </div>
+      </div>
 
     </main>
   </div>
@@ -391,11 +466,11 @@
         <input type="hidden" id="edit-rec-id">
         <div class="form-group" style="margin-bottom: 15px;">
           <label class="form-label" for="edit-rec-filename">File Name</label>
-          <input type="text" id="edit-rec-filename" class="form-input" required style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--border-radius-sm); color: #fff; padding: 10px; width: 100%; box-sizing: border-box;">
+          <input type="text" id="edit-rec-filename" class="form-control" required style="width: 100%; box-sizing: border-box;">
         </div>
         <div class="form-group" style="margin-bottom: 20px;">
           <label class="form-label" for="edit-rec-category">Binder Category</label>
-          <select id="edit-rec-category" class="form-input" required style="background: rgb(21, 25, 41); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--border-radius-sm); color: #fff; padding: 10px; width: 100%; box-sizing: border-box;">
+          <select id="edit-rec-category" class="form-select" required style="width: 100%; box-sizing: border-box;">
             <option value="PATIENT_INFORMATION_SHEET">Patient Information Sheet</option>
             <option value="CONSULTATION_RECORD">Consultation Record</option>
             <option value="IMMUNIZATION_RECORD">Childhood Immunization</option>
@@ -482,14 +557,34 @@
           const p = res.patient;
           const fullName = `${p.first_name} ${p.middle_name ? p.middle_name + ' ' : ''}${p.last_name}`;
 
+          // Calculate age
+          let ageStr = '';
+          if (p.birth_date) {
+            const bd = new Date(p.birth_date);
+            const today = new Date();
+            let age = today.getFullYear() - bd.getFullYear();
+            const m = today.getMonth() - bd.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+            if (age >= 0) ageStr = ` (${age} yrs old)`;
+          }
+
           // Set panel values
           document.getElementById('patient-fullname').textContent = fullName;
           document.getElementById('patient-number').textContent = p.patient_number;
-          document.getElementById('patient-birthdate').textContent = formatDate(p.birth_date);
-          document.getElementById('patient-sex').textContent = p.sex;
+          document.getElementById('patient-birthdate').textContent = `${formatDate(p.birth_date)}${ageStr}`;
+          document.getElementById('patient-sex-status').textContent = `${p.sex || '-'}${p.civil_status ? ' • ' + p.civil_status : ''}`;
           document.getElementById('patient-contact').textContent = p.contact_number || 'None provided';
           document.getElementById('patient-address').textContent = p.address;
-          document.getElementById('patient-philhealth').textContent = p.philhealth_number || 'None provided';
+          
+          let phInfo = p.philhealth_number || 'Non-Member';
+          if (p.philhealth_category) phInfo += ` (${p.philhealth_category})`;
+          if (p.is_4ps_beneficiary === 'Yes') phInfo += ` • 4Ps Beneficiary`;
+          document.getElementById('patient-philhealth').textContent = phInfo;
+
+          let emergencyInfo = p.emergency_contact_name || 'None provided';
+          if (p.emergency_relationship) emergencyInfo += ` (${p.emergency_relationship})`;
+          if (p.emergency_contact_number) emergencyInfo += ` - ${p.emergency_contact_number}`;
+          document.getElementById('patient-emergency').textContent = emergencyInfo;
           
           // Initials for avatar
           const initials = fullName
@@ -523,26 +618,57 @@
       }
     }
 
+    // Flexible category matching helper
+    function isCategoryMatch(recordType, targetCat) {
+      if (!recordType) return targetCat === 'OTHER';
+      const norm = String(recordType).toUpperCase();
+      if (targetCat === 'PATIENT_INFORMATION_SHEET') {
+        return norm === 'PATIENT_INFORMATION_SHEET' || norm === 'INDIVIDUAL_TREATMENT_RECORD' || norm === 'ITR';
+      }
+      if (targetCat === 'CONSULTATION_RECORD') {
+        return norm === 'CONSULTATION_RECORD' || norm === 'CONSULTATION';
+      }
+      if (targetCat === 'IMMUNIZATION_RECORD') {
+        return norm === 'IMMUNIZATION_RECORD' || norm === 'IMMUNIZATION' || norm === 'ANTI_RABIES_RECORD' || norm === 'VACCINATION';
+      }
+      if (targetCat === 'MATERNAL_CARE_RECORD') {
+        return norm === 'MATERNAL_CARE_RECORD' || norm === 'MATERNAL_CARE' || norm === 'PRENATAL';
+      }
+      if (targetCat === 'OTHER') {
+        const knowns = ['PATIENT_INFORMATION_SHEET','INDIVIDUAL_TREATMENT_RECORD','ITR','CONSULTATION_RECORD','CONSULTATION','IMMUNIZATION_RECORD','IMMUNIZATION','ANTI_RABIES_RECORD','VACCINATION','MATERNAL_CARE_RECORD','MATERNAL_CARE','PRENATAL'];
+        return !knowns.includes(norm);
+      }
+      return norm === targetCat.toUpperCase();
+    }
+
     // Load patient record attachments and counts
     async function loadPatientRecords() {
       try {
         const res = await API.fetchJson(`/api/records/patient/${patientId}`);
         if (res && res.success) {
-          allPatientRecords = res.records || [];
-          
+          const rawRecords = res.records || [];
+          allPatientRecords = rawRecords.filter(r => r.status === 'ACTIVE');
+
           // Reset count labels on binders
           const categories = [
             'PATIENT_INFORMATION_SHEET',
             'CONSULTATION_RECORD',
             'IMMUNIZATION_RECORD',
-            'ANTI_RABIES_RECORD',
-            'MATERNAL_CARE_RECORD'
+            'MATERNAL_CARE_RECORD',
+            'OTHER'
           ];
           
           categories.forEach(cat => {
-            const count = allPatientRecords.filter(r => r.record_type === cat).length;
-            document.getElementById(`count-${cat}`).textContent = `${count} document${count === 1 ? '' : 's'} filed`;
+            const count = allPatientRecords.filter(r => isCategoryMatch(r.record_type, cat)).length;
+            const countEl = document.getElementById(`count-${cat}`);
+            if (countEl) {
+              countEl.textContent = `${count} document${count === 1 ? '' : 's'} filed`;
+            }
           });
+
+          // Auto-select first binder with documents, or default to PATIENT_INFORMATION_SHEET
+          const firstCatWithDocs = categories.find(cat => allPatientRecords.some(r => isCategoryMatch(r.record_type, cat))) || 'PATIENT_INFORMATION_SHEET';
+          selectCategory(firstCatWithDocs);
         }
       } catch (err) {
         console.error('Failed to load patient records counts', err);
@@ -579,9 +705,6 @@
       }
       
       renderBinderRecords();
-      
-      // Smooth scroll details panel into view on desktop/mobile
-      detailsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Render binder records lists
@@ -590,7 +713,7 @@
       const tableBody = document.getElementById('records-table-body');
       const emptyState = document.getElementById('empty-binder-state');
       
-      const records = allPatientRecords.filter(r => r.record_type === selectedCategoryType);
+      const records = allPatientRecords.filter(r => isCategoryMatch(r.record_type, selectedCategoryType) && r.status === 'ACTIVE');
       
       if (records.length === 0) {
         tableContainer.style.display = 'none';
@@ -605,36 +728,39 @@
       records.forEach(rec => {
         const dateStr = new Date(rec.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         
-        const isRecordsStaff = currentUser.role === 'RECORDS_STAFF';
-        const editBtnHtml = isRecordsStaff
-          ? `<button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; margin-left: 6px; background: rgba(99, 102, 241, 0.1); color: var(--color-primary); border-color: rgba(99, 102, 241, 0.2);" onclick="openEditMetadataModal('${rec.id}', '${escapeHtml(rec.file_name)}', '${rec.record_type}')">Edit</button>`
-          : '';
-        const archiveBtnHtml = isRecordsStaff
-          ? `<button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px; margin-left: 6px;" onclick="archiveRecord('${rec.id}')">Archive</button>`
-          : '';
-          
+        let jsonColumnHtml = '';
+        if (rec.structured_json && typeof rec.structured_json === 'object') {
+          const ptName = (rec.structured_json.patient_demographics && rec.structured_json.patient_demographics.name)
+            ? rec.structured_json.patient_demographics.name
+            : 'JSON Data Saved';
+          const consultCount = (Array.isArray(rec.structured_json.consultation_records))
+            ? rec.structured_json.consultation_records.length
+            : 0;
+          const detailsStr = consultCount > 0 ? `${consultCount} consultation log${consultCount > 1 ? 's' : ''}` : 'Structured ITR';
+
+          jsonColumnHtml = `
+            <span class="badge" style="background: #FCE8E8; color: #C62828; border: 1px solid #fca5a5; font-weight: 700; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px;" title="${escapeHtml(JSON.stringify(rec.structured_json))}">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              ${escapeHtml(ptName)} (${detailsStr})
+            </span>
+          `;
+        } else {
+          jsonColumnHtml = `<span style="color: var(--text-muted); font-size: 12px;">Unstructured OCR Text</span>`;
+        }
+
         html += `
           <tr>
-            <td>
-              <a href="${rec.file_url}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(rec.file_name)}</a>
+            <td style="font-weight: 700; color: #25282D;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: var(--color-primary); vertical-align: middle; margin-right: 6px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              ${escapeHtml(rec.file_name)}
             </td>
-            <td>
-              <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--color-primary); border: 1px solid rgba(99, 102, 241, 0.2);">
-                ${rec.classification_result === 'MANUAL_FALLBACK' ? 'Manual Selection' : 'AI Keyword Classified'}
-              </span>
-            </td>
+            <td>${jsonColumnHtml}</td>
             <td>${dateStr}</td>
             <td>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="toggleOcrText('${rec.id}')">Show Extracted Text</button>
-              ${editBtnHtml}
-              ${archiveBtnHtml}
-            </td>
-          </tr>
-          <tr id="ocr-drawer-${rec.id}" style="display: none; background: rgba(0, 0, 0, 0.2);">
-            <td colspan="4">
-              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: var(--border-radius-sm); font-family: monospace; font-size: 13px; line-height: 1.5; color: var(--text-secondary); white-space: pre-wrap; user-select: text; max-height: 220px; overflow-y: auto;">
-                ${escapeHtml(rec.extracted_text) || '[No text characters detected in this document]'}
-              </div>
+              <a href="/dashboard/records/view/${rec.id}" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                View
+              </a>
             </td>
           </tr>
         `;
@@ -642,13 +768,41 @@
       tableBody.innerHTML = html;
     }
 
-    // Toggle hidden expanding OCR drawer row
-    function toggleOcrText(id) {
-      const drawer = document.getElementById(`ocr-drawer-${id}`);
-      if (drawer.style.display === 'none') {
-        drawer.style.display = 'table-row';
-      } else {
-        drawer.style.display = 'none';
+    // Download record as Word (.docx) document
+    async function downloadDocx(recordId, fileName) {
+      showToast('Generating Word document... Please wait.', 'info');
+      try {
+        const response = await fetch(`/api/records/download/${recordId}/docx`, {
+          method: 'GET',
+          headers: await API.getCsrfHeaders ? await API.getCsrfHeaders() : {}
+        });
+
+        if (!response.ok) {
+          let errMsg = 'Failed to generate Word document.';
+          try {
+            const errData = await response.json();
+            errMsg = errData.message || errMsg;
+          } catch (_) {}
+          showToast(errMsg, 'error');
+          return;
+        }
+
+        // Stream the binary .docx file to a download
+        const blob = await response.blob();
+        const baseName = fileName.replace(/\.[^/.]+$/, '');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${baseName}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+        showToast('Word document downloaded successfully!', 'success');
+      } catch (err) {
+        console.error('DOCX download error:', err);
+        showToast('An error occurred while downloading the Word document.', 'error');
       }
     }
 
@@ -674,136 +828,59 @@
       }
     }
 
+    // Delete dynamic records permanently
+    async function deleteRecord(id) {
+      if (!confirm('Are you sure you want to PERMANENTLY DELETE this document record?\nThis action cannot be undone.')) {
+        return;
+      }
+      
+      try {
+        const res = await API.fetchJson(`/api/records/${id}`, {
+          method: 'DELETE'
+        });
+        if (res && res.success) {
+          showToast(res.message, 'success');
+          
+          // Refresh binder records
+          await loadPatientRecords();
+          renderBinderRecords();
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to delete document.', 'error');
+      }
+    }
+
     async function restorePatientProfile() {
       if (!confirm('Restore this archived patient profile to the active directory?')) {
         return;
       }
 
       try {
-        const res = await API.fetchJson(`/api/patients/${patientId}/restore`, { method: 'PUT' });
+        const res = await API.fetchJson(`/api/patients/${patientId}/restore`, {
+          method: 'PUT'
+        });
         if (res && res.success) {
-          showToast(res.message, 'success');
-          await loadPatientProfile();
+          showToast('Patient profile restored successfully.', 'success');
+          loadPatientData();
         }
       } catch (err) {
-        showToast(err.message || 'Failed to restore patient profile.', 'error');
+        showToast(err.message || 'Failed to restore patient.', 'error');
       }
     }
 
     // Format human printable category titles
     function formatCategory(type) {
       switch (type) {
-        case 'PATIENT_INFORMATION_SHEET': return 'Patient Information Sheet Binder';
+        case 'PATIENT_INFORMATION_SHEET': return 'Individual Treatment Record Binder';
         case 'CONSULTATION_RECORD': return 'Consultation Records Binder';
-        case 'IMMUNIZATION_RECORD': return 'Routine Childhood Immunization Binder';
-        case 'ANTI_RABIES_RECORD': return 'Anti-Rabies Vaccination Binder';
-        case 'MATERNAL_CARE_RECORD': return 'Maternal Care-Related Binder';
-        default: return type;
+        case 'IMMUNIZATION_RECORD': return 'Immunizations & Vaccine Records Binder';
+        case 'MATERNAL_CARE_RECORD': return 'Maternal Care Binder';
+        case 'OTHER': return 'Other Health Records Binder';
+        default: return type ? type.replace(/_/g, ' ') : 'Health Records Binder';
       }
     }
 
-    // Dynamic Navigation sidebar builder
-    function injectSidebarLinks(role) {
-      const navContainer = document.getElementById('layout-nav-links');
-      let linksHtml = '';
 
-      if (role === 'RHU_ADMINISTRATOR') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/admin" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/admin/users" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-              User Accounts
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/duplicates" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Duplicate Warnings
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/reports" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Reports Dashboard
-            </a>
-          </li>
-        `;
-      } else if (role === 'RECORDS_STAFF') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/records" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/duplicates" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Duplicate Warnings
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/reports" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Reports Dashboard
-            </a>
-          </li>
-        `;
-      } else if (role === 'HEALTHCARE_PERSONNEL') {
-        linksHtml = `
-          <li>
-            <a href="/dashboard/healthcare" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-              Dashboard Overview
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/patients" class="nav-link active">
-              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-              Patient Directory
-            </a>
-          </li>
-          <li>
-            <a href="/dashboard/search" class="nav-link">
-              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-              Unified Search
-            </a>
-          </li>
-        `;
-      }
-
-      navContainer.innerHTML = linksHtml;
-    }
     // Format date string helper
     function formatDate(dateStr) {
       if (!dateStr) return '';

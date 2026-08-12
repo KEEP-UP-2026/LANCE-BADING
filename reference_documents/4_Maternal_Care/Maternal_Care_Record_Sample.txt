@@ -1,0 +1,18 @@
+=== HEALTH FACILITY HEADER ===
+PAETE RURAL HEALTH UNIT
+Maternal Care & Prenatal Record Sheet
+
+=== PATIENT DEMOGRAPHICS ===
+Mother Name: Ana Reyes
+Age: 28 | Civil Status: Married
+LMP: October 12, 2023 | EDC: July 19, 2024
+Gravida: G2 | Para: P1 (1-0-0-1)
+
+=== PRENATAL VISIT LOG ===
+Visit Date: February 15, 2024 (AOG: 18 weeks)
+Vital Signs: BP: 110/70 mmHg | Weight: 58 kg | Fundal Height: 16 cm
+Fetal Heartbeat: 145 bpm (Regular)
+Tetanus Toxoid Vaccine: TT1 Given
+Iron & Folic Acid Supplements: Prescribed 100 tabs
+Ultrasound Report: Single live intrauterine pregnancy, active fetal movement.
+Next Follow-up Visit: March 15, 2024

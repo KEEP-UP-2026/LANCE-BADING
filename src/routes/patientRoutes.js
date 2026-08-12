@@ -11,12 +11,16 @@ router.use(AuthMiddleware.authenticate);
 
 // Read-only operations (list and view profile details)
 router.get('/', AuthMiddleware.requireApiAuth(ALLOWED_READ_ROLES), PatientController.listPatients);
+router.get('/archived', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.listArchivedPatients);
 router.get('/:id', AuthMiddleware.requireApiAuth(ALLOWED_READ_ROLES), PatientController.getPatient);
 
-// Write operations (add, edit, archive) - Records Staff only
+// Write operations (add, edit, archive, restore, delete) - Records Staff only
 router.post('/', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.createPatient);
-router.put('/:id', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.updatePatient);
 router.put('/:id/archive', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.archivePatient);
 router.put('/:id/restore', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.restorePatient);
+router.put('/:id', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.updatePatient);
+router.delete('/:id', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.deletePatient);
 
 module.exports = router;
+
+

@@ -92,17 +92,33 @@ const PatientController = {
   async createPatient(req, res) {
     try {
       const { 
+        patient_number,
         first_name, 
         middle_name, 
         last_name, 
+        suffix,
         birth_date, 
         sex, 
+        civil_status,
+        place_of_birth,
+        religion,
+        nationality,
+        house_street_purok,
+        barangay,
+        city_municipality,
+        province,
         address, 
         contact_number, 
-        philhealth_number 
+        occupation,
+        philhealth_number,
+        philhealth_category,
+        is_4ps_beneficiary,
+        emergency_contact_name,
+        emergency_relationship,
+        emergency_contact_number
       } = req.body;
 
-      // 1. Validate required fields
+      // 1. Validate required fields (First Name, Last Name, Date of Birth, Sex, Contact Number)
       if (!first_name || !first_name.trim()) {
         return res.status(400).json({ success: false, message: 'First name is required.' });
       }
@@ -115,8 +131,8 @@ const PatientController = {
       if (!sex || !sex.trim()) {
         return res.status(400).json({ success: false, message: 'Sex assignment is required.' });
       }
-      if (!address || !address.trim()) {
-        return res.status(400).json({ success: false, message: 'Residential address is required.' });
+      if (!contact_number || !contact_number.trim()) {
+        return res.status(400).json({ success: false, message: 'Contact number is required.' });
       }
 
       // Check birth date validity
@@ -125,15 +141,27 @@ const PatientController = {
         return res.status(400).json({ success: false, message: 'Please provide a valid birth date.' });
       }
 
-      // 2. Generate unique patient_number (PAT-YYYYMM-XXXX)
-      let patientNumber = '';
+      // Construct formatted full address if granular fields provided
+      const constructedAddress = [house_street_purok, barangay, city_municipality, province]
+        .filter(Boolean)
+        .map(s => s.trim())
+        .join(', ');
+      
+      const fullAddress = constructedAddress || (address ? address.trim() : 'N/A');
+
+      // 2. Generate unique patient_number (0001-YYYY-XXXX) if not supplied
+      let patientNumber = patient_number ? patient_number.trim() : '';
       let isUnique = false;
       const year = bDate.getFullYear();
-      const month = String(bDate.getMonth() + 1).padStart(2, '0');
 
-      while (!isUnique) {
+      if (patientNumber) {
+        const exists = await PatientModel.checkPatientNumberExists(patientNumber);
+        if (exists) patientNumber = ''; // re-generate if collision
+      }
+
+      while (!isUnique && !patientNumber) {
         const randomNum = Math.floor(1000 + Math.random() * 9000); // 4 digit random number
-        patientNumber = `PAT-${year}${month}-${randomNum}`;
+        patientNumber = `0001-${year}-${randomNum}`;
         const exists = await PatientModel.checkPatientNumberExists(patientNumber);
         if (!exists) {
           isUnique = true;
@@ -146,11 +174,26 @@ const PatientController = {
         first_name: first_name.trim(),
         middle_name: middle_name ? middle_name.trim() : null,
         last_name: last_name.trim(),
+        suffix: suffix ? suffix.trim() : null,
         birth_date: birth_date,
         sex: sex.trim(),
-        address: address.trim(),
+        civil_status: civil_status ? civil_status.trim() : null,
+        place_of_birth: place_of_birth ? place_of_birth.trim() : null,
+        religion: religion ? religion.trim() : null,
+        nationality: nationality ? nationality.trim() : 'Filipino',
+        house_street_purok: house_street_purok ? house_street_purok.trim() : null,
+        barangay: barangay ? barangay.trim() : null,
+        city_municipality: city_municipality ? city_municipality.trim() : null,
+        province: province ? province.trim() : null,
+        address: fullAddress,
         contact_number: contact_number ? contact_number.trim() : null,
+        occupation: occupation ? occupation.trim() : null,
         philhealth_number: philhealth_number ? philhealth_number.trim() : null,
+        philhealth_category: philhealth_category ? philhealth_category.trim() : null,
+        is_4ps_beneficiary: is_4ps_beneficiary ? is_4ps_beneficiary.trim() : 'No',
+        emergency_contact_name: emergency_contact_name ? emergency_contact_name.trim() : null,
+        emergency_relationship: emergency_relationship ? emergency_relationship.trim() : null,
+        emergency_contact_number: emergency_contact_number ? emergency_contact_number.trim() : null,
         created_by: req.user.id
       });
 
@@ -182,11 +225,26 @@ const PatientController = {
         first_name, 
         middle_name, 
         last_name, 
+        suffix,
         birth_date, 
         sex, 
+        civil_status,
+        place_of_birth,
+        religion,
+        nationality,
+        house_street_purok,
+        barangay,
+        city_municipality,
+        province,
         address, 
         contact_number, 
-        philhealth_number 
+        occupation,
+        philhealth_number,
+        philhealth_category,
+        is_4ps_beneficiary,
+        emergency_contact_name,
+        emergency_relationship,
+        emergency_contact_number
       } = req.body;
 
       // 1. Verify existence
@@ -208,8 +266,8 @@ const PatientController = {
       if (!sex || !sex.trim()) {
         return res.status(400).json({ success: false, message: 'Sex assignment is required.' });
       }
-      if (!address || !address.trim()) {
-        return res.status(400).json({ success: false, message: 'Residential address is required.' });
+      if (!contact_number || !contact_number.trim()) {
+        return res.status(400).json({ success: false, message: 'Contact number is required.' });
       }
 
       // Check birth date validity
@@ -218,16 +276,38 @@ const PatientController = {
         return res.status(400).json({ success: false, message: 'Please provide a valid birth date.' });
       }
 
+      const constructedAddress = [house_street_purok, barangay, city_municipality, province]
+        .filter(Boolean)
+        .map(s => s.trim())
+        .join(', ');
+      
+      const fullAddress = constructedAddress || (address ? address.trim() : patient.address || 'N/A');
+
       // 3. Update in database
       const updatedPatient = await PatientModel.update(id, {
         first_name: first_name.trim(),
         middle_name: middle_name ? middle_name.trim() : null,
         last_name: last_name.trim(),
+        suffix: suffix ? suffix.trim() : null,
         birth_date: birth_date,
         sex: sex.trim(),
-        address: address.trim(),
+        civil_status: civil_status ? civil_status.trim() : null,
+        place_of_birth: place_of_birth ? place_of_birth.trim() : null,
+        religion: religion ? religion.trim() : null,
+        nationality: nationality ? nationality.trim() : 'Filipino',
+        house_street_purok: house_street_purok ? house_street_purok.trim() : null,
+        barangay: barangay ? barangay.trim() : null,
+        city_municipality: city_municipality ? city_municipality.trim() : null,
+        province: province ? province.trim() : null,
+        address: fullAddress,
         contact_number: contact_number ? contact_number.trim() : null,
-        philhealth_number: philhealth_number ? philhealth_number.trim() : null
+        occupation: occupation ? occupation.trim() : null,
+        philhealth_number: philhealth_number ? philhealth_number.trim() : null,
+        philhealth_category: philhealth_category ? philhealth_category.trim() : null,
+        is_4ps_beneficiary: is_4ps_beneficiary ? is_4ps_beneficiary.trim() : 'No',
+        emergency_contact_name: emergency_contact_name ? emergency_contact_name.trim() : null,
+        emergency_relationship: emergency_relationship ? emergency_relationship.trim() : null,
+        emergency_contact_number: emergency_contact_number ? emergency_contact_number.trim() : null
       });
 
       // 4. Run background duplicate check on updated patient details
@@ -320,6 +400,60 @@ const PatientController = {
       return res.status(500).json({
         success: false,
         message: 'An internal server error occurred while restoring the patient record.'
+      });
+    }
+  },
+
+  // Permanently delete a patient (Records Staff only)
+  async deletePatient(req, res) {
+    try {
+      const { id } = req.params;
+
+      const patient = await PatientModel.findById(id);
+      if (!patient) {
+        return res.status(404).json({ success: false, message: 'Patient profile not found.' });
+      }
+
+      // Clean up duplicate flags
+      await DuplicateModel.deleteFlagsForPatient(id);
+
+      await PatientModel.delete(id);
+
+      await AuditMiddleware.logActivity(
+        req.user.id,
+        req.user.email,
+        'PATIENT_DELETED',
+        `Permanently deleted patient profile: ${patient.first_name} ${patient.last_name} (${patient.patient_number})`,
+        req
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: `Patient record of "${patient.first_name} ${patient.last_name}" has been permanently deleted.`
+      });
+
+    } catch (error) {
+      console.error('Delete patient error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while deleting the patient record.'
+      });
+    }
+  },
+
+  // List all ARCHIVED patients
+  async listArchivedPatients(req, res) {
+    try {
+      const archivedPatients = await PatientModel.findAllArchived();
+      return res.status(200).json({
+        success: true,
+        patients: archivedPatients
+      });
+    } catch (error) {
+      console.error('List archived patients error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while fetching archived patients.'
       });
     }
   }

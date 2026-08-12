@@ -1,0 +1,19 @@
+=== HEALTH FACILITY HEADER ===
+PAETE RURAL HEALTH UNIT
+Routine Childhood Immunization Record (Baby Book)
+
+=== PATIENT & CHILD DEMOGRAPHICS ===
+Child Name: Baby Dela Cruz
+Mother Name: Maria Dela Cruz
+Date of Birth: January 10, 2024
+
+=== VACCINATION LOG ===
+BCG Vaccine: Given Jan 10, 2024 (At birth)
+Hepatitis B (Birth dose): Given Jan 10, 2024
+Penta 1 (DPT-HepB-Hib): Given Mar 12, 2024
+OPV 1 (Oral Polio): Given Mar 12, 2024
+PCV 1 (Pneumococcal): Given Mar 12, 2024
+Penta 2: Given Apr 14, 2024
+OPV 2: Given Apr 14, 2024
+Penta 3: Given May 16, 2024
+Measles / MMR 1: Scheduled Oct 10, 2024

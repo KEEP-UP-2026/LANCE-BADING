@@ -71,9 +71,9 @@ const ReportController = {
 
       const totalActivePatients = patients.filter(p => p.status === 'ACTIVE').length;
       const totalArchivedPatients = patients.filter(p => p.status === 'ARCHIVED').length;
+      const totalItrRecords = records.filter(r => r.record_type === 'PATIENT_INFORMATION_SHEET' && r.status === 'ACTIVE').length;
       const totalConsultationRecords = records.filter(r => r.record_type === 'CONSULTATION_RECORD' && r.status === 'ACTIVE').length;
       const totalImmunizationRecords = records.filter(r => r.record_type === 'IMMUNIZATION_RECORD' && r.status === 'ACTIVE').length;
-      const totalAntiRabiesRecords = records.filter(r => r.record_type === 'ANTI_RABIES_RECORD' && r.status === 'ACTIVE').length;
       const totalMaternalCareRecords = records.filter(r => r.record_type === 'MATERNAL_CARE_RECORD' && r.status === 'ACTIVE').length;
       const totalUploadedHealthcareRecords = records.filter(r => r.status === 'ACTIVE').length;
       const totalDuplicateWarnings = duplicateFlags.length;
@@ -99,9 +99,9 @@ const ReportController = {
             total: patients.length
           },
           binders: {
+            itr: totalItrRecords,
             consultation: totalConsultationRecords,
             immunization: totalImmunizationRecords,
-            anti_rabies: totalAntiRabiesRecords,
             maternal_care: totalMaternalCareRecords,
             total_active: totalUploadedHealthcareRecords
           },

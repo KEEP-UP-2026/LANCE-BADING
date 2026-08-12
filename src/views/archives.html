@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archives - KEEP UP System</title>
+  <meta name="description" content="View and manage all archived patient profiles and document records in the KEEP UP System.">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .archives-tabs {
+      display: flex;
+      gap: 8px;
+      background: #F5F7FA;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 30px;
+      padding: 6px;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+    .archive-tab-btn {
+      padding: 10px 24px;
+      border: 1.5px solid transparent;
+      border-radius: 24px;
+      background: transparent;
+      color: #25282D !important;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .archive-tab-btn.active {
+      background: #C62828 !important;
+      color: #FFFFFF !important;
+      border-color: #C62828 !important;
+      box-shadow: 0 4px 14px rgba(198, 40, 40, 0.3);
+    }
+    .archive-tab-btn:hover:not(.active) {
+      background: #FCE8E8;
+      color: #C62828 !important;
+      border-color: #fca5a5;
+    }
+    .archive-tab-btn svg { width: 16px; height: 16px; fill: currentColor; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 16px 10px 38px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-input:focus {
+      border-color: var(--color-primary);
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+    .action-icons-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .action-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+    .action-icon-btn svg { width: 15px; height: 15px; fill: currentColor; }
+    .action-icon-btn.btn-restore:hover {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--color-success);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .action-icon-btn.btn-view:hover {
+      background: rgba(14, 165, 233, 0.1);
+      color: var(--color-info);
+      border-color: rgba(14, 165, 233, 0.3);
+    }
+    .action-icon-btn.btn-delete:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--color-danger);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .badge-archived {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stats-strip {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: #fca5a5;
+      font-weight: 600;
+    }
+    .stat-pill svg { width: 14px; height: 14px; fill: currentColor; }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state svg {
+      width: 60px;
+      height: 60px;
+      fill: rgba(255,255,255,0.08);
+      margin-bottom: 16px;
+    }
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 0 0 6px 0;
+    }
+    .empty-state p {
+      font-size: 13px;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar Drawer -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <!-- Dynamic navigation links based on role -->
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically by JS -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main View Area -->
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <!-- Content Section -->
+      <div class="content-card glass-panel" style="margin-top: 20px;">
+        <div class="card-title-section">
+          <div>
+            <h1 class="card-title" style="font-size: 20px;">
+              <svg style="width: 22px; height: 22px; fill: #f87171; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24">
+                <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.01 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.49-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.87 1H5.12z"/>
+              </svg>
+              Archives
+            </h1>
+            <p class="card-subtitle">View, restore, or permanently delete archived patients and documents.</p>
+          </div>
+        </div>
+
+        <!-- Tab Switcher -->
+        <div class="archives-tabs">
+          <button class="archive-tab-btn active" id="tab-btn-patients" onclick="switchTab('patients')">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+            Archived Patients
+            <span id="patients-count-badge" style="background: rgba(239,68,68,0.2); color: #f87171; border-radius: 20px; padding: 1px 9px; font-size: 12px;">0</span>
+          </button>
+          <button class="archive-tab-btn" id="tab-btn-records" onclick="switchTab('records')">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            Archived Documents
+            <span id="records-count-badge" style="background: rgba(239,68,68,0.2); color: #f87171; border-radius: 20px; padding: 1px 9px; font-size: 12px;">0</span>
+          </button>
+        </div>
+
+        <!-- ===== ARCHIVED PATIENTS TAB ===== -->
+        <div class="tab-panel active" id="panel-patients">
+          <div class="stats-strip">
+            <div class="stat-pill">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+              <span id="stat-total-archived-patients">0 archived patients</span>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="search-input-wrapper">
+              <input type="text" class="search-input" id="search-archived-patients" placeholder="Search by name or patient number...">
+              <svg class="search-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/></svg>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Patient No.</th>
+                  <th>Full Name</th>
+                  <th>Birth Date</th>
+                  <th>Sex</th>
+                  <th>Address</th>
+                  <th>Archived On</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="archived-patients-tbody">
+                <tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 40px;">Loading archived patients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===== ARCHIVED DOCUMENTS TAB ===== -->
+        <div class="tab-panel" id="panel-records">
+          <div class="stats-strip">
+            <div class="stat-pill">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              <span id="stat-total-archived-records">0 archived documents</span>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="search-input-wrapper">
+              <input type="text" class="search-input" id="search-archived-records" placeholder="Search by patient name, document type, or filename...">
+              <svg class="search-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/></svg>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Patient No.</th>
+                  <th>Document Type</th>
+                  <th>Filename</th>
+                  <th>Archived On</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="archived-records-tbody">
+                <tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 40px;">Loading archived documents...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let allArchivedPatients = [];
+    let allArchivedRecords = [];
+    let currentUser = null;
+    let activeTab = 'patients';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      }
+
+      injectSidebarLinks(currentUser.role);
+
+      // Load both datasets
+      await Promise.all([fetchArchivedPatients(), fetchArchivedRecords()]);
+
+      // Search listeners
+      document.getElementById('search-archived-patients').addEventListener('input', e => {
+        filterTable('patients', e.target.value.toLowerCase().trim());
+      });
+      document.getElementById('search-archived-records').addEventListener('input', e => {
+        filterTable('records', e.target.value.toLowerCase().trim());
+      });
+
+      // Logout
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      });
+    });
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.archive-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`tab-btn-${tab}`).classList.add('active');
+      document.getElementById(`panel-${tab}`).classList.add('active');
+    }
+
+    async function fetchArchivedPatients() {
+      try {
+        const res = await API.fetchJson('/api/patients/archived');
+        if (res && res.success) {
+          allArchivedPatients = res.patients || [];
+          renderArchivedPatients(allArchivedPatients);
+          document.getElementById('patients-count-badge').textContent = allArchivedPatients.length;
+          document.getElementById('stat-total-archived-patients').textContent = `${allArchivedPatients.length} archived patient${allArchivedPatients.length !== 1 ? 's' : ''}`;
+        }
+      } catch (err) {
+        document.getElementById('archived-patients-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--color-danger);padding:40px;">Failed to load archived patients.</td></tr>`;
+      }
+    }
+
+    async function fetchArchivedRecords() {
+      try {
+        const res = await API.fetchJson('/api/records/archived');
+        if (res && res.success) {
+          allArchivedRecords = res.records || [];
+          renderArchivedRecords(allArchivedRecords);
+          document.getElementById('records-count-badge').textContent = allArchivedRecords.length;
+          document.getElementById('stat-total-archived-records').textContent = `${allArchivedRecords.length} archived document${allArchivedRecords.length !== 1 ? 's' : ''}`;
+        }
+      } catch (err) {
+        document.getElementById('archived-records-tbody').innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--color-danger);padding:40px;">Failed to load archived documents.</td></tr>`;
+      }
+    }
+
+    function renderArchivedPatients(list) {
+      const tbody = document.getElementById('archived-patients-tbody');
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="7">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+              <h3>No Archived Patients</h3>
+              <p>Archived patient profiles will appear here.</p>
+            </div>
+          </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(p => {
+        const fullName = `${p.first_name} ${p.middle_name ? p.middle_name + ' ' : ''}${p.last_name}`;
+        return `
+          <tr id="prow-${p.id}">
+            <td style="font-weight:700;color:var(--color-primary);">${escapeHtml(p.patient_number)}</td>
+            <td style="font-weight:600;">${escapeHtml(fullName)}</td>
+            <td>${formatDate(p.birth_date)}</td>
+            <td><span class="badge badge-sex">${escapeHtml(p.sex || '-')}</span></td>
+            <td style="color:var(--text-secondary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(p.address || '-')}</td>
+            <td style="color:var(--text-muted);font-size:13px;">${formatDate(p.updated_at || p.created_at)}</td>
+            <td>
+              <div class="action-icons-group">
+                <a href="/dashboard/patients/profile/${p.id}" class="action-icon-btn btn-view" title="View Profile">
+                  <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                </a>
+                <button onclick="handleRestorePatient('${p.id}', '${escapeJs(fullName)}')" class="action-icon-btn btn-restore" title="Restore to Active">
+                  <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </button>
+                <button onclick="handleDeletePatient('${p.id}', '${escapeJs(fullName)}')" class="action-icon-btn btn-delete" title="Permanently Delete">
+                  <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderArchivedRecords(list) {
+      const tbody = document.getElementById('archived-records-tbody');
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="6">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              <h3>No Archived Documents</h3>
+              <p>Archived document records will appear here.</p>
+            </div>
+          </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(r => {
+        const typeFmt = formatRecordType(r.record_type);
+        return `
+          <tr id="rrow-${r.id}">
+            <td style="font-weight:600;">${escapeHtml(r.patient_name || 'Unknown')}</td>
+            <td style="color:var(--color-primary);font-weight:700;">${escapeHtml(r.patient_number || '-')}</td>
+            <td><span class="badge-archived">${escapeHtml(typeFmt)}</span></td>
+            <td style="color:var(--text-secondary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;" title="${escapeHtml(r.file_name || r.original_filename || '-')}">${escapeHtml(r.file_name || r.original_filename || '-')}</td>
+            <td style="color:var(--text-muted);font-size:13px;">${formatDate(r.updated_at || r.created_at)}</td>
+            <td>
+              <div class="action-icons-group">
+                <button onclick="handleRestoreRecord('${r.id}')" class="action-icon-btn btn-restore" title="Restore Document">
+                  <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </button>
+                <button onclick="handleDeleteRecord('${r.id}')" class="action-icon-btn btn-delete" title="Permanently Delete Document">
+                  <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function filterTable(type, query) {
+      if (type === 'patients') {
+        if (!query) { renderArchivedPatients(allArchivedPatients); return; }
+        const filtered = allArchivedPatients.filter(p => {
+          const fullName = `${p.first_name} ${p.middle_name || ''} ${p.last_name}`.toLowerCase();
+          return fullName.includes(query) || (p.patient_number || '').toLowerCase().includes(query);
+        });
+        renderArchivedPatients(filtered);
+      } else {
+        if (!query) { renderArchivedRecords(allArchivedRecords); return; }
+        const filtered = allArchivedRecords.filter(r => {
+          return (r.patient_name || '').toLowerCase().includes(query) ||
+                 (r.patient_number || '').toLowerCase().includes(query) ||
+                 (r.record_type || '').toLowerCase().includes(query) ||
+                 (r.file_name || r.original_filename || '').toLowerCase().includes(query);
+        });
+        renderArchivedRecords(filtered);
+      }
+    }
+
+    // ===== Patient Actions =====
+    async function handleRestorePatient(id, name) {
+      if (!confirm(`Restore patient "${name}" back to the active directory?`)) return;
+      try {
+        const res = await API.fetchJson(`/api/patients/${id}/restore`, { method: 'PUT' });
+        if (res && res.success) {
+          showToast(res.message || 'Patient restored successfully.', 'success');
+          allArchivedPatients = allArchivedPatients.filter(p => p.id !== id);
+          renderArchivedPatients(allArchivedPatients);
+          document.getElementById('patients-count-badge').textContent = allArchivedPatients.length;
+          document.getElementById('stat-total-archived-patients').textContent = `${allArchivedPatients.length} archived patient${allArchivedPatients.length !== 1 ? 's' : ''}`;
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to restore patient.', 'error');
+      }
+    }
+
+    async function handleDeletePatient(id, name) {
+      if (!confirm(`⚠️ PERMANENTLY DELETE patient "${name}"?\n\nThis action CANNOT be undone. All patient data will be erased.`)) return;
+      if (!confirm(`Final confirmation: Delete "${name}" permanently?`)) return;
+      try {
+        const res = await API.fetchJson(`/api/patients/${id}`, { method: 'DELETE' });
+        if (res && res.success) {
+          showToast(res.message || 'Patient permanently deleted.', 'success');
+          allArchivedPatients = allArchivedPatients.filter(p => p.id !== id);
+          renderArchivedPatients(allArchivedPatients);
+          document.getElementById('patients-count-badge').textContent = allArchivedPatients.length;
+          document.getElementById('stat-total-archived-patients').textContent = `${allArchivedPatients.length} archived patient${allArchivedPatients.length !== 1 ? 's' : ''}`;
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to delete patient.', 'error');
+      }
+    }
+
+    // ===== Record Actions =====
+    async function handleRestoreRecord(id) {
+      if (!confirm('Restore this archived document back to the active binder?')) return;
+      try {
+        const res = await API.fetchJson(`/api/records/${id}/restore`, {
+          method: 'PUT'
+        });
+        if (res && res.success) {
+          showToast('Document restored successfully.', 'success');
+          allArchivedRecords = allArchivedRecords.filter(r => r.id !== id);
+          renderArchivedRecords(allArchivedRecords);
+          document.getElementById('records-count-badge').textContent = allArchivedRecords.length;
+          document.getElementById('stat-total-archived-records').textContent = `${allArchivedRecords.length} archived document${allArchivedRecords.length !== 1 ? 's' : ''}`;
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to restore document.', 'error');
+      }
+    }
+
+    async function handleDeleteRecord(id) {
+      if (!confirm('⚠️ PERMANENTLY DELETE this document?\n\nThis action cannot be undone.')) return;
+      try {
+        const res = await API.fetchJson(`/api/records/${id}`, { method: 'DELETE' });
+        if (res && res.success) {
+          showToast(res.message || 'Document permanently deleted.', 'success');
+          allArchivedRecords = allArchivedRecords.filter(r => r.id !== id);
+          renderArchivedRecords(allArchivedRecords);
+          document.getElementById('records-count-badge').textContent = allArchivedRecords.length;
+          document.getElementById('stat-total-archived-records').textContent = `${allArchivedRecords.length} archived document${allArchivedRecords.length !== 1 ? 's' : ''}`;
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to delete document.', 'error');
+      }
+    }
+
+    function formatRecordType(type) {
+      if (!type) return 'Unknown';
+      const map = {
+        'PATIENT_INFORMATION_SHEET': 'Patient Info Sheet',
+        'INDIVIDUAL_TREATMENT_RECORD': 'Indiv. Treatment Record',
+        'ITR': 'ITR',
+        'CONSULTATION_RECORD': 'Consultation Record',
+        'IMMUNIZATION_RECORD': 'Immunization Record',
+        'MATERNAL_CARE_RECORD': 'Maternal Care Record',
+        'ANTI_RABIES_RECORD': 'Anti-Rabies Record',
+      };
+      return map[type.toUpperCase()] || type;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function escapeJs(str) {
+      if (!str) return '';
+      return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+
+  </script>
+</body>
+</html>
