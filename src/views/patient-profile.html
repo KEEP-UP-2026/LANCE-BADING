@@ -7,112 +7,195 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* =============================================
-       PATIENT PROFILE - STACKED VERTICAL LAYOUT
+       PATIENT PROFILE - MODERN HIGH-CONTRAST DESIGN
     ============================================= */
 
-    .category-card.active-binder {
-      border-color: #C62828;
-      box-shadow: 0 0 15px rgba(198, 40, 40, 0.2);
-      background: #FCE8E8;
-    }
-
-    /* Full-width stacked layout (no more side-by-side grid) */
     .profile-layout {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
     
-    /* Horizontal profile card: avatar + info grid side by side */
     .demographics-panel {
-      padding: 22px 28px;
+      background: #ffffff !important;
+      border-radius: 16px !important;
+      border: 1px solid #e2e8f0 !important;
+      padding: 18px 22px !important;
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 28px;
+      gap: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
     }
 
     .profile-avatar-col {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 6px;
       flex-shrink: 0;
-      min-width: 130px;
+      min-width: 165px;
       border-right: 1px solid #e2e8f0;
-      padding-right: 28px;
+      padding-right: 20px;
     }
 
     .profile-fields-col {
       flex: 1;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px 24px;
+      gap: 14px 18px;
       align-items: start;
     }
 
     .profile-actions-col {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       flex-shrink: 0;
-      min-width: 170px;
+      min-width: 165px;
       border-left: 1px solid #e2e8f0;
-      padding-left: 24px;
+      padding-left: 20px;
     }
 
-    .demo-info-group {
+    /* --- DEMOGRAPHIC ITEMS WITH ICON BOXES --- */
+    .demo-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .demo-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .demo-icon-box svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .demo-item-info {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
     }
 
-    .demo-label {
-      font-size: 10px;
-      color: var(--text-muted);
-      text-transform: uppercase;
+    .demo-item-label {
+      font-size: 9.5px;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    .demo-value {
-      font-size: 13px;
-      color: var(--text-primary);
-      font-weight: 600;
-      line-height: 1.4;
+    .demo-item-val {
+      font-size: 12px;
+      font-weight: 700;
+      color: #25282D;
+      line-height: 1.35;
     }
 
-    /* Binder category cards: 5 across in one row */
+    /* --- STYLISH PILL BUTTONS --- */
+    .btn-pill {
+      border-radius: 24px !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      padding: 8px 14px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      border: 1px solid transparent !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .btn-pill-primary {
+      background: #C62828 !important;
+      color: #ffffff !important;
+      border-color: #C62828 !important;
+      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.28) !important;
+    }
+
+    .btn-pill-primary:hover {
+      background: #b71c1c !important;
+      border-color: #b71c1c !important;
+      box-shadow: 0 6px 16px rgba(198, 40, 40, 0.38) !important;
+    }
+
+    .btn-pill-secondary {
+      background: #ffffff !important;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+
+    .btn-pill-secondary:hover {
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+
+    .btn-pill-warning {
+      background: #fffbe8 !important;
+      color: #b45309 !important;
+      border: 1px solid #fef08a !important;
+    }
+
+    .btn-pill-warning:hover {
+      background: #fef9c3 !important;
+      color: #92400e !important;
+    }
+
+    /* --- CATEGORY BINDER CARDS --- */
     .category-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 14px;
-      margin-top: 20px;
+      margin-top: 14px;
     }
 
     .category-card {
-      padding: 16px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px 12px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition);
+      gap: 8px;
+      transition: all 0.2s ease;
       cursor: pointer;
     }
 
     .category-card:hover {
-      border-color: var(--card-border-focus);
+      border-color: #cbd5e1;
       transform: translateY(-2px);
     }
 
+    .category-card.active-binder {
+      background: #fff5f5 !important;
+      border: 1.5px solid #ef4444 !important;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08) !important;
+    }
+
+    .category-card.active-binder .category-status {
+      color: #dc2626 !important;
+      font-weight: 700 !important;
+    }
+
     .category-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--border-radius-sm);
-      background: rgba(99, 102, 241, 0.1);
-      color: var(--color-primary);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -120,66 +203,43 @@
     }
 
     .category-icon svg {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       fill: currentColor;
     }
 
-    .category-info { width: 100%; }
-
     .category-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 4px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 3px;
       line-height: 1.3;
     }
 
     .category-status {
       font-size: 11px;
-      color: var(--text-muted);
+      color: #64748b;
       font-weight: 600;
     }
 
-    .category-lock-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(8, 10, 16, 0.85);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      text-align: center;
-    }
-
-    .category-card:hover .category-lock-overlay {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .lock-text-small {
-      font-size: 11px;
-      color: var(--color-warning);
+    /* --- TABLE JSON BADGE --- */
+    .json-form-badge {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      color: #be123c;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 11.5px;
       font-weight: 700;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
-    .lock-text-small svg {
-      width: 12px;
-      height: 12px;
+    .json-form-badge svg {
+      width: 13px;
+      height: 13px;
       fill: currentColor;
-    }
-
-    /* Binder details panel: full width table */
-    #binder-details-panel .data-table th,
-    #binder-details-panel .data-table td {
-      white-space: nowrap;
     }
 
     /* Responsive */
@@ -199,20 +259,15 @@
       }
       .profile-avatar-col {
         border-right: none;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid #e2e8f0;
         padding-right: 0;
         padding-bottom: 16px;
-        flex-direction: row;
-        gap: 16px;
-        align-items: center;
       }
       .profile-actions-col {
         border-left: none;
-        border-top: 1px solid rgba(255,255,255,0.05);
+        border-top: 1px solid #e2e8f0;
         padding-left: 0;
         padding-top: 16px;
-        flex-direction: row;
-        flex-wrap: wrap;
       }
       .profile-fields-col {
         grid-template-columns: repeat(2, 1fr);
@@ -293,76 +348,140 @@
 
           <!-- Avatar + name + badge -->
           <div class="profile-avatar-col">
-            <div class="user-avatar" style="width: 72px; height: 72px; font-size: 26px; border-color: var(--color-primary);" id="patient-initials">--</div>
-            <div style="text-align: center;">
-              <div class="card-title" style="font-size: 15px; margin: 0 0 6px;" id="patient-fullname">Loading...</div>
-              <span class="badge badge-active" id="patient-status-badge">ACTIVE</span>
+            <div style="position: relative; display: inline-block; cursor: pointer;" id="avatar-container" title="Click to view/upload profile photo">
+              <!-- Green status dot -->
+              <span style="position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: #22c55e; border: 2px solid #ffffff; z-index: 2;"></span>
+
+              <div class="user-avatar" style="width: 84px; height: 84px; font-size: 28px; border: 3px solid #C62828; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center; border-radius: 50%;" id="patient-initials-box">
+                <span id="patient-initials">--</span>
+                <img id="patient-photo-img" src="" alt="Patient Profile Picture" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+              </div>
+              <button type="button" id="change-photo-overlay-btn" style="position: absolute; bottom: 0; right: 0; background: #C62828; color: #fff; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" title="Upload Profile Picture">
+                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+              </button>
+              <input type="file" id="patient-photo-input" accept="image/jpeg,image/png,image/webp" style="display: none;">
+            </div>
+            
+            <div style="text-align: center; margin-top: 6px;">
+              <div class="card-title" style="font-size: 15px; font-weight: 800; color: #25282D; margin: 0 0 6px;" id="patient-fullname">Loading...</div>
+              <span class="badge" style="background: #e8f5e9; color: #2e7d32; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 20px; text-transform: uppercase;" id="patient-status-badge">ACTIVE</span>
             </div>
           </div>
 
-          <!-- Demographic fields grid -->
+          <!-- Demographic fields grid (2 rows x 4 cols) -->
           <div class="profile-fields-col">
-            <div class="demo-info-group">
-              <span class="demo-label">Patient Number</span>
-              <span class="demo-value" style="color: var(--color-primary);" id="patient-number">PAT-XXXX</span>
+            
+            <!-- Item 1: Patient Number -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #f1f5f9; color: #475569;">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">PATIENT NUMBER</span>
+                <span class="demo-item-val" style="color: #C62828;" id="patient-number">PAT-XXXX</span>
+              </div>
             </div>
-            <div class="demo-info-group">
-              <span class="demo-label">Birth Date &amp; Age</span>
-              <span class="demo-value" id="patient-birthdate">-</span>
+
+            <!-- Item 2: Birth Date & Age -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #e0f2fe; color: #0284c7;">
+                <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">BIRTH DATE &amp; AGE</span>
+                <span class="demo-item-val" id="patient-birthdate">-</span>
+              </div>
             </div>
-            <div class="demo-info-group">
-              <span class="demo-label">Sex &amp; Civil Status</span>
-              <span class="demo-value" id="patient-sex-status">-</span>
+
+            <!-- Item 3: Sex & Civil Status -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #f3e8ff; color: #9333ea;">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">SEX &amp; CIVIL STATUS</span>
+                <span class="demo-item-val" id="patient-sex-status">-</span>
+              </div>
             </div>
-            <div class="demo-info-group">
-              <span class="demo-label">Contact Info</span>
-              <span class="demo-value" id="patient-contact">-</span>
+
+            <!-- Item 4: Contact Info -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #e0e7ff; color: #4f46e5;">
+                <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">CONTACT INFO</span>
+                <span class="demo-item-val" id="patient-contact">-</span>
+              </div>
             </div>
-            <div class="demo-info-group">
-              <span class="demo-label">Residential Address</span>
-              <span class="demo-value" id="patient-address" style="line-height: 1.4;">-</span>
+
+            <!-- Item 5: Residential Address -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #ffedd5; color: #ea580c;">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">RESIDENTIAL ADDRESS</span>
+                <span class="demo-item-val" id="patient-address">-</span>
+              </div>
             </div>
-            <div class="demo-info-group">
-              <span class="demo-label">PhilHealth &amp; 4Ps</span>
-              <span class="demo-value" id="patient-philhealth">-</span>
+
+            <!-- Item 6: PhilHealth & 4Ps -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #dcfce7; color: #16a34a;">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">PHILHEALTH &amp; 4PS</span>
+                <span class="demo-item-val" id="patient-philhealth">-</span>
+              </div>
             </div>
-            <div class="demo-info-group">
-              <span class="demo-label">Emergency Contact</span>
-              <span class="demo-value" id="patient-emergency">-</span>
+
+            <!-- Item 7: Emergency Contact -->
+            <div class="demo-item">
+              <div class="demo-icon-box" style="background: #fae8ff; color: #c026d3;">
+                <svg viewBox="0 0 24 24"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1-.37-1.12-.57-2.32-.57-3.57 0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </div>
+              <div class="demo-item-info">
+                <span class="demo-item-label">EMERGENCY CONTACT</span>
+                <span class="demo-item-val" id="patient-emergency">-</span>
+              </div>
             </div>
+
           </div>
 
-          <!-- Action buttons column -->
+          <!-- Action buttons column (Right Stack) -->
           <div class="profile-actions-col">
-            <a href="/dashboard/patients" class="btn btn-secondary" style="text-align: center;">Back to Directory</a>
-            <a href="#" id="scan-document-action-btn" class="btn btn-primary" style="display: none; font-weight: 700; align-items: center; justify-content: center; gap: 8px;">
-              <svg style="width: 16px; height: 16px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+            <a href="/dashboard/patients" class="btn-pill btn-pill-secondary">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              Back to Directory
+            </a>
+            <a href="#" id="scan-document-action-btn" class="btn-pill btn-pill-primary" style="display: none;">
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: currentColor;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
               + Scan / Upload
             </a>
-            <a href="#" id="edit-patient-action-btn" class="btn btn-secondary" style="display: none; text-align: center;">
+            <a href="#" id="edit-patient-action-btn" class="btn-pill btn-pill-secondary" style="display: none;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
               Edit Demographics
             </a>
-            <button type="button" id="restore-patient-action-btn" class="btn btn-primary" style="display: none; font-weight: 700;">
-              Restore Patient Profile
+            <button type="button" id="archive-patient-action-btn" class="btn-pill btn-pill-warning" style="display: none;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5l-4 4-4-4 1.41-1.41L11 13.67V10h2v3.67l1.59-1.58L16 13.5z"/></svg>
+              Archive Profile
             </button>
           </div>
         </div>
 
         <!-- ─── 2. RHU CENTRALIZED RECORD BINDER ─── -->
-        <div class="content-card glass-panel" style="margin-bottom: 0;">
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-            <div>
-              <h3 class="card-title" style="margin-bottom: 4px;">RHU Centralized Record Binder</h3>
-              <p class="card-subtitle" style="margin: 0;">Select a category binder to view its filed documents.</p>
-            </div>
-          </div>
+        <div class="content-card glass-panel" style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 0;">
+          <h3 class="card-title" style="font-size: 17px; font-weight: 800; color: #25282D; margin-bottom: 4px;">RHU Centralized Record Binder</h3>
+          <p class="card-subtitle" style="font-size: 12.5px; color: #64748b; margin-top: 0; margin-bottom: 16px;">Select a category binder to view its filed documents.</p>
 
           <div class="category-grid">
 
             <!-- Category 1: Individual Treatment Record -->
-            <div class="category-card glass-panel" id="card-PATIENT_INFORMATION_SHEET" onclick="selectCategory('PATIENT_INFORMATION_SHEET')">
-              <div class="category-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <div class="category-card" id="card-PATIENT_INFORMATION_SHEET" onclick="selectCategory('PATIENT_INFORMATION_SHEET')">
+              <div class="category-icon" style="background: #fee2e2; color: #dc2626;">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
               </div>
               <div class="category-info">
                 <h4 class="category-title">Individual Treatment Record</h4>
@@ -371,8 +490,8 @@
             </div>
 
             <!-- Category 2: Consultation Records -->
-            <div class="category-card glass-panel" id="card-CONSULTATION_RECORD" onclick="selectCategory('CONSULTATION_RECORD')">
-              <div class="category-icon" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+            <div class="category-card" id="card-CONSULTATION_RECORD" onclick="selectCategory('CONSULTATION_RECORD')">
+              <div class="category-icon" style="background: #dcfce7; color: #16a34a;">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
               </div>
               <div class="category-info">
@@ -382,8 +501,8 @@
             </div>
 
             <!-- Category 3: Immunizations -->
-            <div class="category-card glass-panel" id="card-IMMUNIZATION_RECORD" onclick="selectCategory('IMMUNIZATION_RECORD')">
-              <div class="category-icon" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+            <div class="category-card" id="card-IMMUNIZATION_RECORD" onclick="selectCategory('IMMUNIZATION_RECORD')">
+              <div class="category-icon" style="background: #fef3c7; color: #d97706;">
                 <svg viewBox="0 0 24 24"><path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/></svg>
               </div>
               <div class="category-info">
@@ -393,8 +512,8 @@
             </div>
 
             <!-- Category 4: Maternal Care -->
-            <div class="category-card glass-panel" id="card-MATERNAL_CARE_RECORD" onclick="selectCategory('MATERNAL_CARE_RECORD')">
-              <div class="category-icon" style="background: rgba(236,72,153,0.1); color: #ec4899;">
+            <div class="category-card" id="card-MATERNAL_CARE_RECORD" onclick="selectCategory('MATERNAL_CARE_RECORD')">
+              <div class="category-icon" style="background: #fce7f3; color: #db2777;">
                 <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
               </div>
               <div class="category-info">
@@ -404,8 +523,8 @@
             </div>
 
             <!-- Category 5: Other Health Records -->
-            <div class="category-card glass-panel" id="card-OTHER" onclick="selectCategory('OTHER')">
-              <div class="category-icon" style="background: rgba(107,114,128,0.15); color: #9ca3af;">
+            <div class="category-card" id="card-OTHER" onclick="selectCategory('OTHER')">
+              <div class="category-icon" style="background: #f3e8ff; color: #9333ea;">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
               </div>
               <div class="category-info">
@@ -417,24 +536,31 @@
           </div>
         </div>
 
-        <!-- ─── 3. BINDER DETAILS TABLE PANEL — full width ─── -->
-        <div class="content-card glass-panel" id="binder-details-panel" style="display: none; margin-bottom: 0;">
-          <div class="card-title-section" style="margin-bottom: 16px;">
-            <div>
-              <h3 class="card-title" id="selected-binder-title">Selected Binder Documents</h3>
-              <p class="card-subtitle">Scanned demographic registries, consultation sheets, or vaccinations filed under this category.</p>
+        <!-- ─── 3. BINDER DETAILS TABLE PANEL ─── -->
+        <div class="content-card glass-panel" id="binder-details-panel" style="display: none; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              </div>
+              <div>
+                <h3 class="card-title" id="selected-binder-title" style="font-size: 17px; font-weight: 800; color: #25282D; margin: 0 0 2px;">Selected Binder Documents</h3>
+                <p class="card-subtitle" style="font-size: 12px; color: #64748b; margin: 0;">Scanned demographic registries, consultation sheets, or vaccinations filed under this category.</p>
+              </div>
             </div>
-            <a href="#" class="btn btn-primary" id="add-document-btn" style="display: none;">+ Add Document</a>
+            <a href="#" class="btn-pill btn-pill-primary" id="add-document-btn" style="display: none; width: auto !important; padding: 9px 22px !important;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              + Add Document
+            </a>
           </div>
 
           <div class="table-responsive" id="records-table-container">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>File Name</th>
-                  <th>JSON Data (Extracted Form)</th>
-                  <th>Filing Date</th>
-                  <th>Actions</th>
+                  <th>FILE NAME</th>
+                  <th>FILING DATE</th>
+                  <th>ACTIONS</th>
                 </tr>
               </thead>
               <tbody id="records-table-body">
@@ -444,10 +570,10 @@
           </div>
 
           <!-- Empty binder state -->
-          <div id="empty-binder-state" style="display: none; padding: 50px; text-align: center; border: 2px dashed rgba(255,255,255,0.05); border-radius: 10px; margin-top: 10px;">
-            <svg style="width:48px;height:48px;fill:rgba(255,255,255,0.08);margin-bottom:14px;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-            <span style="color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 8px;">No files registered in this binder yet.</span>
-            <p class="card-subtitle" style="font-size: 12px; margin: 0;">Records Staff can click "+ Add Document" above to digitize physical records via OCR.</p>
+          <div id="empty-binder-state" style="display: none; padding: 50px; text-align: center; border: 2px dashed #cbd5e1; border-radius: 12px; margin-top: 10px;">
+            <svg style="width:48px;height:48px;fill:#cbd5e1;margin-bottom:14px;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <span style="color: #64748b; font-weight: 700; display: block; margin-bottom: 6px;">No files registered in this binder yet.</span>
+            <p style="font-size: 12px; color: #94a3b8; margin: 0;">Records Staff can click "+ Add Document" above to digitize physical records via OCR.</p>
           </div>
         </div>
 
@@ -486,6 +612,26 @@
     </div>
   </div>
 
+  <!-- View Profile Picture Modal -->
+  <div id="view-photo-modal" class="modal-backdrop" onclick="if(event.target === this) closeViewPhotoModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); z-index: 1050; justify-content: center; align-items: center; padding: 20px;">
+    <div class="content-card glass-panel" style="position: relative; max-width: 440px; width: 100%; padding: 24px; text-align: center; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+      <button type="button" onclick="closeViewPhotoModal()" style="position: absolute; top: 12px; right: 14px; background: rgba(0,0,0,0.06); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 20px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center;" title="Close">&times;</button>
+      <h3 style="margin-top: 0; margin-bottom: 4px; font-size: 16px; font-weight: 800; color: var(--text-primary);" id="view-photo-name">Patient Profile Picture</h3>
+      <p style="margin-bottom: 16px; font-size: 12px; color: var(--text-muted);" id="view-photo-sub">Full resolution photo</p>
+      
+      <div style="width: 100%; max-height: 360px; border-radius: 12px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+        <img id="view-photo-img" src="" alt="Profile Picture" style="max-width: 100%; max-height: 360px; object-fit: contain;">
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" id="modal-change-photo-btn" class="btn btn-primary" style="display: none; padding: 8px 16px; font-size: 13px;" onclick="closeViewPhotoModal(); document.getElementById('patient-photo-input').click();">
+          📷 Upload / Change Photo
+        </button>
+        <button type="button" class="btn btn-secondary" style="padding: 8px 18px; font-size: 13px;" onclick="closeViewPhotoModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="/js/toast.js"></script>
   <script src="/js/api.js"></script>
@@ -494,6 +640,53 @@
     let patientId = null;
     let allPatientRecords = [];
     let selectedCategoryType = '';
+    let currentPatientPhotoUrl = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeJs(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
+    }
+
+    function openViewPhotoModal(photoUrl, fullName, patientNumber) {
+      const modal = document.getElementById('view-photo-modal');
+      const img = document.getElementById('view-photo-img');
+      const nameElem = document.getElementById('view-photo-name');
+      const subElem = document.getElementById('view-photo-sub');
+      const changeBtn = document.getElementById('modal-change-photo-btn');
+
+      if (!photoUrl) return;
+
+      img.src = photoUrl;
+      nameElem.textContent = fullName || 'Patient Profile Picture';
+      subElem.textContent = patientNumber ? `Patient No: ${patientNumber}` : 'Full resolution picture';
+      
+      if (currentUser && currentUser.role === 'RECORDS_STAFF') {
+        changeBtn.style.display = 'inline-flex';
+      } else {
+        changeBtn.style.display = 'none';
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeViewPhotoModal() {
+      document.getElementById('view-photo-modal').style.display = 'none';
+    }
 
     document.addEventListener('DOMContentLoaded', async () => {
       // 1. Get patient ID from path URL
@@ -534,7 +727,54 @@
         editBtn.href = `/dashboard/patients/edit/${patientId}`;
         editBtn.style.display = 'block';
 
-        document.getElementById('restore-patient-action-btn').addEventListener('click', restorePatientProfile);
+        const archiveBtn = document.getElementById('archive-patient-action-btn');
+        if (archiveBtn) archiveBtn.addEventListener('click', archivePatientProfile);
+
+        const restoreBtn = document.getElementById('restore-patient-action-btn');
+        if (restoreBtn) restoreBtn.addEventListener('click', restorePatientProfile);
+
+        // Avatar container & overlay click handlers
+        const avatarContainer = document.getElementById('avatar-container');
+        const overlayBtn = document.getElementById('change-photo-overlay-btn');
+        const photoInput = document.getElementById('patient-photo-input');
+
+        if (overlayBtn) {
+          overlayBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentUser.role === 'RECORDS_STAFF') photoInput.click();
+          });
+        }
+
+        if (avatarContainer && photoInput) {
+          avatarContainer.addEventListener('click', () => {
+            if (currentPatientPhotoUrl) {
+              const fullName = document.getElementById('patient-fullname').textContent;
+              const patNum = document.getElementById('patient-number').textContent;
+              openViewPhotoModal(currentPatientPhotoUrl, fullName, patNum);
+            } else if (currentUser.role === 'RECORDS_STAFF') {
+              photoInput.click();
+            }
+          });
+
+          photoInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('photo', file);
+
+            showToast('Uploading profile photo...', 'info');
+            try {
+              const data = await API.postForm(`/api/patients/${patientId}/photo`, formData);
+              if (data && data.success) {
+                showToast('Profile photo updated successfully!', 'success');
+                await loadPatientProfile();
+              }
+            } catch (err) {
+              showToast(err.message || 'An error occurred while uploading profile photo.', 'error');
+            }
+          });
+        }
       }
 
       // 6. Fetch and render patient profile data
@@ -586,7 +826,7 @@
           if (p.emergency_contact_number) emergencyInfo += ` - ${p.emergency_contact_number}`;
           document.getElementById('patient-emergency').textContent = emergencyInfo;
           
-          // Initials for avatar
+          // Initials or Photo for avatar
           const initials = fullName
             .split(' ')
             .map(n => n[0])
@@ -594,6 +834,18 @@
             .substring(0, 2)
             .toUpperCase();
           document.getElementById('patient-initials').textContent = initials || 'PT';
+
+          currentPatientPhotoUrl = p.photo_url || null;
+          const photoImg = document.getElementById('patient-photo-img');
+          const initialsSpan = document.getElementById('patient-initials');
+          if (p.photo_url) {
+            photoImg.src = p.photo_url;
+            photoImg.style.display = 'block';
+            initialsSpan.style.display = 'none';
+          } else {
+            photoImg.style.display = 'none';
+            initialsSpan.style.display = 'inline';
+          }
 
           // Status badge colors
           const statusBadge = document.getElementById('patient-status-badge');
@@ -607,9 +859,17 @@
           // Toggle records-staff actions for archived vs active profiles
           if (currentUser && currentUser.role === 'RECORDS_STAFF') {
             const isArchived = p.status === 'ARCHIVED';
-            document.getElementById('scan-document-action-btn').style.display = isArchived ? 'none' : 'inline-flex';
-            document.getElementById('edit-patient-action-btn').style.display = isArchived ? 'none' : 'block';
-            document.getElementById('restore-patient-action-btn').style.display = isArchived ? 'block' : 'none';
+            const scanBtn = document.getElementById('scan-document-action-btn');
+            if (scanBtn) scanBtn.style.display = isArchived ? 'none' : 'inline-flex';
+
+            const editBtn = document.getElementById('edit-patient-action-btn');
+            if (editBtn) editBtn.style.display = isArchived ? 'none' : 'block';
+
+            const archiveBtn = document.getElementById('archive-patient-action-btn');
+            if (archiveBtn) archiveBtn.style.display = isArchived ? 'none' : 'block';
+
+            const restoreBtn = document.getElementById('restore-patient-action-btn');
+            if (restoreBtn) restoreBtn.style.display = isArchived ? 'block' : 'none';
           }
         }
       } catch (error) {
@@ -728,39 +988,25 @@
       records.forEach(rec => {
         const dateStr = new Date(rec.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         
-        let jsonColumnHtml = '';
-        if (rec.structured_json && typeof rec.structured_json === 'object') {
-          const ptName = (rec.structured_json.patient_demographics && rec.structured_json.patient_demographics.name)
-            ? rec.structured_json.patient_demographics.name
-            : 'JSON Data Saved';
-          const consultCount = (Array.isArray(rec.structured_json.consultation_records))
-            ? rec.structured_json.consultation_records.length
-            : 0;
-          const detailsStr = consultCount > 0 ? `${consultCount} consultation log${consultCount > 1 ? 's' : ''}` : 'Structured ITR';
-
-          jsonColumnHtml = `
-            <span class="badge" style="background: #FCE8E8; color: #C62828; border: 1px solid #fca5a5; font-weight: 700; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px;" title="${escapeHtml(JSON.stringify(rec.structured_json))}">
-              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-              ${escapeHtml(ptName)} (${detailsStr})
-            </span>
-          `;
-        } else {
-          jsonColumnHtml = `<span style="color: var(--text-muted); font-size: 12px;">Unstructured OCR Text</span>`;
-        }
+        const fileExt = (rec.file_name || '').split('.').pop().toUpperCase();
+        const extBadgeHtml = ['JPG', 'PNG', 'PDF', 'JPEG', 'WEBP'].includes(fileExt)
+          ? `<span style="background: #C62828; color: #ffffff; font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 4px; margin-right: 8px; vertical-align: middle;">${fileExt}</span>`
+          : `<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: #C62828; vertical-align: middle; margin-right: 6px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
 
         html += `
           <tr>
             <td style="font-weight: 700; color: #25282D;">
-              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: var(--color-primary); vertical-align: middle; margin-right: 6px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+              ${extBadgeHtml}
               ${escapeHtml(rec.file_name)}
             </td>
-            <td>${jsonColumnHtml}</td>
-            <td>${dateStr}</td>
+            <td style="color: #475569; font-weight: 600;">${dateStr}</td>
             <td>
-              <a href="/dashboard/records/view/${rec.id}" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
-                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                View
-              </a>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="/dashboard/records/view/${rec.id}" class="btn-pill btn-pill-primary" style="width: auto !important; padding: 5px 16px !important; font-size: 11.5px !important;">
+                  <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                  View
+                </a>
+              </div>
             </td>
           </tr>
         `;
@@ -850,6 +1096,25 @@
       }
     }
 
+    async function archivePatientProfile() {
+      const name = document.getElementById('patient-fullname').textContent;
+      if (!confirm(`Are you sure you want to ARCHIVE the record of patient "${name}"?\nThis record will be removed from the active directory but preserved in the archive.`)) {
+        return;
+      }
+
+      try {
+        const res = await API.fetchJson(`/api/patients/${patientId}/archive`, {
+          method: 'PUT'
+        });
+        if (res && res.success) {
+          showToast(res.message || 'Patient profile archived successfully.', 'success');
+          await loadPatientProfile();
+        }
+      } catch (err) {
+        showToast(err.message || 'Failed to archive patient profile.', 'error');
+      }
+    }
+
     async function restorePatientProfile() {
       if (!confirm('Restore this archived patient profile to the active directory?')) {
         return;
@@ -861,7 +1126,7 @@
         });
         if (res && res.success) {
           showToast('Patient profile restored successfully.', 'success');
-          loadPatientData();
+          await loadPatientProfile();
         }
       } catch (err) {
         showToast(err.message || 'Failed to restore patient.', 'error');

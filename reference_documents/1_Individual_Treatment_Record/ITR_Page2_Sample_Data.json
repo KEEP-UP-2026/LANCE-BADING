@@ -1,0 +1,191 @@
+{
+  "philhealth_membership": {
+    "philhealth_id_number": "",
+    "membership_type": {
+      "member": false,
+      "dependent": false,
+      "non_member": false
+    },
+    "membership_category": {
+      "sponsored": false,
+      "ipp": false,
+      "employed": false,
+      "lifetime": false,
+      "nhits": false,
+      "lgu": false,
+      "organized_group": false,
+      "government": false,
+      "nga": false,
+      "private": false,
+      "ofw": false
+    }
+  },
+
+  "vital_signs": {
+    "blood_pressure": "",
+    "heart_rate": null,
+    "respiratory_rate": null,
+    "pulse_rate": null,
+    "temperature": null,
+    "spo2": null,
+    "height_cm": null,
+    "weight_kg": null,
+    "waist_circumference_cm": null,
+    "hip_circumference_cm": null
+  },
+
+  "past_medical_history": {
+    "allergy": "",
+    "asthma": null,
+    "cancer": {
+      "has": null,
+      "organ": ""
+    },
+    "cerebrovascular_disease": null,
+    "coronary_artery_disease": null,
+    "diabetes_mellitus": null,
+    "emphysema": null,
+    "epilepsy_seizure_disorder": null,
+    "hepatitis": {
+      "has": null,
+      "type": ""
+    },
+    "hyperlipidemia": null,
+    "hypertension": {
+      "has": null,
+      "highest_bp": ""
+    },
+    "peptic_ulcer_disease": null,
+    "pneumonia": null,
+    "thyroid_disease": null,
+    "tuberculosis": {
+      "organ": "",
+      "category": ""
+    },
+    "urinary_tract_infection": null,
+    "others": ""
+  },
+
+  "past_surgical_history": {
+    "operation": "",
+    "date": ""
+  },
+
+  "family_history": {
+    "allergy": "",
+    "asthma": null,
+    "cancer": {
+      "has": null,
+      "organ": ""
+    },
+    "cerebrovascular_disease": null,
+    "coronary_artery_disease": null,
+    "diabetes_mellitus": null,
+    "emphysema": null,
+    "epilepsy_seizure_disorder": null,
+    "hepatitis": {
+      "has": null,
+      "type": ""
+    },
+    "hyperlipidemia": null,
+    "hypertension": {
+      "has": null,
+      "highest_bp": ""
+    },
+    "peptic_ulcer_disease": null,
+    "pneumonia": null,
+    "thyroid_disease": null,
+    "pulmonary_tuberculosis": null,
+    "extrapulmonary_tuberculosis": null,
+    "urinary_tract_infection": null,
+    "mental_illness": null,
+    "others": ""
+  },
+
+  "personal_social_history": {
+    "smoking": {
+      "yes": false,
+      "no": false,
+      "quit": false,
+      "pack_years": null
+    },
+    "alcohol": {
+      "yes": false,
+      "no": false,
+      "quit": false,
+      "bottles_per_day": null
+    },
+    "illicit_drugs": {
+      "yes": false,
+      "no": false,
+      "quit": false
+    },
+    "sexually_active": null
+  },
+
+  "immunizations": {
+    "child_care": {
+      "bcg_date": "",
+      "hepb_birth_date": "",
+      "hepb_24hrs_date": "",
+      "penta_date": "",
+      "opv_date": "",
+      "ipv_date": "",
+      "pcv_date": "",
+      "measles_vaccine_date": "",
+      "rotavirus_vaccine_date": "",
+      "chickenpox_vaccine_date": ""
+    },
+    "general": {
+      "flu_vaccine_date": "",
+      "hpv_date": "",
+      "hpv_grade4_date": "",
+      "mr_grade1_date": "",
+      "mr_grade7_date": "",
+      "td_grade1_date": "",
+      "td_grade7_date": "",
+      "tetanus_toxoid_date": ""
+    },
+    "animal_bite": {
+      "pcecv1_date": "",
+      "pvrv1_date": "",
+      "pvrv2_date": "",
+      "pvrv3_date": "",
+      "pvrv4_date": "",
+      "pcecv2_date": ""
+    },
+    "ncd": {
+      "pneumococcal_vaccine_date": "",
+      "flu_vaccine_date": ""
+    },
+    "maternal_care": {
+      "tetanus_toxoid_date": ""
+    }
+  },
+
+  "menstrual_history": {
+    "menarche_age": null,
+    "onset_of_sexual_intercourse": null,
+    "last_menstrual_period": "",
+    "menstrual_bleeding_pattern": "",
+    "birth_control_method": "",
+    "period_duration": "",
+    "cycle_interval": "",
+    "pads_per_day": null,
+    "menopause": null,
+    "age_of_menopause": null
+  },
+
+  "pregnancy_history": {
+    "gravidity": null,
+    "parity": null,
+    "type_of_delivery": "",
+    "full_term": null,
+    "premature": null,
+    "abortion": null,
+    "living_children": null,
+    "pre_eclampsia": null,
+    "age_at_first_pregnancy": null,
+    "family_planning_counseling": null
+  }
+}

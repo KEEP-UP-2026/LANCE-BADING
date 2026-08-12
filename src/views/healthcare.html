@@ -247,7 +247,7 @@
         recentList.forEach(rec => {
           const fileLink = `<a href="${rec.file_url}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(rec.file_name)}</a>`;
           
-          const profileLink = `<a href="/dashboard/patients/profile/${rec.patient_id}" style="color: #f8fafc; font-weight: 600;" class="hover-underline">${escapeHtml(rec.patient_name)}</a>`;
+          const profileLink = `<a href="/dashboard/patients/profile/${rec.patient_id}" style="color: #25282D; font-weight: 700;" class="hover-underline">${escapeHtml(rec.patient_name)}</a>`;
           
           const dateStr = new Date(rec.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
@@ -255,7 +255,7 @@
             <tr>
               <td>${fileLink}</td>
               <td>${profileLink} (${escapeHtml(rec.patient_number)})</td>
-              <td><span class="badge" style="background: rgba(255,255,255,0.04);">${formatCategory(rec.record_type)}</span></td>
+              <td><span class="badge" style="background: #F5F7FA; color: #25282D; border: 1px solid #e2e8f0;">${formatCategory(rec.record_type)}</span></td>
               <td>${dateStr}</td>
             </tr>
           `;

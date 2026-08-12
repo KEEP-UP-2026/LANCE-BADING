@@ -214,7 +214,9 @@
 
           <!-- TAB CONTENT 1: STRUCTURED INFORMATION FORM (OFFICIAL ITR PAPER LAYOUT) -->
           <div id="vtab-content-form" class="vtab-content" style="display: block;">
-            <div class="itr-paper">
+            
+            <!-- PAGE 1 OF ITR -->
+            <div id="itr-paper-page1" class="itr-paper" style="display: block;">
               <!-- HEADER -->
               <div class="header">
                   <div class="sub-header">Republic of the Philippines</div>
@@ -413,6 +415,426 @@
               </table>
 
             </div>
+
+            <!-- PAGE 2 OF ITR -->
+            <div id="itr-paper-page2" class="itr-paper" style="display: none;">
+              <!-- HEADER -->
+              <div class="header">
+                  <div class="sub-header">Republic of the Philippines</div>
+                  <div class="sub-header">Province of Laguna</div>
+                  <div class="sub-header">Municipality of Paete</div>
+                  <h2>PAETE RURAL HEALTH UNIT</h2>
+                  <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                  <h1>Individual Treatment Record</h1>
+                  <h3>Page 2 — Medical &amp; Clinical History, Immunizations</h3>
+              </div>
+
+              <!-- SECTION 1: PHILHEALTH MEMBERSHIP INFORMATION -->
+              <div class="section-header" style="margin-top: 10px;">=== PHILHEALTH MEMBERSHIP INFORMATION ===</div>
+              <table style="margin-bottom: 16px;">
+                <tr>
+                  <td style="width: 40%;">
+                    <strong>Philhealth ID Number:</strong>
+                    <input type="text" id="itr2-philhealth-id" style="width: 55%;" placeholder="">
+                  </td>
+                  <td style="width: 60%;">
+                    <strong>Membership Type:</strong><br>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-memtype-member"> Member</label> &nbsp;&nbsp;
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-memtype-dependent"> Dependent</label> &nbsp;&nbsp;
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-memtype-nonmember"> Non-Member</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <strong>Membership Category:</strong><br>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; margin-top: 4px;">
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-sponsored"> Sponsored</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-ipp"> IPP</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-employed"> Employed</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-lifetime"> Lifetime</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-nhits"> NHITS</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-lgu"> LGU</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-organized"> Organized Group</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-government"> Government</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-nga"> NGA</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-private"> Private</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-ofw"> OFW</label>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 2: VITAL SIGNS -->
+              <div class="section-header">=== VITAL SIGNS ===</div>
+              <div class="vitals-grid" style="margin-bottom: 16px;">
+                <div>
+                  <strong>BP:</strong> <input type="text" id="itr2-vs-bp" style="width: 75px;"> &nbsp;
+                  <strong>HR:</strong> <input type="number" id="itr2-vs-hr" style="width: 45px;"> &nbsp;
+                  <strong>RR:</strong> <input type="number" id="itr2-vs-rr" style="width: 45px;"> &nbsp;
+                  <strong>PR:</strong> <input type="number" id="itr2-vs-pr" style="width: 45px;">
+                </div>
+                <div>
+                  <strong>TEMP:</strong> <input type="text" id="itr2-vs-temp" style="width: 50px;"> °C &nbsp;
+                  <strong>SpO2:</strong> <input type="number" id="itr2-vs-spo2" style="width: 45px;"> %
+                </div>
+                <div>
+                  <strong>HT:</strong> <input type="text" id="itr2-vs-height" style="width: 45px;"> cm &nbsp;
+                  <strong>WT:</strong> <input type="text" id="itr2-vs-weight" style="width: 45px;"> kg<br>
+                  <strong>Waist:</strong> <input type="text" id="itr2-vs-waist" style="width: 45px;"> cm &nbsp;
+                  <strong>Hip:</strong> <input type="text" id="itr2-vs-hip" style="width: 45px;"> cm
+                </div>
+              </div>
+
+              <!-- SECTION 3: PAST MEDICAL HISTORY vs FAMILY HISTORY -->
+              <div class="grid-2col">
+                <!-- LEFT COLUMN: PAST MEDICAL & SURGICAL & SOCIAL HISTORY -->
+                <div class="col-left">
+                  <div class="section-header">=== PAST MEDICAL HISTORY ===</div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Allergy (specify):</strong> <input type="text" id="itr2-pmh-allergy" style="width: 60%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Asthma:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-asthma-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-asthma-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Cancer:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cancer-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cancer-no"> No</label>
+                    Organ: <input type="text" id="itr2-pmh-cancer-organ" style="width: 40%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Cerebrovascular Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cvd-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cvd-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Coronary Artery Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cad-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cad-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Diabetes Mellitus:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-dm-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-dm-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Emphysema:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-emphysema-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-emphysema-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Epilepsy / Seizure Disorder:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-epilepsy-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-epilepsy-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Hepatitis:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hep-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hep-no"> No</label>
+                    Type: <input type="text" id="itr2-pmh-hep-type" style="width: 40%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Hyperlipidemia:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hyperlipid-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hyperlipid-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Hypertension:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-htn-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-htn-no"> No</label>
+                    Highest BP: <input type="text" id="itr2-pmh-htn-highest" style="width: 60px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Peptic Ulcer Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pud-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pud-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Pneumonia:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pneu-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pneu-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Thyroid Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-thyroid-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-thyroid-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Tuberculosis:</strong> Organ: <input type="text" id="itr2-pmh-tb-organ" style="width: 30%;"> Category: <input type="text" id="itr2-pmh-tb-category" style="width: 30%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>UTI:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-uti-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-uti-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 12px;">
+                    <strong>Others:</strong> <input type="text" id="itr2-pmh-others" style="width: 75%;">
+                  </div>
+
+                  <div class="section-header">=== PAST SURGICAL HISTORY ===</div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Operation:</strong> <input type="text" id="itr2-psh-op" style="width: 50%;"> &nbsp;
+                    <strong>Date:</strong> <input type="text" id="itr2-psh-date" style="width: 30%;">
+                  </div>
+
+                  <div class="section-header" style="margin-top: 12px;">=== PERSONAL / SOCIAL HISTORY ===</div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Smoking:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-smk-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-smk-no"> No</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-smk-quit"> Quit</label>
+                    Pack Years: <input type="text" id="itr2-psoc-packyears" style="width: 50px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Alcohol:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-alc-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-alc-no"> No</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-alc-quit"> Quit</label>
+                    Bottles/Day: <input type="text" id="itr2-psoc-bottles" style="width: 45px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Illicit Drugs:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-drugs-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-drugs-no"> No</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-drugs-quit"> Quit</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Sexually Active:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-sex-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-sex-no"> No</label>
+                  </div>
+                </div>
+
+                <!-- RIGHT COLUMN: FAMILY HISTORY -->
+                <div class="col-right">
+                  <div class="section-header">=== FAMILY HISTORY ===</div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Allergy (specify):</strong> <input type="text" id="itr2-fh-allergy" style="width: 60%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Asthma:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-asthma-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-asthma-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Cancer:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cancer-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cancer-no"> No</label>
+                    Organ: <input type="text" id="itr2-fh-cancer-organ" style="width: 40%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Cerebrovascular Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cvd-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cvd-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Coronary Artery Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cad-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cad-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Diabetes Mellitus:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-dm-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-dm-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Emphysema:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-emphysema-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-emphysema-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Epilepsy / Seizure Disorder:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-epilepsy-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-epilepsy-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Hepatitis:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hep-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hep-no"> No</label>
+                    Type: <input type="text" id="itr2-fh-hep-type" style="width: 40%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Hyperlipidemia:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hyperlipid-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hyperlipid-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Hypertension:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-htn-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-htn-no"> No</label>
+                    Highest BP: <input type="text" id="itr2-fh-htn-highest" style="width: 60px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Peptic Ulcer Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pud-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pud-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Pneumonia:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pneu-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pneu-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Thyroid Disease:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-thyroid-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-thyroid-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Pulmonary TB:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-ptb-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-ptb-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Extrapulmonary TB:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-eptb-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-eptb-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>UTI:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-uti-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-uti-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Mental Illness:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-mental-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-fh-mental-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Others:</strong> <input type="text" id="itr2-fh-others" style="width: 75%;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 4: IMMUNIZATIONS TABLE -->
+              <div class="section-header" style="margin-top: 16px;">=== IMMUNIZATIONS ===</div>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px;">
+                <thead>
+                  <tr style="background: #0f172a; color: #ffffff;">
+                    <th style="padding: 6px 10px; width: 20%;">Category</th>
+                    <th style="padding: 6px 10px; width: 80%;">Vaccine Dates Recorded</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 700; background: #f1f5f9;">CHILD CARE</td>
+                    <td>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
+                        <div>BCG: <input type="text" id="itr2-imm-bcg" style="width: 90px;"></div>
+                        <div>HepB Birth: <input type="text" id="itr2-imm-hepb-birth" style="width: 80px;"></div>
+                        <div>HepB 24h: <input type="text" id="itr2-imm-hepb-24h" style="width: 80px;"></div>
+                        <div>PENTA: <input type="text" id="itr2-imm-penta" style="width: 90px;"></div>
+                        <div>OPV: <input type="text" id="itr2-imm-opv" style="width: 90px;"></div>
+                        <div>IPV: <input type="text" id="itr2-imm-ipv" style="width: 90px;"></div>
+                        <div>PCV: <input type="text" id="itr2-imm-pcv" style="width: 90px;"></div>
+                        <div>Measles: <input type="text" id="itr2-imm-measles" style="width: 80px;"></div>
+                        <div>Rotavirus: <input type="text" id="itr2-imm-rotavirus" style="width: 70px;"></div>
+                        <div>Chickenpox: <input type="text" id="itr2-imm-chickenpox" style="width: 65px;"></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700; background: #f1f5f9;">GENERAL</td>
+                    <td>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
+                        <div>Flu: <input type="text" id="itr2-imm-flu" style="width: 100px;"></div>
+                        <div>HPV: <input type="text" id="itr2-imm-hpv" style="width: 100px;"></div>
+                        <div>HPV Gr.4: <input type="text" id="itr2-imm-hpv-g4" style="width: 80px;"></div>
+                        <div>MR Gr.1: <input type="text" id="itr2-imm-mr-g1" style="width: 80px;"></div>
+                        <div>MR Gr.7: <input type="text" id="itr2-imm-mr-g7" style="width: 80px;"></div>
+                        <div>TD Gr.1: <input type="text" id="itr2-imm-td-g1" style="width: 80px;"></div>
+                        <div>TD Gr.7: <input type="text" id="itr2-imm-td-g7" style="width: 80px;"></div>
+                        <div>Tetanus Toxoid: <input type="text" id="itr2-imm-tt" style="width: 60px;"></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700; background: #f1f5f9;">ANIMAL BITE</td>
+                    <td>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;">
+                        <div>PCECV1: <input type="text" id="itr2-imm-pcecv1" style="width: 70px;"></div>
+                        <div>PVRV1: <input type="text" id="itr2-imm-pvrv1" style="width: 70px;"></div>
+                        <div>PVRV2: <input type="text" id="itr2-imm-pvrv2" style="width: 70px;"></div>
+                        <div>PVRV3: <input type="text" id="itr2-imm-pvrv3" style="width: 70px;"></div>
+                        <div>PVRV4: <input type="text" id="itr2-imm-pvrv4" style="width: 70px;"></div>
+                        <div>PCECV2: <input type="text" id="itr2-imm-pcecv2" style="width: 70px;"></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700; background: #f1f5f9;">NCD &amp; MATERNAL</td>
+                    <td>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px;">
+                        <div>Pneumococcal: <input type="text" id="itr2-imm-pneumo" style="width: 80px;"></div>
+                        <div>Flu (NCD): <input type="text" id="itr2-imm-flu-ncd" style="width: 100px;"></div>
+                        <div>Tetanus Toxoid (Mat.): <input type="text" id="itr2-imm-tt-mat" style="width: 60px;"></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- SECTION 5: MENSTRUAL & PREGNANCY HISTORY -->
+              <div class="grid-2col">
+                <!-- MENSTRUAL HISTORY -->
+                <div class="col-left">
+                  <div class="section-header">=== MENSTRUAL HISTORY ===</div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Menarche Age:</strong> <input type="number" id="itr2-men-age" style="width: 45px;"> &nbsp;
+                    <strong>Onset Sexual Intercourse:</strong> <input type="number" id="itr2-men-onset" style="width: 45px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>LMP:</strong> <input type="text" id="itr2-men-lmp" style="width: 120px;"> &nbsp;
+                    <strong>Pattern:</strong> <input type="text" id="itr2-men-pattern" style="width: 100px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Birth Control Method:</strong> <input type="text" id="itr2-men-method" style="width: 50%;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Duration:</strong> <input type="text" id="itr2-men-duration" style="width: 70px;"> &nbsp;
+                    <strong>Cycle Interval:</strong> <input type="text" id="itr2-men-interval" style="width: 70px;"> &nbsp;
+                    <strong>Pads/Day:</strong> <input type="number" id="itr2-men-pads" style="width: 45px;">
+                  </div>
+                  <div>
+                    <strong>Menopause:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-men-meno-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-men-meno-no"> No</label>
+                    Age: <input type="number" id="itr2-men-menoage" style="width: 45px;">
+                  </div>
+                </div>
+
+                <!-- PREGNANCY HISTORY -->
+                <div class="col-right">
+                  <div class="section-header">=== PREGNANCY HISTORY ===</div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Gravidity:</strong> <input type="number" id="itr2-preg-grav" style="width: 40px;"> &nbsp;
+                    <strong>Parity:</strong> <input type="number" id="itr2-preg-par" style="width: 40px;"> &nbsp;
+                    <strong>Type of Delivery:</strong> <input type="text" id="itr2-preg-delivery" style="width: 80px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Full Term:</strong> <input type="number" id="itr2-preg-fullterm" style="width: 40px;"> &nbsp;
+                    <strong>Premature:</strong> <input type="number" id="itr2-preg-premature" style="width: 40px;"> &nbsp;
+                    <strong>Abortion:</strong> <input type="number" id="itr2-preg-abortion" style="width: 40px;"> &nbsp;
+                    <strong>Living:</strong> <input type="number" id="itr2-preg-living" style="width: 40px;">
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Pre-eclampsia:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-preg-preeclamp-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-preg-preeclamp-no"> No</label>
+                  </div>
+                  <div style="margin-bottom: 6px;">
+                    <strong>Age at First Pregnancy:</strong> <input type="number" id="itr2-preg-agefirst" style="width: 45px;">
+                  </div>
+                  <div>
+                    <strong>Family Planning Counseling:</strong>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-preg-fp-yes"> Yes</label>
+                    <label class="checkbox-label"><input type="checkbox" id="itr2-preg-fp-no"> No</label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
 
           <!-- TAB CONTENT 2: ORIGINAL DOCUMENT SCAN -->
@@ -506,16 +928,57 @@
         while ((match = pattern.exec(str)) !== null) {
           sections[match[1].trim()] = match[2].trim();
         }
-        return sections;
+        if (Object.keys(sections).length >= 2) return sections;
+
+        const hdrRegex = /^[ \t]*(?:===|[#*]-*)?[ \t]*(PHILHEALTH MEMBERSHIP INFORMATION|PHILHEALTH|VITAL SIGNS|PAST MEDICAL HISTORY|PAST SURGICAL HISTORY|FAMILY HISTORY|PERSONAL\s*\/\s*SOCIAL HISTORY|PERSONAL\/SOCIAL HISTORY|IMMUNIZATIONS|MENSTRUAL HISTORY|PREGNANCY HISTORY|HEALTH FACILITY HEADER|PATIENT DEMOGRAPHICS|LIFESTYLE\s*&\s*RISK FACTORS|VITAL SIGNS\s*&\s*PHYSICAL MEASUREMENTS|CONSULTATION\s*&\s*CLINICAL FINDINGS)[ \t]*(?:===|:|\(For Women\)|$)/gim;
+
+        const found = [];
+        let m;
+        while ((m = hdrRegex.exec(str)) !== null) {
+          found.push({ index: m.index, matchEnd: hdrRegex.lastIndex, name: m[1].toUpperCase().trim() });
+        }
+        if (found.length === 0) return sections;
+
+        const fallbackRes = {};
+        if (found[0].index > 0) {
+          const prefix = str.slice(0, found[0].index).trim();
+          if (/PHILHEALTH|MEMBERSHIP|ID NUMBER|MEMBER/i.test(prefix)) {
+            fallbackRes['PHILHEALTH MEMBERSHIP INFORMATION'] = prefix;
+          }
+        }
+
+        for (let i = 0; i < found.length; i++) {
+          let rawH = found[i].name;
+          let hkey = rawH;
+          if (rawH.includes('PHILHEALTH')) hkey = 'PHILHEALTH MEMBERSHIP INFORMATION';
+          else if (rawH.includes('VITAL') && !rawH.includes('PHYSICAL')) hkey = 'VITAL SIGNS';
+          else if (rawH.includes('PERSONAL')) hkey = 'PERSONAL / SOCIAL HISTORY';
+          else if (rawH.includes('MEDICAL')) hkey = 'PAST MEDICAL HISTORY';
+          else if (rawH.includes('SURGICAL')) hkey = 'PAST SURGICAL HISTORY';
+          else if (rawH.includes('FAMILY')) hkey = 'FAMILY HISTORY';
+          else if (rawH.includes('IMMUNIZ')) hkey = 'IMMUNIZATIONS';
+          else if (rawH.includes('MENSTRUAL')) hkey = 'MENSTRUAL HISTORY';
+          else if (rawH.includes('PREGNANCY')) hkey = 'PREGNANCY HISTORY';
+
+          const startPos = found[i].matchEnd;
+          const endPos = (i + 1 < found.length) ? found[i + 1].index : str.length;
+          fallbackRes[hkey] = str.slice(startPos, endPos).trim();
+        }
+        return { ...fallbackRes, ...sections };
       }
 
       function getValue(block, label) {
         if (!block) return '';
         const cleanLabel = label.replace(/[?: ]+$/, '').trim();
         const escaped = cleanLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp('^[ \\t]*' + escaped + '[?: \\t]*([^\\n]*)$', 'im');
+        const regex = new RegExp(escaped + '[?: \\t]*([^\\n;,\\t]+)', 'i');
         const match = block.match(regex);
-        return match && match[1] ? match[1].trim() : '';
+        if (match && match[1]) {
+          let val = match[1].trim();
+          val = val.replace(/\s+[A-Z][a-zA-Z0-9\s/()]+:.*$/, '');
+          return val;
+        }
+        return '';
       }
 
       function getNumber(val) {
@@ -529,7 +992,7 @@
       function checkbox(block, label) {
         if (!block) return false;
         const escaped = label.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp('\\[X\\]\\s*' + escaped, 'i');
+        const regex = new RegExp('\\[[\\s]*[XxvV✓/*1]+[\\s]*\\][ \\t]*' + escaped + '|' + escaped + '[ \\t]*\\[[\\s]*[XxvV✓/*1]+[\\s]*\\]|\\([\\s]*[XxvV✓/*1]+[\\s]*\\)[ \\t]*' + escaped, 'i');
         return regex.test(block);
       }
 
@@ -738,6 +1201,217 @@
         return results;
       }
 
+      const pm_block = sections['PHILHEALTH MEMBERSHIP INFORMATION'] || '';
+      const pmh_block = sections['PAST MEDICAL HISTORY'] || '';
+      const psh_block = sections['PAST SURGICAL HISTORY'] || '';
+      const fh_page2_block = sections['FAMILY HISTORY'] || '';
+      const psoc_block = sections['PERSONAL / SOCIAL HISTORY'] || sections['PERSONAL/SOCIAL HISTORY'] || '';
+      const imm_block = sections['IMMUNIZATIONS'] || '';
+      const men_block = sections['MENSTRUAL HISTORY'] || '';
+      const preg_block = sections['PREGNANCY HISTORY'] || '';
+
+      const isPage2 = !!(pm_block || pmh_block || psh_block || imm_block || men_block || preg_block);
+
+      function parsePage2(secs) {
+        const pmB = secs['PHILHEALTH MEMBERSHIP INFORMATION'] || '';
+        const vsB = secs['VITAL SIGNS'] || secs['VITAL SIGNS & PHYSICAL MEASUREMENTS'] || '';
+        const pmhB = secs['PAST MEDICAL HISTORY'] || '';
+        const pshB = secs['PAST SURGICAL HISTORY'] || '';
+        const fhB  = secs['FAMILY HISTORY'] || '';
+        const psocB = secs['PERSONAL / SOCIAL HISTORY'] || secs['PERSONAL/SOCIAL HISTORY'] || '';
+        const immB  = secs['IMMUNIZATIONS'] || '';
+        const menB  = secs['MENSTRUAL HISTORY'] || '';
+        const pregB = secs['PREGNANCY HISTORY'] || '';
+
+        return {
+          philhealth_membership: {
+            philhealth_id_number: getValue(pmB, 'Philhealth ID Number') || getValue(pmB, 'PhilHealth ID Number') || getValue(pmB, 'Philhealth No.'),
+            membership_type: {
+              member: checkbox(pmB, 'Member') && !checkbox(pmB, 'Non-Member'),
+              dependent: checkbox(pmB, 'Dependent'),
+              non_member: checkbox(pmB, 'Non-Member')
+            },
+            membership_category: {
+              sponsored: checkbox(pmB, 'Sponsored'),
+              ipp: checkbox(pmB, 'Individual Paying Program (IPP)') || checkbox(pmB, 'IPP'),
+              employed: checkbox(pmB, 'Employed'),
+              lifetime: checkbox(pmB, 'Lifetime'),
+              nhits: checkbox(pmB, 'NHITS'),
+              lgu: checkbox(pmB, 'LGU'),
+              organized_group: checkbox(pmB, 'Organized Group'),
+              government: checkbox(pmB, 'Government'),
+              nga: checkbox(pmB, 'NGA'),
+              private: checkbox(pmB, 'Private'),
+              ofw: checkbox(pmB, 'OFW')
+            }
+          },
+          vital_signs: {
+            blood_pressure: getValue(vsB, 'Blood Pressure') || getValue(vsB, 'BP'),
+            heart_rate: getNumber(getValue(vsB, 'Heart Rate') || getValue(vsB, 'HR')),
+            respiratory_rate: getNumber(getValue(vsB, 'Respiratory Rate') || getValue(vsB, 'RR')),
+            pulse_rate: getNumber(getValue(vsB, 'Pulse Rate') || getValue(vsB, 'PR')),
+            temperature: getNumber(getValue(vsB, 'Temperature') || getValue(vsB, 'TEMP')),
+            spo2: getNumber(getValue(vsB, 'SpO2')),
+            height_cm: getNumber(getValue(vsB, 'Height (cm)') || getValue(vsB, 'HT')),
+            weight_kg: getNumber(getValue(vsB, 'Weight (kg)') || getValue(vsB, 'WEIGHT')),
+            waist_circumference_cm: getNumber(getValue(vsB, 'Waist Circumference (cm)') || getValue(vsB, 'WaistLine')),
+            hip_circumference_cm: getNumber(getValue(vsB, 'Hip Circumference (cm)') || getValue(vsB, 'Hip'))
+          },
+          past_medical_history: {
+            allergy: getValue(pmhB, 'Allergy (specify)') || getValue(pmhB, 'Allergy'),
+            asthma: checkbox(pmhB, 'Asthma') ? true : (pmhB.includes('Asthma:') && checkbox(pmhB.split('Asthma:')[1].split('\n')[0], 'NO') ? false : null),
+            cancer: {
+              has: checkbox(pmhB, 'Cancer') ? true : null,
+              organ: getValue(pmhB, 'Cancer (specify organ)')
+            },
+            cerebrovascular_disease: checkbox(pmhB, 'Cerebrovascular Disease') ? true : null,
+            coronary_artery_disease: checkbox(pmhB, 'Coronary Artery Disease') ? true : null,
+            diabetes_mellitus: checkbox(pmhB, 'Diabetes Mellitus') ? true : null,
+            emphysema: checkbox(pmhB, 'Emphysema') ? true : null,
+            epilepsy_seizure_disorder: checkbox(pmhB, 'Epilepsy/Seizure Disorder') || checkbox(pmhB, 'Epilepsy') ? true : null,
+            hepatitis: {
+              has: checkbox(pmhB, 'Hepatitis') ? true : null,
+              type: getValue(pmhB, 'Hepatitis (specify type)')
+            },
+            hyperlipidemia: checkbox(pmhB, 'Hyperlipidemia') ? true : null,
+            hypertension: {
+              has: checkbox(pmhB, 'Hypertension') ? true : null,
+              highest_bp: getValue(pmhB, 'Highest BP Recorded')
+            },
+            peptic_ulcer_disease: checkbox(pmhB, 'Peptic Ulcer Disease') ? true : null,
+            pneumonia: checkbox(pmhB, 'Pneumonia') ? true : null,
+            thyroid_disease: checkbox(pmhB, 'Thyroid Disease') ? true : null,
+            tuberculosis: {
+              organ: getValue(pmhB, 'Tuberculosis (specify organ)'),
+              category: getValue(pmhB, 'If Pulmonary TB Category')
+            },
+            urinary_tract_infection: checkbox(pmhB, 'Urinary Tract Infection') || checkbox(pmhB, 'UTI') ? true : null,
+            others: getValue(pmhB, 'Others')
+          },
+          past_surgical_history: {
+            operation: getValue(pshB, 'Operation'),
+            date: getValue(pshB, 'Date')
+          },
+          family_history: {
+            allergy: getValue(fhB, 'Allergy (specify)') || getValue(fhB, 'Allergy'),
+            asthma: checkbox(fhB, 'Asthma') ? true : null,
+            cancer: {
+              has: checkbox(fhB, 'Cancer') ? true : null,
+              organ: getValue(fhB, 'Cancer (specify organ)')
+            },
+            cerebrovascular_disease: checkbox(fhB, 'Cerebrovascular Disease') ? true : null,
+            coronary_artery_disease: checkbox(fhB, 'Coronary Artery Disease') ? true : null,
+            diabetes_mellitus: checkbox(fhB, 'Diabetes Mellitus') ? true : null,
+            emphysema: checkbox(fhB, 'Emphysema') ? true : null,
+            epilepsy_seizure_disorder: checkbox(fhB, 'Epilepsy/Seizure Disorder') || checkbox(fhB, 'Epilepsy') ? true : null,
+            hepatitis: {
+              has: checkbox(fhB, 'Hepatitis') ? true : null,
+              type: getValue(fhB, 'Hepatitis (specify type)')
+            },
+            hyperlipidemia: checkbox(fhB, 'Hyperlipidemia') ? true : null,
+            hypertension: {
+              has: checkbox(fhB, 'Hypertension') ? true : null,
+              highest_bp: getValue(fhB, 'Highest BP Recorded')
+            },
+            peptic_ulcer_disease: checkbox(fhB, 'Peptic Ulcer Disease') ? true : null,
+            pneumonia: checkbox(fhB, 'Pneumonia') ? true : null,
+            thyroid_disease: checkbox(fhB, 'Thyroid Disease') ? true : null,
+            pulmonary_tuberculosis: checkbox(fhB, 'Pulmonary Tuberculosis') ? true : null,
+            extrapulmonary_tuberculosis: checkbox(fhB, 'Extrapulmonary Tuberculosis') ? true : null,
+            urinary_tract_infection: checkbox(fhB, 'Urinary Tract Infection') || checkbox(fhB, 'UTI') ? true : null,
+            mental_illness: checkbox(fhB, 'Mental Illness') ? true : null,
+            others: getValue(fhB, 'Others')
+          },
+          personal_social_history: {
+            smoking: {
+              yes: psocB.includes('Smoking:') && checkbox(psocB.split('Smoking:')[1].split('\n')[0], 'Yes'),
+              no: psocB.includes('Smoking:') && checkbox(psocB.split('Smoking:')[1].split('\n')[0], 'No'),
+              quit: psocB.includes('Smoking:') && checkbox(psocB.split('Smoking:')[1].split('\n')[0], 'Quit'),
+              pack_years: getNumber(getValue(psocB, 'Pack Years'))
+            },
+            alcohol: {
+              yes: psocB.includes('Alcohol:') && checkbox(psocB.split('Alcohol:')[1].split('\n')[0], 'Yes'),
+              no: psocB.includes('Alcohol:') && checkbox(psocB.split('Alcohol:')[1].split('\n')[0], 'No'),
+              quit: psocB.includes('Alcohol:') && checkbox(psocB.split('Alcohol:')[1].split('\n')[0], 'Quit'),
+              bottles_per_day: getNumber(getValue(psocB, 'Bottles per Day'))
+            },
+            illicit_drugs: {
+              yes: psocB.includes('Illicit Drugs:') && checkbox(psocB.split('Illicit Drugs:')[1].split('\n')[0], 'Yes'),
+              no: psocB.includes('Illicit Drugs:') && checkbox(psocB.split('Illicit Drugs:')[1].split('\n')[0], 'No'),
+              quit: psocB.includes('Illicit Drugs:') && checkbox(psocB.split('Illicit Drugs:')[1].split('\n')[0], 'Quit')
+            },
+            sexually_active: psocB.includes('Sexually Active:') ? checkbox(psocB.split('Sexually Active:')[1].split('\n')[0], 'Yes') : null
+          },
+          immunizations: {
+            child_care: {
+              bcg_date: getValue(immB, 'BCG Date'),
+              hepb_birth_date: getValue(immB, 'HepB Birth Date'),
+              hepb_24hrs_date: getValue(immB, 'HepB 24hrs Date'),
+              penta_date: getValue(immB, 'PENTA Date'),
+              opv_date: getValue(immB, 'OPV Date'),
+              ipv_date: getValue(immB, 'IPV Date'),
+              pcv_date: getValue(immB, 'PCV Date'),
+              measles_vaccine_date: getValue(immB, 'Measles Vaccine Date'),
+              rotavirus_vaccine_date: getValue(immB, 'Rotavirus Vaccine Date'),
+              chickenpox_vaccine_date: getValue(immB, 'Chickenpox Vaccine Date')
+            },
+            general: {
+              flu_vaccine_date: getValue(immB, 'Flu Vaccine Date'),
+              hpv_date: getValue(immB, 'HPV Date'),
+              hpv_grade4_date: getValue(immB, 'HPV Grade 4 Date'),
+              mr_grade1_date: getValue(immB, 'MR Grade 1 Date'),
+              mr_grade7_date: getValue(immB, 'MR Grade 7 Date'),
+              td_grade1_date: getValue(immB, 'TD Grade 1 Date'),
+              td_grade7_date: getValue(immB, 'TD Grade 7 Date'),
+              tetanus_toxoid_date: getValue(immB, 'Tetanus Toxoid Date')
+            },
+            animal_bite: {
+              pcecv1_date: getValue(immB, 'PCECV1 Date'),
+              pvrv1_date: getValue(immB, 'PVRV1 Date'),
+              pvrv2_date: getValue(immB, 'PVRV2 Date'),
+              pvrv3_date: getValue(immB, 'PVRV3 Date'),
+              pvrv4_date: getValue(immB, 'PVRV4 Date'),
+              pcecv2_date: getValue(immB, 'PCECV2 Date')
+            },
+            ncd: {
+              pneumococcal_vaccine_date: getValue(immB, 'Pneumococcal Vaccine Date'),
+              flu_vaccine_date: getValue(immB, 'Flu Vaccine (NCD) Date')
+            },
+            maternal_care: {
+              tetanus_toxoid_date: getValue(immB, 'Tetanus Toxoid (Maternal) Date')
+            }
+          },
+          menstrual_history: {
+            menarche_age: getNumber(getValue(menB, 'Menarche Age')),
+            onset_of_sexual_intercourse: getNumber(getValue(menB, 'Onset of Sexual Intercourse')),
+            last_menstrual_period: getValue(menB, 'Last Menstrual Period'),
+            menstrual_bleeding_pattern: getValue(menB, 'Menstrual Bleeding Pattern'),
+            birth_control_method: getValue(menB, 'Birth Control Method'),
+            period_duration: getValue(menB, 'Period Duration'),
+            cycle_interval: getValue(menB, 'Cycle Interval'),
+            pads_per_day: getNumber(getValue(menB, 'Pads per Day')),
+            menopause: menB.includes('Menopause:') ? checkbox(menB.split('Menopause:')[1].split('\n')[0], 'Yes') : null,
+            age_of_menopause: getNumber(getValue(menB, 'Age of Menopause'))
+          },
+          pregnancy_history: {
+            gravidity: getNumber(getValue(pregB, 'Gravidity')),
+            parity: getNumber(getValue(pregB, 'Parity')),
+            type_of_delivery: getValue(pregB, 'Type of Delivery'),
+            full_term: getNumber(getValue(pregB, 'Full Term')),
+            premature: getNumber(getValue(pregB, 'Premature')),
+            abortion: getNumber(getValue(pregB, 'Abortion')),
+            living_children: getNumber(getValue(pregB, 'Living Children')),
+            pre_eclampsia: pregB.includes('Pre-eclampsia:') ? checkbox(pregB.split('Pre-eclampsia:')[1].split('\n')[0], 'Yes') : null,
+            age_at_first_pregnancy: getNumber(getValue(pregB, 'Age at First Pregnancy')),
+            family_planning_counseling: pregB.includes('Family Planning Counseling:') ? checkbox(pregB.split('Family Planning Counseling:')[1].split('\n')[0], 'Yes') : null
+          }
+        };
+      }
+
+      if (isPage2) {
+        return parsePage2(sections);
+      }
+
       return {
         header: parseHeader(header_block),
         patient_demographics: parsePatient(patient_block),
@@ -800,10 +1474,27 @@
         document.getElementById('review-filename').value = currentRecord.file_name || '';
         document.getElementById('review-category').value = currentRecord.record_type || 'PATIENT_INFORMATION_SHEET';
 
-        // Set scan image preview
+        // Set scan image or PDF document preview
         const scanImg = document.getElementById('review-original-image');
-        if (scanImg && currentRecord.preview_url) {
-          scanImg.src = currentRecord.preview_url;
+        const previewUrl = currentRecord.preview_url || `/api/records/download/${currentRecord.id}`;
+        const fileExt = (currentRecord.file_name || '').split('.').pop().toLowerCase();
+        
+        if (scanImg && previewUrl) {
+          if (fileExt === 'pdf') {
+            const parent = scanImg.parentElement;
+            if (parent) {
+              parent.innerHTML = `<iframe src="${previewUrl}" style="width: 100%; height: 650px; border: none; border-radius: 8px; background: #ffffff;"></iframe>`;
+            }
+          } else {
+            scanImg.src = previewUrl;
+            scanImg.onerror = function() {
+              const parent = this.parentElement;
+              this.style.display = 'none';
+              if (parent && !parent.querySelector('.no-preview-msg')) {
+                parent.insertAdjacentHTML('beforeend', '<div class="no-preview-msg" style="padding: 40px; text-align: center; color: #94a3b8; font-weight: 700; font-size: 14px;">Original document image file is being processed or unavailable.</div>');
+              }
+            };
+          }
         }
 
         // Set Extracted Digital Text
@@ -847,6 +1538,26 @@
         setTimeout(() => { window.location.href = '/dashboard/patients'; }, 2000);
       }
     }
+
+    // ITR Paper Page 1 / Page 2 Switcher
+    window.switchItrPaperPage = function(page) {
+      const p1 = document.getElementById('itr-paper-page1');
+      const p2 = document.getElementById('itr-paper-page2');
+      const btn1 = document.getElementById('subtab-itr-p1');
+      const btn2 = document.getElementById('subtab-itr-p2');
+      
+      if (page === 1) {
+        if (p1) p1.style.display = 'block';
+        if (p2) p2.style.display = 'none';
+        if (btn1) btn1.classList.add('active');
+        if (btn2) btn2.classList.remove('active');
+      } else {
+        if (p1) p1.style.display = 'none';
+        if (p2) p2.style.display = 'block';
+        if (btn1) btn1.classList.remove('active');
+        if (btn2) btn2.classList.add('active');
+      }
+    };
 
     // Tab Switcher
     window.switchVerificationTab = function(tabName) {
@@ -926,7 +1637,7 @@
       }
     });
 
-    // Populate Form fields from structured JSON
+    // Populate Form fields from structured JSON (Page 1 + Page 2)
     function populateFormFieldsFromJson(data) {
       if (!data || typeof data !== 'object') return;
 
@@ -940,7 +1651,25 @@
         if (el) el.checked = !!boolVal;
       }
 
-      // Demographics
+      // Auto-display Page 1, Page 2, or both based on record data
+      const p1El = document.getElementById('itr-paper-page1');
+      const p2El = document.getElementById('itr-paper-page2');
+
+      const hasP2Data = !!(data.philhealth_membership || data.past_medical_history || data.immunizations || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2);
+      const hasP1Data = !!(data.header || (data.patient_demographics && data.patient_demographics.name) || data.smoking_cessation_profile || (data.consultation_records && data.consultation_records.length > 0) || data.itr_page_number === 1);
+
+      if (hasP2Data && !hasP1Data) {
+        if (p1El) p1El.style.display = 'none';
+        if (p2El) p2El.style.display = 'block';
+      } else if (hasP1Data && !hasP2Data) {
+        if (p1El) p1El.style.display = 'block';
+        if (p2El) p2El.style.display = 'none';
+      } else {
+        if (p1El) p1El.style.display = 'block';
+        if (p2El) p2El.style.display = 'block';
+      }
+
+      // --- PAGE 1 POPULATION ---
       const d = data.patient_demographics || {};
       setField('itr-field-name', d.name || '');
       setField('itr-field-philhealth', d.philhealth_no || '');
@@ -952,7 +1681,6 @@
       setField('itr-field-education', d.educational_attainment || '');
       setField('itr-field-bhw', d.bhw || '');
 
-      // Smoking Profile
       const sc = data.smoking_cessation_profile || {};
       const opts = sc.options || {};
       const smkSt = sc.smoker_status || '';
@@ -973,13 +1701,11 @@
       setCheck('itr-smk-quit-no', sc.tried_quitting_before === false);
       setField('itr-field-smoking-unsuccessful', sc.reason_not_successful || '');
 
-      // Physical Activity
       const dl = data.diet_and_lifestyle || {};
       const pa = dl.physical_activity || {};
       setCheck('itr-pa-yes', pa.meets_2_5_hours_per_week === true);
       setCheck('itr-pa-no', pa.meets_2_5_hours_per_week === false);
 
-      // Family History
       const fh = data.family_history || {};
       setCheck('itr-fh-htn', fh.hypertension === true);
       setCheck('itr-fh-stroke', fh.stroke === true);
@@ -993,7 +1719,6 @@
       setField('itr-field-comorbid', cb.co_morbid || '');
       setField('itr-field-allergy', cb.allergy || '');
 
-      // Alcohol
       const alc = data.alcohol_intake || {};
       const alcExc = alc.excessive_alcohol_intake || {};
       setCheck('itr-alc-never', alc.never_consumed === true);
@@ -1001,7 +1726,6 @@
       setCheck('itr-alc-excess-yes', alcExc.yes === true);
       setCheck('itr-alc-excess-no', alcExc.no === true);
 
-      // High Fat & Fiber
       const fat = dl.high_fat_high_salt_food_intake || {};
       setCheck('itr-fat-yes', fat.weekly_processed_fastfood === true);
       setCheck('itr-fat-no', fat.weekly_processed_fastfood === false);
@@ -1012,7 +1736,6 @@
       setCheck('itr-fiber-fruit-yes', fiber.fruits_2_3_servings_daily === true);
       setCheck('itr-fiber-fruit-no', fiber.fruits_2_3_servings_daily === false);
 
-      // Vitals
       const vs = data.vital_signs || {};
       const bpr = vs.blood_pressure_readings || {};
       setField('itr-field-bmi', vs.bmi !== undefined && vs.bmi !== null ? vs.bmi : '');
@@ -1023,9 +1746,229 @@
       setField('itr-field-bp1', bpr.first || '');
       setField('itr-field-bp2', bpr.second || '');
 
-      // Consultation Table
       const consults = data.consultation_records || [];
       renderConsultationTableRows(consults);
+
+      // --- PAGE 2 POPULATION ---
+      const pm = data.philhealth_membership || {};
+      setField('itr2-philhealth-id', pm.philhealth_id_number || '');
+      const mt = pm.membership_type || {};
+      setCheck('itr2-memtype-member', mt.member);
+      setCheck('itr2-memtype-dependent', mt.dependent);
+      setCheck('itr2-memtype-nonmember', mt.non_member);
+
+      const mc = pm.membership_category || {};
+      setCheck('itr2-memcat-sponsored', mc.sponsored);
+      setCheck('itr2-memcat-ipp', mc.ipp);
+      setCheck('itr2-memcat-employed', mc.employed);
+      setCheck('itr2-memcat-lifetime', mc.lifetime);
+      setCheck('itr2-memcat-nhits', mc.nhits);
+      setCheck('itr2-memcat-lgu', mc.lgu);
+      setCheck('itr2-memcat-organized', mc.organized_group);
+      setCheck('itr2-memcat-government', mc.government);
+      setCheck('itr2-memcat-nga', mc.nga);
+      setCheck('itr2-memcat-private', mc.private);
+      setCheck('itr2-memcat-ofw', mc.ofw);
+
+      setField('itr2-vs-bp', vs.blood_pressure || '');
+      setField('itr2-vs-hr', vs.heart_rate);
+      setField('itr2-vs-rr', vs.respiratory_rate);
+      setField('itr2-vs-pr', vs.pulse_rate);
+      setField('itr2-vs-temp', vs.temperature);
+      setField('itr2-vs-spo2', vs.spo2);
+      setField('itr2-vs-height', vs.height_cm);
+      setField('itr2-vs-weight', vs.weight_kg);
+      setField('itr2-vs-waist', vs.waist_circumference_cm);
+      setField('itr2-vs-hip', vs.hip_circumference_cm);
+
+      const pmh = data.past_medical_history || {};
+      setField('itr2-pmh-allergy', pmh.allergy || '');
+      setCheck('itr2-pmh-asthma-yes', pmh.asthma === true);
+      setCheck('itr2-pmh-asthma-no', pmh.asthma === false);
+
+      const pmhCancer = pmh.cancer || {};
+      setCheck('itr2-pmh-cancer-yes', pmhCancer.has === true || pmh.cancer === true);
+      setCheck('itr2-pmh-cancer-no', pmhCancer.has === false || pmh.cancer === false);
+      setField('itr2-pmh-cancer-organ', pmhCancer.organ || '');
+
+      setCheck('itr2-pmh-cvd-yes', pmh.cerebrovascular_disease === true);
+      setCheck('itr2-pmh-cvd-no', pmh.cerebrovascular_disease === false);
+      setCheck('itr2-pmh-cad-yes', pmh.coronary_artery_disease === true);
+      setCheck('itr2-pmh-cad-no', pmh.coronary_artery_disease === false);
+      setCheck('itr2-pmh-dm-yes', pmh.diabetes_mellitus === true);
+      setCheck('itr2-pmh-dm-no', pmh.diabetes_mellitus === false);
+      setCheck('itr2-pmh-emphysema-yes', pmh.emphysema === true);
+      setCheck('itr2-pmh-emphysema-no', pmh.emphysema === false);
+      setCheck('itr2-pmh-epilepsy-yes', pmh.epilepsy_seizure_disorder === true);
+      setCheck('itr2-pmh-epilepsy-no', pmh.epilepsy_seizure_disorder === false);
+
+      const pmhHep = pmh.hepatitis || {};
+      setCheck('itr2-pmh-hep-yes', pmhHep.has === true);
+      setCheck('itr2-pmh-hep-no', pmhHep.has === false);
+      setField('itr2-pmh-hep-type', pmhHep.type || '');
+
+      setCheck('itr2-pmh-hyperlipid-yes', pmh.hyperlipidemia === true);
+      setCheck('itr2-pmh-hyperlipid-no', pmh.hyperlipidemia === false);
+
+      const pmhHtn = pmh.hypertension || {};
+      setCheck('itr2-pmh-htn-yes', pmhHtn.has === true);
+      setCheck('itr2-pmh-htn-no', pmhHtn.has === false);
+      setField('itr2-pmh-htn-highest', pmhHtn.highest_bp || '');
+
+      setCheck('itr2-pmh-pud-yes', pmh.peptic_ulcer_disease === true);
+      setCheck('itr2-pmh-pud-no', pmh.peptic_ulcer_disease === false);
+      setCheck('itr2-pmh-pneu-yes', pmh.pneumonia === true);
+      setCheck('itr2-pmh-pneu-no', pmh.pneumonia === false);
+      setCheck('itr2-pmh-thyroid-yes', pmh.thyroid_disease === true);
+      setCheck('itr2-pmh-thyroid-no', pmh.thyroid_disease === false);
+
+      const pmhTb = pmh.tuberculosis || {};
+      setField('itr2-pmh-tb-organ', pmhTb.organ || '');
+      setField('itr2-pmh-tb-category', pmhTb.category || '');
+
+      setCheck('itr2-pmh-uti-yes', pmh.urinary_tract_infection === true);
+      setCheck('itr2-pmh-uti-no', pmh.urinary_tract_infection === false);
+      setField('itr2-pmh-others', pmh.others || '');
+
+      const psh = data.past_surgical_history || {};
+      setField('itr2-psh-op', psh.operation || '');
+      setField('itr2-psh-date', psh.date || '');
+
+      const psoc = data.personal_social_history || {};
+      const psocSmk = psoc.smoking || {};
+      setCheck('itr2-psoc-smk-yes', psocSmk.yes);
+      setCheck('itr2-psoc-smk-no', psocSmk.no);
+      setCheck('itr2-psoc-smk-quit', psocSmk.quit);
+      setField('itr2-psoc-packyears', psocSmk.pack_years || '');
+
+      const psocAlc = psoc.alcohol || {};
+      setCheck('itr2-psoc-alc-yes', psocAlc.yes);
+      setCheck('itr2-psoc-alc-no', psocAlc.no);
+      setCheck('itr2-psoc-alc-quit', psocAlc.quit);
+      setField('itr2-psoc-bottles', psocAlc.bottles_per_day || '');
+
+      const psocDrugs = psoc.illicit_drugs || {};
+      setCheck('itr2-psoc-drugs-yes', psocDrugs.yes);
+      setCheck('itr2-psoc-drugs-no', psocDrugs.no);
+      setCheck('itr2-psoc-drugs-quit', psocDrugs.quit);
+
+      setCheck('itr2-psoc-sex-yes', psoc.sexually_active === true);
+      setCheck('itr2-psoc-sex-no', psoc.sexually_active === false);
+
+      const fh2 = data.family_history || {};
+      setField('itr2-fh-allergy', fh2.allergy || '');
+      setCheck('itr2-fh-asthma-yes', fh2.asthma === true);
+      setCheck('itr2-fh-asthma-no', fh2.asthma === false);
+
+      const fhCancer = fh2.cancer || {};
+      setCheck('itr2-fh-cancer-yes', fhCancer.has === true);
+      setCheck('itr2-fh-cancer-no', fhCancer.has === false);
+      setField('itr2-fh-cancer-organ', fhCancer.organ || '');
+
+      setCheck('itr2-fh-cvd-yes', fh2.cerebrovascular_disease === true);
+      setCheck('itr2-fh-cvd-no', fh2.cerebrovascular_disease === false);
+      setCheck('itr2-fh-cad-yes', fh2.coronary_artery_disease === true);
+      setCheck('itr2-fh-cad-no', fh2.coronary_artery_disease === false);
+      setCheck('itr2-fh-dm-yes', fh2.diabetes_mellitus === true);
+      setCheck('itr2-fh-dm-no', fh2.diabetes_mellitus === false);
+      setCheck('itr2-fh-emphysema-yes', fh2.emphysema === true);
+      setCheck('itr2-fh-emphysema-no', fh2.emphysema === false);
+      setCheck('itr2-fh-epilepsy-yes', fh2.epilepsy_seizure_disorder === true);
+      setCheck('itr2-fh-epilepsy-no', fh2.epilepsy_seizure_disorder === false);
+
+      const fhHep = fh2.hepatitis || {};
+      setCheck('itr2-fh-hep-yes', fhHep.has === true);
+      setCheck('itr2-fh-hep-no', fhHep.has === false);
+      setField('itr2-fh-hep-type', fhHep.type || '');
+
+      setCheck('itr2-fh-hyperlipid-yes', fh2.hyperlipidemia === true);
+      setCheck('itr2-fh-hyperlipid-no', fh2.hyperlipidemia === false);
+
+      const fhHtn = fh2.hypertension || {};
+      setCheck('itr2-fh-htn-yes', fhHtn.has === true);
+      setCheck('itr2-fh-htn-no', fhHtn.has === false);
+      setField('itr2-fh-htn-highest', fhHtn.highest_bp || '');
+
+      setCheck('itr2-fh-pud-yes', fh2.peptic_ulcer_disease === true);
+      setCheck('itr2-fh-pud-no', fh2.peptic_ulcer_disease === false);
+      setCheck('itr2-fh-pneu-yes', fh2.pneumonia === true);
+      setCheck('itr2-fh-pneu-no', fh2.pneumonia === false);
+      setCheck('itr2-fh-thyroid-yes', fh2.thyroid_disease === true);
+      setCheck('itr2-fh-thyroid-no', fh2.thyroid_disease === false);
+      setCheck('itr2-fh-ptb-yes', fh2.pulmonary_tuberculosis === true);
+      setCheck('itr2-fh-ptb-no', fh2.pulmonary_tuberculosis === false);
+      setCheck('itr2-fh-eptb-yes', fh2.extrapulmonary_tuberculosis === true);
+      setCheck('itr2-fh-eptb-no', fh2.extrapulmonary_tuberculosis === false);
+      setCheck('itr2-fh-uti-yes', fh2.urinary_tract_infection === true);
+      setCheck('itr2-fh-uti-no', fh2.urinary_tract_infection === false);
+      setCheck('itr2-fh-mental-yes', fh2.mental_illness === true);
+      setCheck('itr2-fh-mental-no', fh2.mental_illness === false);
+      setField('itr2-fh-others', fh2.others || '');
+
+      const imm = data.immunizations || {};
+      const child = imm.child_care || {};
+      setField('itr2-imm-bcg', child.bcg_date || '');
+      setField('itr2-imm-hepb-birth', child.hepb_birth_date || '');
+      setField('itr2-imm-hepb-24h', child.hepb_24hrs_date || '');
+      setField('itr2-imm-penta', child.penta_date || '');
+      setField('itr2-imm-opv', child.opv_date || '');
+      setField('itr2-imm-ipv', child.ipv_date || '');
+      setField('itr2-imm-pcv', child.pcv_date || '');
+      setField('itr2-imm-measles', child.measles_vaccine_date || '');
+      setField('itr2-imm-rotavirus', child.rotavirus_vaccine_date || '');
+      setField('itr2-imm-chickenpox', child.chickenpox_vaccine_date || '');
+
+      const gen = imm.general || {};
+      setField('itr2-imm-flu', gen.flu_vaccine_date || '');
+      setField('itr2-imm-hpv', gen.hpv_date || '');
+      setField('itr2-imm-hpv-g4', gen.hpv_grade4_date || '');
+      setField('itr2-imm-mr-g1', gen.mr_grade1_date || '');
+      setField('itr2-imm-mr-g7', gen.mr_grade7_date || '');
+      setField('itr2-imm-td-g1', gen.td_grade1_date || '');
+      setField('itr2-imm-td-g7', gen.td_grade7_date || '');
+      setField('itr2-imm-tt', gen.tetanus_toxoid_date || '');
+
+      const ab = imm.animal_bite || {};
+      setField('itr2-imm-pcecv1', ab.pcecv1_date || '');
+      setField('itr2-imm-pvrv1', ab.pvrv1_date || '');
+      setField('itr2-imm-pvrv2', ab.pvrv2_date || '');
+      setField('itr2-imm-pvrv3', ab.pvrv3_date || '');
+      setField('itr2-imm-pvrv4', ab.pvrv4_date || '');
+      setField('itr2-imm-pcecv2', ab.pcecv2_date || '');
+
+      const ncd = imm.ncd || {};
+      setField('itr2-imm-pneumo', ncd.pneumococcal_vaccine_date || '');
+      setField('itr2-imm-flu-ncd', ncd.flu_vaccine_date || '');
+
+      const mat = imm.maternal_care || {};
+      setField('itr2-imm-tt-mat', mat.tetanus_toxoid_date || '');
+
+      const men = data.menstrual_history || {};
+      setField('itr2-men-age', men.menarche_age);
+      setField('itr2-men-onset', men.onset_of_sexual_intercourse);
+      setField('itr2-men-lmp', men.last_menstrual_period || '');
+      setField('itr2-men-pattern', men.menstrual_bleeding_pattern || '');
+      setField('itr2-men-method', men.birth_control_method || '');
+      setField('itr2-men-duration', men.period_duration || '');
+      setField('itr2-men-interval', men.cycle_interval || '');
+      setField('itr2-men-pads', men.pads_per_day);
+      setCheck('itr2-men-meno-yes', men.menopause === true);
+      setCheck('itr2-men-meno-no', men.menopause === false);
+      setField('itr2-men-menoage', men.age_of_menopause);
+
+      const preg = data.pregnancy_history || {};
+      setField('itr2-preg-grav', preg.gravidity);
+      setField('itr2-preg-par', preg.parity);
+      setField('itr2-preg-delivery', preg.type_of_delivery || '');
+      setField('itr2-preg-fullterm', preg.full_term);
+      setField('itr2-preg-premature', preg.premature);
+      setField('itr2-preg-abortion', preg.abortion);
+      setField('itr2-preg-living', preg.living_children);
+      setCheck('itr2-preg-preeclamp-yes', preg.pre_eclampsia === true);
+      setCheck('itr2-preg-preeclamp-no', preg.pre_eclampsia === false);
+      setField('itr2-preg-agefirst', preg.age_at_first_pregnancy);
+      setCheck('itr2-preg-fp-yes', preg.family_planning_counseling === true);
+      setCheck('itr2-preg-fp-no', preg.family_planning_counseling === false);
     }
 
     // Collect edited DOM values into structured JSON
@@ -1208,6 +2151,182 @@
 
       function chk(val) { return val === true ? '[x]' : '[ ]'; }
       function opt(status, target) { return status === target ? '[x]' : '[ ]'; }
+
+      const is_page_2 = !!(data.philhealth_membership || data.past_medical_history || data.immunizations || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2);
+
+      if (is_page_2) {
+        const pm = data.philhealth_membership || {};
+        const pm_type = pm.membership_type || {};
+        const pm_cat = pm.membership_category || {};
+        const pmh = data.past_medical_history || {};
+        const pmh_can = pmh.cancer || {};
+        const pmh_hep = pmh.hepatitis || {};
+        const pmh_htn = pmh.hypertension || {};
+        const pmh_tb = pmh.tuberculosis || {};
+        const psh = data.past_surgical_history || {};
+        const fh2 = data.family_history || {};
+        const fh_can = fh2.cancer || {};
+        const fh_hep = fh2.hepatitis || {};
+        const fh_htn = fh2.hypertension || {};
+        const psoc = data.personal_social_history || {};
+        const psoc_smk = psoc.smoking || {};
+        const psoc_alc = psoc.alcohol || {};
+        const psoc_drg = psoc.illicit_drugs || {};
+        const imm = data.immunizations || {};
+        const imm_child = imm.child_care || {};
+        const imm_gen = imm.general || {};
+        const imm_ab = imm.animal_bite || {};
+        const imm_ncd = imm.ncd || {};
+        const imm_mat = imm.maternal_care || {};
+        const men = data.menstrual_history || {};
+        const preg = data.pregnancy_history || {};
+
+        const lines2 = [];
+        lines2.push('=== PHILHEALTH MEMBERSHIP INFORMATION ===');
+        lines2.push(`Philhealth ID Number: ${pm.philhealth_id_number || ''}\n`);
+        lines2.push('Membership Type:');
+        lines2.push(`${chk(pm_type.member)} Member`);
+        lines2.push(`${chk(pm_type.dependent)} Dependent`);
+        lines2.push(`${chk(pm_type.non_member)} Non-Member\n`);
+        lines2.push('Membership Category:');
+        lines2.push(`${chk(pm_cat.sponsored)} Sponsored`);
+        lines2.push(`${chk(pm_cat.ipp)} Individual Paying Program (IPP)`);
+        lines2.push(`${chk(pm_cat.employed)} Employed`);
+        lines2.push(`${chk(pm_cat.lifetime)} Lifetime`);
+        lines2.push(`${chk(pm_cat.nhits)} NHITS`);
+        lines2.push(`${chk(pm_cat.lgu)} LGU`);
+        lines2.push(`${chk(pm_cat.organized_group)} Organized Group`);
+        lines2.push(`${chk(pm_cat.government)} Government`);
+        lines2.push(`${chk(pm_cat.nga)} NGA`);
+        lines2.push(`${chk(pm_cat.private)} Private`);
+        lines2.push(`${chk(pm_cat.ofw)} OFW\n`);
+
+        lines2.push('=== VITAL SIGNS ===');
+        lines2.push(`Blood Pressure: ${vs.blood_pressure || ''}`);
+        lines2.push(`Heart Rate: ${vs.heart_rate !== undefined && vs.heart_rate !== null ? vs.heart_rate : ''}`);
+        lines2.push(`Respiratory Rate: ${vs.respiratory_rate !== undefined && vs.respiratory_rate !== null ? vs.respiratory_rate : ''}`);
+        lines2.push(`Pulse Rate: ${vs.pulse_rate !== undefined && vs.pulse_rate !== null ? vs.pulse_rate : ''}`);
+        lines2.push(`Temperature: ${vs.temperature !== undefined && vs.temperature !== null ? vs.temperature : ''}`);
+        lines2.push(`SpO2: ${vs.spo2 !== undefined && vs.spo2 !== null ? vs.spo2 : ''}`);
+        lines2.push(`Height (cm): ${vs.height_cm !== undefined && vs.height_cm !== null ? vs.height_cm : ''}`);
+        lines2.push(`Weight (kg): ${vs.weight_kg !== undefined && vs.weight_kg !== null ? vs.weight_kg : ''}`);
+        lines2.push(`Waist Circumference (cm): ${vs.waist_circumference_cm !== undefined && vs.waist_circumference_cm !== null ? vs.waist_circumference_cm : ''}`);
+        lines2.push(`Hip Circumference (cm): ${vs.hip_circumference_cm !== undefined && vs.hip_circumference_cm !== null ? vs.hip_circumference_cm : ''}\n`);
+
+        lines2.push('=== PAST MEDICAL HISTORY ===');
+        lines2.push(`Allergy (specify): ${pmh.allergy || ''}`);
+        lines2.push(`Asthma:\n${chk(pmh.asthma === true)} Yes\n${chk(pmh.asthma === false)} No\n`);
+        lines2.push(`Cancer (specify organ): ${pmh_can.organ || ''}`);
+        lines2.push(`Cerebrovascular Disease:\n${chk(pmh.cerebrovascular_disease === true)} Yes\n${chk(pmh.cerebrovascular_disease === false)} No\n`);
+        lines2.push(`Coronary Artery Disease:\n${chk(pmh.coronary_artery_disease === true)} Yes\n${chk(pmh.coronary_artery_disease === false)} No\n`);
+        lines2.push(`Diabetes Mellitus:\n${chk(pmh.diabetes_mellitus === true)} Yes\n${chk(pmh.diabetes_mellitus === false)} No\n`);
+        lines2.push(`Emphysema:\n${chk(pmh.emphysema === true)} Yes\n${chk(pmh.emphysema === false)} No\n`);
+        lines2.push(`Epilepsy/Seizure Disorder:\n${chk(pmh.epilepsy_seizure_disorder === true)} Yes\n${chk(pmh.epilepsy_seizure_disorder === false)} No\n`);
+        lines2.push(`Hepatitis (specify type): ${pmh_hep.type || ''}`);
+        lines2.push(`Hyperlipidemia:\n${chk(pmh.hyperlipidemia === true)} Yes\n${chk(pmh.hyperlipidemia === false)} No\n`);
+        lines2.push(`Hypertension:\n${chk(pmh_htn.has === true)} Yes\n${chk(pmh_htn.has === false)} No`);
+        lines2.push(`Highest BP Recorded: ${pmh_htn.highest_bp || ''}\n`);
+        lines2.push(`Peptic Ulcer Disease:\n${chk(pmh.peptic_ulcer_disease === true)} Yes\n${chk(pmh.peptic_ulcer_disease === false)} No\n`);
+        lines2.push(`Pneumonia:\n${chk(pmh.pneumonia === true)} Yes\n${chk(pmh.pneumonia === false)} No\n`);
+        lines2.push(`Thyroid Disease:\n${chk(pmh.thyroid_disease === true)} Yes\n${chk(pmh.thyroid_disease === false)} No\n`);
+        lines2.push(`Tuberculosis (specify organ): ${pmh_tb.organ || ''}`);
+        lines2.push(`If Pulmonary TB Category: ${pmh_tb.category || ''}\n`);
+        lines2.push(`Urinary Tract Infection:\n${chk(pmh.urinary_tract_infection === true)} Yes\n${chk(pmh.urinary_tract_infection === false)} No\n`);
+        lines2.push(`Others: ${pmh.others || ''}\n`);
+
+        lines2.push('=== PAST SURGICAL HISTORY ===');
+        lines2.push(`Operation: ${psh.operation || ''}`);
+        lines2.push(`Date: ${psh.date || ''}\n`);
+
+        lines2.push('=== FAMILY HISTORY ===');
+        lines2.push(`Allergy (specify): ${fh2.allergy || ''}`);
+        lines2.push(`Asthma:\n${chk(fh2.asthma === true)} Yes\n${chk(fh2.asthma === false)} No\n`);
+        lines2.push(`Cancer (specify organ): ${fh_can.organ || ''}`);
+        lines2.push(`Cerebrovascular Disease:\n${chk(fh2.cerebrovascular_disease === true)} Yes\n${chk(fh2.cerebrovascular_disease === false)} No\n`);
+        lines2.push(`Coronary Artery Disease:\n${chk(fh2.coronary_artery_disease === true)} Yes\n${chk(fh2.coronary_artery_disease === false)} No\n`);
+        lines2.push(`Diabetes Mellitus:\n${chk(fh2.diabetes_mellitus === true)} Yes\n${chk(fh2.diabetes_mellitus === false)} No\n`);
+        lines2.push(`Emphysema:\n${chk(fh2.emphysema === true)} Yes\n${chk(fh2.emphysema === false)} No\n`);
+        lines2.push(`Epilepsy/Seizure Disorder:\n${chk(fh2.epilepsy_seizure_disorder === true)} Yes\n${chk(fh2.epilepsy_seizure_disorder === false)} No\n`);
+        lines2.push(`Hepatitis (specify type): ${fh_hep.type || ''}`);
+        lines2.push(`Hyperlipidemia:\n${chk(fh2.hyperlipidemia === true)} Yes\n${chk(fh2.hyperlipidemia === false)} No\n`);
+        lines2.push(`Hypertension:\n${chk(fh_htn.has === true)} Yes\n${chk(fh_htn.has === false)} No`);
+        lines2.push(`Highest BP Recorded: ${fh_htn.highest_bp || ''}\n`);
+        lines2.push(`Peptic Ulcer Disease:\n${chk(fh2.peptic_ulcer_disease === true)} Yes\n${chk(fh2.peptic_ulcer_disease === false)} No\n`);
+        lines2.push(`Pneumonia:\n${chk(fh2.pneumonia === true)} Yes\n${chk(fh2.pneumonia === false)} No\n`);
+        lines2.push(`Thyroid Disease:\n${chk(fh2.thyroid_disease === true)} Yes\n${chk(fh2.thyroid_disease === false)} No\n`);
+        lines2.push(`Pulmonary Tuberculosis:\n${chk(fh2.pulmonary_tuberculosis === true)} Yes\n${chk(fh2.pulmonary_tuberculosis === false)} No\n`);
+        lines2.push(`Extrapulmonary Tuberculosis:\n${chk(fh2.extrapulmonary_tuberculosis === true)} Yes\n${chk(fh2.extrapulmonary_tuberculosis === false)} No\n`);
+        lines2.push(`Urinary Tract Infection:\n${chk(fh2.urinary_tract_infection === true)} Yes\n${chk(fh2.urinary_tract_infection === false)} No\n`);
+        lines2.push(`Mental Illness:\n${chk(fh2.mental_illness === true)} Yes\n${chk(fh2.mental_illness === false)} No\n`);
+        lines2.push(`Others: ${fh2.others || ''}\n`);
+
+        lines2.push('=== PERSONAL / SOCIAL HISTORY ===');
+        lines2.push(`Smoking:\n${chk(psoc_smk.yes)} Yes\n${chk(psoc_smk.no)} No\n${chk(psoc_smk.quit)} Quit`);
+        lines2.push(`Pack Years: ${psoc_smk.pack_years !== undefined && psoc_smk.pack_years !== null ? psoc_smk.pack_years : ''}\n`);
+        lines2.push(`Alcohol:\n${chk(psoc_alc.yes)} Yes\n${chk(psoc_alc.no)} No\n${chk(psoc_alc.quit)} Quit`);
+        lines2.push(`Bottles per Day: ${psoc_alc.bottles_per_day !== undefined && psoc_alc.bottles_per_day !== null ? psoc_alc.bottles_per_day : ''}\n`);
+        lines2.push(`Illicit Drugs:\n${chk(psoc_drg.yes)} Yes\n${chk(psoc_drg.no)} No\n${chk(psoc_drg.quit)} Quit\n`);
+        lines2.push(`Sexually Active:\n${chk(psoc.sexually_active === true)} Yes\n${chk(psoc.sexually_active === false)} No\n`);
+
+        lines2.push('=== IMMUNIZATIONS ===\n');
+        lines2.push('-- CHILD CARE --');
+        lines2.push(`BCG Date: ${imm_child.bcg_date || ''}`);
+        lines2.push(`HepB Birth Date: ${imm_child.hepb_birth_date || ''}`);
+        lines2.push(`HepB 24hrs Date: ${imm_child.hepb_24hrs_date || ''}`);
+        lines2.push(`PENTA Date: ${imm_child.penta_date || ''}`);
+        lines2.push(`OPV Date: ${imm_child.opv_date || ''}`);
+        lines2.push(`IPV Date: ${imm_child.ipv_date || ''}`);
+        lines2.push(`PCV Date: ${imm_child.pcv_date || ''}`);
+        lines2.push(`Measles Vaccine Date: ${imm_child.measles_vaccine_date || ''}`);
+        lines2.push(`Rotavirus Vaccine Date: ${imm_child.rotavirus_vaccine_date || ''}`);
+        lines2.push(`Chickenpox Vaccine Date: ${imm_child.chickenpox_vaccine_date || ''}\n`);
+        lines2.push('-- GENERAL --');
+        lines2.push(`Flu Vaccine Date: ${imm_gen.flu_vaccine_date || ''}`);
+        lines2.push(`HPV Date: ${imm_gen.hpv_date || ''}`);
+        lines2.push(`HPV Grade 4 Date: ${imm_gen.hpv_grade4_date || ''}`);
+        lines2.push(`MR Grade 1 Date: ${imm_gen.mr_grade1_date || ''}`);
+        lines2.push(`MR Grade 7 Date: ${imm_gen.mr_grade7_date || ''}`);
+        lines2.push(`TD Grade 1 Date: ${imm_gen.td_grade1_date || ''}`);
+        lines2.push(`TD Grade 7 Date: ${imm_gen.td_grade7_date || ''}`);
+        lines2.push(`Tetanus Toxoid Date: ${imm_gen.tetanus_toxoid_date || ''}\n`);
+        lines2.push('-- ANIMAL BITE --');
+        lines2.push(`PCECV1 Date: ${imm_ab.pcecv1_date || ''}`);
+        lines2.push(`PVRV1 Date: ${imm_ab.pvrv1_date || ''}`);
+        lines2.push(`PVRV2 Date: ${imm_ab.pvrv2_date || ''}`);
+        lines2.push(`PVRV3 Date: ${imm_ab.pvrv3_date || ''}`);
+        lines2.push(`PVRV4 Date: ${imm_ab.pvrv4_date || ''}`);
+        lines2.push(`PCECV2 Date: ${imm_ab.pcecv2_date || ''}\n`);
+        lines2.push('-- NCD --');
+        lines2.push(`Pneumococcal Vaccine Date: ${imm_ncd.pneumococcal_vaccine_date || ''}`);
+        lines2.push(`Flu Vaccine (NCD) Date: ${imm_ncd.flu_vaccine_date || ''}\n`);
+        lines2.push('-- MATERNAL CARE --');
+        lines2.push(`Tetanus Toxoid (Maternal) Date: ${imm_mat.tetanus_toxoid_date || ''}\n`);
+
+        lines2.push('=== MENSTRUAL HISTORY ===');
+        lines2.push(`Menarche Age: ${men.menarche_age !== undefined && men.menarche_age !== null ? men.menarche_age : ''}`);
+        lines2.push(`Onset of Sexual Intercourse: ${men.onset_of_sexual_intercourse !== undefined && men.onset_of_sexual_intercourse !== null ? men.onset_of_sexual_intercourse : ''}`);
+        lines2.push(`Last Menstrual Period: ${men.last_menstrual_period || ''}`);
+        lines2.push(`Menstrual Bleeding Pattern: ${men.menstrual_bleeding_pattern || ''}`);
+        lines2.push(`Birth Control Method: ${men.birth_control_method || ''}`);
+        lines2.push(`Period Duration: ${men.period_duration || ''}`);
+        lines2.push(`Cycle Interval: ${men.cycle_interval || ''}`);
+        lines2.push(`Pads per Day: ${men.pads_per_day !== undefined && men.pads_per_day !== null ? men.pads_per_day : ''}\n`);
+        lines2.push(`Menopause:\n${chk(men.menopause === true)} Yes\n${chk(men.menopause === false)} No`);
+        lines2.push(`Age of Menopause: ${men.age_of_menopause !== undefined && men.age_of_menopause !== null ? men.age_of_menopause : ''}\n`);
+
+        lines2.push('=== PREGNANCY HISTORY ===');
+        lines2.push(`Gravidity: ${preg.gravidity !== undefined && preg.gravidity !== null ? preg.gravidity : ''}`);
+        lines2.push(`Parity: ${preg.parity !== undefined && preg.parity !== null ? preg.parity : ''}`);
+        lines2.push(`Type of Delivery: ${preg.type_of_delivery || ''}`);
+        lines2.push(`Full Term: ${preg.full_term !== undefined && preg.full_term !== null ? preg.full_term : ''}`);
+        lines2.push(`Premature: ${preg.premature !== undefined && preg.premature !== null ? preg.premature : ''}`);
+        lines2.push(`Abortion: ${preg.abortion !== undefined && preg.abortion !== null ? preg.abortion : ''}`);
+        lines2.push(`Living Children: ${preg.living_children !== undefined && preg.living_children !== null ? preg.living_children : ''}\n`);
+        lines2.push(`Pre-eclampsia:\n${chk(preg.pre_eclampsia === true)} Yes\n${chk(preg.pre_eclampsia === false)} No\n`);
+        lines2.push(`Age at First Pregnancy: ${preg.age_at_first_pregnancy !== undefined && preg.age_at_first_pregnancy !== null ? preg.age_at_first_pregnancy : ''}\n`);
+        lines2.push(`Family Planning Counseling:\n${chk(preg.family_planning_counseling === true)} Yes\n${chk(preg.family_planning_counseling === false)} No`);
+        return lines2.join('\n');
+      }
 
       const lines = [];
       lines.push('=== HEALTH FACILITY HEADER ===');

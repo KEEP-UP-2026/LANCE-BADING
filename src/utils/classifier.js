@@ -7,9 +7,31 @@ const CATEGORY_KEYWORDS = {
     { word: "individual treatment", weight: 8 },
     { word: "20 years old and above", weight: 10 },
     { word: "paete rural health unit", weight: 8 },
+    { word: "philhealth membership information", weight: 15 },
+    { word: "philhealth id number", weight: 15 },
+    { word: "philhealth no", weight: 10 },
+    { word: "past medical history", weight: 15 },
+    { word: "past surgical history", weight: 15 },
+    { word: "family history", weight: 12 },
+    { word: "personal / social history", weight: 15 },
+    { word: "personal/social history", weight: 15 },
+    { word: "menstrual history", weight: 15 },
+    { word: "pregnancy history", weight: 15 },
+    { word: "child care", weight: 8 },
+    { word: "animal bite", weight: 8 },
+    { word: "ncd", weight: 6 },
+    { word: "pack years", weight: 10 },
+    { word: "bottles/day", weight: 10 },
+    { word: "bottles per day", weight: 10 },
+    { word: "highest bp", weight: 10 },
+    { word: "coronary artery disease", weight: 8 },
+    { word: "cerebrovascular disease", weight: 8 },
+    { word: "epilepsy/seizure disorder", weight: 8 },
+    { word: "peptic ulcer disease", weight: 8 },
+    { word: "pulmonary tuberculosis", weight: 8 },
+    { word: "extrapulmonary tuberculosis", weight: 8 },
     { word: "smoking cessation profile", weight: 8 },
     { word: "smokers?", weight: 8 },
-    { word: "family history", weight: 7 },
     { word: "alcohol intake", weight: 7 },
     { word: "excessive alcohol intake", weight: 7 },
     { word: "high fat / high salt food intake", weight: 7 },
@@ -18,7 +40,6 @@ const CATEGORY_KEYWORDS = {
     { word: "ncd risk assessment done", weight: 10 },
     { word: "profiling of smoking cessation done", weight: 10 },
     { word: "educational attainment", weight: 6 },
-    { word: "philhealth no", weight: 6 },
     { word: "bhw", weight: 6 },
     { word: "raised bp", weight: 6 },
     { word: "itr form", weight: 6 },
@@ -176,6 +197,11 @@ const Classifier = {
           matchedTermsMap[category].push(kw.word);
         }
       }
+    }
+
+    // Structural override: If text contains ITR section headers, boost PATIENT_INFORMATION_SHEET
+    if (/PHILHEALTH MEMBERSHIP|PHILHEALTH ID|PAST MEDICAL HISTORY|PAST SURGICAL HISTORY|MENSTRUAL HISTORY|PREGNANCY HISTORY|INDIVIDUAL TREATMENT RECORD/i.test(normalizedText)) {
+      scores['PATIENT_INFORMATION_SHEET'] = (scores['PATIENT_INFORMATION_SHEET'] || 0) + 100;
     }
 
     // 2. Sort categories by score descending

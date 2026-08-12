@@ -282,6 +282,18 @@
               <input type="text" id="patient_number" class="patient-id-input read-only-badge" readonly tabindex="-1">
             </div>
 
+            <!-- Profile Picture Upload -->
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-label" for="photo_file">Patient Profile Picture (Optional)</label>
+              <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--card-border, #cbd5e1); background: #F5F7FA; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;" id="edit-photo-preview-box">
+                  <span id="photo-placeholder" style="font-size: 20px; color: #64748b;">📷</span>
+                  <img id="photo-img-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                </div>
+                <input type="file" id="photo_file" accept="image/jpeg,image/png,image/webp" class="form-input" style="padding: 8px 12px; line-height: 1;">
+              </div>
+            </div>
+
             <!-- Row 2: Pangalan (4 Columns) -->
             <div class="grid-4">
               <div class="form-group">
@@ -741,6 +753,15 @@
           });
 
           if (res && res.success) {
+            const photoFileInput = document.getElementById('photo_file');
+            if (photoFileInput && photoFileInput.files && photoFileInput.files[0]) {
+              const photoData = new FormData();
+              photoData.append('photo', photoFileInput.files[0]);
+              try {
+                await API.postForm(`/api/patients/${patientId}/photo`, photoData);
+              } catch (_) {}
+            }
+
             showToast(res.message || 'Patient record updated successfully.', 'success');
             setTimeout(() => {
               window.location.href = '/dashboard/patients';
@@ -767,6 +788,16 @@
           const p = res.patient;
           document.getElementById('patient-number-title').textContent = p.patient_number;
           document.getElementById('patient_number').value = p.patient_number;
+
+          if (p.photo_url) {
+            const imgPreview = document.getElementById('photo-img-preview');
+            const placeholder = document.getElementById('photo-placeholder');
+            if (imgPreview && placeholder) {
+              imgPreview.src = p.photo_url;
+              imgPreview.style.display = 'block';
+              placeholder.style.display = 'none';
+            }
+          }
 
           document.getElementById('first_name').value = p.first_name || '';
           document.getElementById('middle_name').value = p.middle_name || '';
@@ -987,6 +1018,20 @@
         if (rawDigits.length > 11) formatted += '-' + rawDigits.slice(11, 12);
         e.target.value = formatted;
       });
+
+      const photoFileInput = document.getElementById('photo_file');
+      if (photoFileInput) {
+        photoFileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          const imgPreview = document.getElementById('photo-img-preview');
+          const placeholder = document.getElementById('photo-placeholder');
+          if (file) {
+            imgPreview.src = URL.createObjectURL(file);
+            imgPreview.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+          }
+        });
+      }
     }
 
 

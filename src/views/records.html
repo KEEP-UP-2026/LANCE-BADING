@@ -6,59 +6,54 @@
   <title>Records Staff Dashboard - KEEP UP</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .stats-card-alert {
-      background: #FCE8E8;
-      border: 1px solid #fca5a5;
-      cursor: pointer;
+    /* Custom Pill Buttons & Badges for Dashboard */
+    .btn-pill {
+      border-radius: 24px !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      padding: 7px 16px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      border: 1px solid transparent !important;
     }
-    .stats-card-alert:hover {
-      border-color: #C62828;
-      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.2);
+
+    .btn-pill-primary {
+      background: #C62828 !important;
+      color: #ffffff !important;
+      border-color: #C62828 !important;
+      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25) !important;
     }
-    .shortcuts-panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
+
+    .btn-pill-primary:hover {
+      background: #b71c1c !important;
+      border-color: #b71c1c !important;
+      box-shadow: 0 6px 16px rgba(198, 40, 40, 0.35) !important;
     }
-    .shortcut-btn-card {
-      background: #FFFFFF;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 20px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: var(--transition);
-      color: #25282D;
-      box-shadow: var(--shadow-sm);
+
+    .btn-pill-secondary {
+      background: #ffffff !important;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1 !important;
     }
-    .shortcut-btn-card:hover {
-      border-color: #C62828;
-      background: #FCE8E8;
-      color: #C62828;
+
+    .btn-pill-secondary:hover {
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+
+    .hover-card {
+      transition: all 0.2s ease;
+    }
+    .hover-card:hover {
       transform: translateY(-2px);
-    }
-    .shortcut-icon-box {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: #FCE8E8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #C62828;
-    }
-    .shortcut-icon-box svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-    .shortcut-label {
-      font-size: 13.5px;
-      font-weight: 800;
-      color: inherit;
+      border-color: #fca5a5 !important;
+      box-shadow: 0 6px 18px rgba(198, 40, 40, 0.06) !important;
     }
   </style>
 </head>
@@ -67,10 +62,11 @@
   <div class="app-container">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
+          <svg style="width: 20px; height: 20px; fill: #fff;" viewBox="0 0 24 24">
             <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
           </svg>
         </div>
@@ -100,6 +96,7 @@
     </aside>
 
     <main class="main-content">
+      <!-- Mobile Header -->
       <header class="mobile-header">
         <button class="menu-toggle" id="menu-toggle">
           <svg viewBox="0 0 24 24">
@@ -110,103 +107,185 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <div class="welcome-banner">
-        <h2 class="welcome-title">Welcome back, <span id="welcome-user-name">Staff</span>!</h2>
-        <p class="welcome-desc">Records Portal - KEEP UP Patient File Management System with automated AI OCR Digitization.</p>
-      </div>
-
-      <!-- Guidance Alert for Records Filing -->
-      <div class="glass-panel" style="padding: 16px; border: 1.5px dashed #fca5a5; border-radius: var(--border-radius-md); margin-bottom: 25px; display: flex; align-items: center; gap: 15px; background: #FCE8E8;">
-        <div style="width: 42px; height: 42px; border-radius: 50%; background: rgba(198,40,40,0.1); display: flex; align-items: center; justify-content: center; color: #C62828; flex-shrink: 0;">
-          <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+      <!-- ─── 1. TOP WELCOME BANNER ─── -->
+      <div class="demographics-panel" style="background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%) !important; border-radius: 16px !important; border: 1px solid #fee2e2 !important; padding: 20px 24px !important; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(198, 40, 40, 0.03);">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);">
+            <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: currentColor;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+          </div>
+          <div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #1e293b; margin: 0 0 3px;">Welcome back, <span id="welcome-user-name">Records Staff User</span>!</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0 0 2px; font-weight: 600;">Records Portal – KEEP UP Patient File Management System</p>
+            <span style="font-size: 11.5px; font-weight: 800; color: #C62828; letter-spacing: 0.04em; text-transform: uppercase;">RURAL HEALTH UNIT OF PAETE, LAGUNA</span>
+          </div>
+        </div>
+        <div style="position: relative; width: 100px; height: 50px; display: flex; align-items: center; justify-content: flex-end; opacity: 0.95;">
+          <svg viewBox="0 0 100 50" style="width: 90px; height: 45px;">
+            <path d="M10 15 h40 v30 h-40 z" fill="#fca5a5" rx="4"/>
+            <path d="M25 10 h50 v35 h-50 z" fill="#ef4444" rx="4"/>
+            <rect x="70" y="5" width="22" height="14" rx="3" fill="#dc2626"/>
+            <text x="73" y="15" fill="#ffffff" font-size="8" font-weight="900" font-family="sans-serif">OCR</text>
           </svg>
         </div>
-        <div>
-          <h5 style="margin: 0; font-size: 14px; font-weight: 800; color: #25282D;">How to Digitize &amp; Scan Documents</h5>
-          <p style="margin: 4px 0 0; font-size: 12px; color: #334155; line-height: 1.4;">
-            Go to the <a href="/dashboard/patients" style="color: #C62828; font-weight: 700; text-decoration: underline;">Patient Directory</a>, select a patient profile, and click <strong>+ Scan / Upload File</strong> to upload medical sheets, consultation notes, or vaccination records with automated AI-assisted OCR scanning.
-          </p>
+      </div>
+
+      <!-- ─── 2. HOW TO DIGITIZE ALERT BAR ─── -->
+      <div class="content-card glass-panel" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 280px;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: #dc2626; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; flex-shrink: 0;">i</div>
+          <div>
+            <h5 style="margin: 0 0 2px; font-size: 13.5px; font-weight: 800; color: #1e293b;">How to Digitize &amp; Scan Documents</h5>
+            <p style="margin: 0; font-size: 12px; color: #64748b; line-height: 1.35;">
+              Go to the <a href="/dashboard/patients" style="color: #dc2626; font-weight: 700; text-decoration: underline;">Patient Directory</a>, select a patient profile, and click <strong style="color: #dc2626;">+ Scan / Upload File</strong> to upload medical sheets, consultation notes, or vaccination records with automated AI-assisted OCR scanning.
+            </p>
+          </div>
+        </div>
+        <a href="/dashboard/patients" class="btn-pill btn-pill-secondary" style="width: auto !important; padding: 7px 16px !important; border-color: #fca5a5 !important; color: #dc2626 !important; font-size: 12px !important;">
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+          View Guide
+        </a>
+      </div>
+
+      <!-- ─── 3. STATS CARDS GRID (3 COLS) ─── -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;">
+        <!-- Card 1: DIGITIZED RECORDS -->
+        <div class="content-card glass-panel hover-card" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 18px 20px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="window.location.href='/dashboard/search'">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px;">DIGITIZED RECORDS</span>
+              <span id="stats-total-files" style="font-size: 24px; font-weight: 900; color: #dc2626; line-height: 1;">0</span>
+              <span style="font-size: 11px; color: #64748b; font-weight: 600; display: block; margin-top: 3px;">Total files digitized</span>
+            </div>
+          </div>
+          <div style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b;">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </div>
+        </div>
+
+        <!-- Card 2: REGISTERED PATIENTS -->
+        <div class="content-card glass-panel hover-card" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 18px 20px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="window.location.href='/dashboard/patients'">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px;">REGISTERED PATIENTS</span>
+              <span id="stats-total-patients" style="font-size: 24px; font-weight: 900; color: #dc2626; line-height: 1;">0</span>
+              <span style="font-size: 11px; color: #64748b; font-weight: 600; display: block; margin-top: 3px;">Total patients in system</span>
+            </div>
+          </div>
+          <div style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b;">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </div>
+        </div>
+
+        <!-- Card 3: DUPLICATE ALERTS -->
+        <div class="content-card glass-panel hover-card" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 18px 20px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="window.location.href='/dashboard/duplicates'">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 10px; font-weight: 800; color: #dc2626; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 2px;">DUPLICATE ALERTS</span>
+              <span id="stats-total-warnings" style="font-size: 24px; font-weight: 900; color: #dc2626; line-height: 1;">0</span>
+              <span style="font-size: 11px; color: #64748b; font-weight: 600; display: block; margin-top: 3px;">Potential duplicates found</span>
+            </div>
+          </div>
+          <div style="width: 26px; height: 26px; border-radius: 50%; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b;">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </div>
         </div>
       </div>
 
-      <!-- Dashboard Statistics Row -->
-      <div class="stats-grid">
-        <div class="stats-card glass-panel">
-          <div class="stats-info">
-            <span class="stats-label">Digitized Records</span>
-            <span class="stats-value" id="stats-total-files">0</span>
+      <!-- ─── 4. ADMINISTRATIVE FILING SHORTCUTS ─── -->
+      <div style="margin-bottom: 20px;">
+        <h4 style="font-size: 13.5px; font-weight: 800; color: #1e293b; margin: 0 0 12px;">Administrative Filing Shortcuts</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <!-- Shortcut 1: Register New Patient -->
+          <div class="content-card glass-panel hover-card" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="window.location.href='/dashboard/patients/add'">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              </div>
+              <div>
+                <h5 style="margin: 0 0 2px; font-size: 13px; font-weight: 800; color: #1e293b;">Register New Patient</h5>
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">Add a new patient to the system</span>
+              </div>
+            </div>
+            <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #64748b;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+            </div>
           </div>
-          <div class="stats-icon-wrapper" style="color: var(--color-info);">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-          </div>
-        </div>
 
-        <div class="stats-card glass-panel">
-          <div class="stats-info">
-            <span class="stats-label">Registered Patients</span>
-            <span class="stats-value" id="stats-total-patients">0</span>
+          <!-- Shortcut 2: Run Keyword Search -->
+          <div class="content-card glass-panel hover-card" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="window.location.href='/dashboard/search'">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/></svg>
+              </div>
+              <div>
+                <h5 style="margin: 0 0 2px; font-size: 13px; font-weight: 800; color: #1e293b;">Run Keyword Search</h5>
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">Search records and documents</span>
+              </div>
+            </div>
+            <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #64748b;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+            </div>
           </div>
-          <div class="stats-icon-wrapper" style="color: var(--color-primary);">
-            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-          </div>
-        </div>
 
-        <!-- Rose red alerting card clicking navigates to Warnings review center -->
-        <div class="stats-card glass-panel stats-card-alert" id="duplicate-warning-card" onclick="window.location.href='/dashboard/duplicates'">
-          <div class="stats-info">
-            <span class="stats-label" style="color: #fda4af;">Duplicate Alerts</span>
-            <span class="stats-value" id="stats-total-warnings" style="color: var(--color-danger);">0</span>
+          <!-- Shortcut 3: Demographic Duplicates -->
+          <div class="content-card glass-panel hover-card" style="background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 14px 18px; margin-bottom: 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="window.location.href='/dashboard/duplicates'">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </div>
+              <div>
+                <h5 style="margin: 0 0 2px; font-size: 13px; font-weight: 800; color: #1e293b;">Demographic Duplicates</h5>
+                <span style="font-size: 11px; color: #64748b; font-weight: 600;">Review possible duplicate entries</span>
+              </div>
+            </div>
+            <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #64748b;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+            </div>
           </div>
-          <div class="stats-icon-wrapper" style="color: var(--color-danger); background: rgba(239, 68, 68, 0.1);">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Shortcuts Row -->
-      <h4 class="result-section-title" style="margin-bottom: 12px; font-size: 13px;">Administrative Filing Shortcuts</h4>
-      <div class="shortcuts-panel">
-        <div class="shortcut-btn-card glass-panel" onclick="window.location.href='/dashboard/patients'">
-          <div class="shortcut-icon-box">
-            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-          </div>
-          <span class="shortcut-label">Register New Patient</span>
-        </div>
-
-        <div class="shortcut-btn-card glass-panel" onclick="window.location.href='/dashboard/search'">
-          <div class="shortcut-icon-box">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/></svg>
-          </div>
-          <span class="shortcut-label">Run Keyword Search</span>
-        </div>
-
-        <div class="shortcut-btn-card glass-panel" onclick="window.location.href='/dashboard/duplicates'">
-          <div class="shortcut-icon-box" style="color: var(--color-danger);">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          </div>
-          <span class="shortcut-label">Demographic Duplicates</span>
         </div>
       </div>
 
-      <!-- Recent Digital Attachments filing streams -->
-      <div class="content-card glass-panel" style="flex: 1; min-height: 350px; margin-bottom: 0;">
-        <h3 class="card-title" style="margin-bottom: 4px;">Recent Digitized Documents</h3>
-        <p class="card-subtitle">Showing recently scanned files registered across category binders.</p>
+      <!-- ─── 5. RECENT DIGITIZED DOCUMENTS PANEL ─── -->
+      <div class="content-card glass-panel" style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px 26px; margin-bottom: 0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 2px;">Recent Digitized Documents</h3>
+              <p style="font-size: 12px; color: #64748b; margin: 0;">Showing recently scanned files registered across category binders.</p>
+            </div>
+          </div>
+          <a href="/dashboard/search" class="btn-pill btn-pill-secondary" style="width: auto !important; padding: 7px 18px !important; border-color: #fca5a5 !important; color: #dc2626 !important; font-size: 12px !important;">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+            View All Documents
+          </a>
+        </div>
 
-        <div class="table-responsive" style="margin-top: 20px;">
+        <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th>File Name</th>
-                <th>Patient Profile</th>
-                <th>Filing Binder</th>
-                <th>Upload Date</th>
+                <th>FILE NAME</th>
+                <th>PATIENT PROFILE</th>
+                <th>FILING BINDER</th>
+                <th>UPLOAD DATE</th>
+                <th>ACTIONS</th>
               </tr>
             </thead>
             <tbody id="recent-records-stream">
               <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading recent files list...</td>
+                <td colspan="5" style="text-align: center; color: #64748b; padding: 30px;">Loading recent files list...</td>
               </tr>
             </tbody>
           </table>
@@ -231,6 +310,12 @@
         return;
       }
 
+      // Set user welcome name
+      const welcomeUser = document.getElementById('welcome-user-name');
+      if (welcomeUser && currentUser.full_name) {
+        welcomeUser.textContent = currentUser.full_name;
+      }
+
       // 2. Set mobile header initials
       const mobileInitials = document.getElementById('mobile-user-initials');
       if (mobileInitials && currentUser.full_name) {
@@ -249,11 +334,14 @@
       await loadDashboardData();
 
       // 5. Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
-      });
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+          if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+            await API.logout();
+          }
+        });
+      }
     });
 
     async function loadDashboardData() {
@@ -279,7 +367,7 @@
         if (allRecords.length === 0) {
           streamContainer.innerHTML = `
             <tr>
-              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">
+              <td colspan="5" style="text-align: center; color: #64748b; padding: 30px; font-weight: 600;">
                 No patient documents have been digitized yet.
               </td>
             </tr>
@@ -290,22 +378,74 @@
         const recentList = allRecords.slice(0, 5);
         let html = '';
         recentList.forEach(rec => {
-          const fileLink = `<a href="${rec.file_url}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(rec.file_name)}</a>`;
-          
-          const profileLink = `<a href="/dashboard/patients/profile/${rec.patient_id}" style="color: #f8fafc; font-weight: 600;" class="hover-underline">${escapeHtml(rec.patient_name)}</a>`;
-          
-          const dateStr = new Date(rec.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const fileExt = (rec.file_name || '').split('.').pop().toUpperCase();
+          const extBadgeHtml = ['JPG', 'PNG', 'PDF', 'JPEG', 'WEBP'].includes(fileExt)
+            ? `<span style="background: #C62828; color: #ffffff; font-size: 9px; font-weight: 900; padding: 2px 5px; border-radius: 4px; margin-right: 8px; vertical-align: middle;">${fileExt}</span>`
+            : `<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: #C62828; vertical-align: middle; margin-right: 6px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+
+          const fileLink = `
+            <div style="display: flex; align-items: center;">
+              ${extBadgeHtml}
+              <a href="/dashboard/records/view/${rec.id}" style="color: #1e293b; font-weight: 700;" class="hover-underline">${escapeHtml(rec.file_name)}</a>
+            </div>
+          `;
+
+          // Patient Avatar Thumbnail + Details
+          let avatarHtml = `<div style="width: 32px; height: 32px; border-radius: 50%; background: #fee2e2; border: 1.5px solid #C62828; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #C62828; flex-shrink: 0;">${escapeHtml((rec.patient_name || 'PT').substring(0, 2).toUpperCase())}</div>`;
+          if (rec.patient_photo_url) {
+            avatarHtml = `<img src="${rec.patient_photo_url}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid #C62828; flex-shrink: 0;">`;
+          }
+
+          let ageStr = '';
+          if (rec.patient_birth_date) {
+            const bd = new Date(rec.patient_birth_date);
+            const today = new Date();
+            let age = today.getFullYear() - bd.getFullYear();
+            const m = today.getMonth() - bd.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+            if (age >= 0) ageStr = ` (${age} yrs old)`;
+          }
+
+          const bdateStr = rec.patient_birth_date ? new Date(rec.patient_birth_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+          const subInfo = [bdateStr ? `${bdateStr}${ageStr}` : '', rec.patient_sex || ''].filter(Boolean).join(' • ');
+
+          const profileLink = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+              ${avatarHtml}
+              <div>
+                <a href="/dashboard/patients/profile/${rec.patient_id}" style="color: #1e293b; font-weight: 800; font-size: 13px; display: block;" class="hover-underline">
+                  ${escapeHtml(rec.patient_name)} <span style="font-weight: 600; color: #64748b;">(${escapeHtml(rec.patient_number || '')})</span>
+                </a>
+                ${subInfo ? `<span style="font-size: 11px; color: #64748b; font-weight: 500; display: block;">${escapeHtml(subInfo)}</span>` : ''}
+              </div>
+            </div>
+          `;
+
+          const dt = new Date(rec.created_at);
+          const dateOnly = dt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          const timeOnly = dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+          const dateDisplay = `
+            <div style="display: flex; align-items: center; gap: 6px; color: #475569; font-weight: 600; font-size: 12.5px;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #dc2626;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+              <div>
+                <div>${dateOnly}</div>
+                <div style="font-size: 10.5px; color: #94a3b8; font-weight: 500;">${timeOnly}</div>
+              </div>
+            </div>
+          `;
 
           html += `
             <tr>
               <td>${fileLink}</td>
-              <td>${profileLink} (${escapeHtml(rec.patient_number)})</td>
-              <td><span class="badge" style="background: rgba(255,255,255,0.04);">${formatCategory(rec.record_type)}</span></td>
+              <td>${profileLink}</td>
+              <td><span class="badge" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; font-weight: 800; font-size: 10px; padding: 4px 10px; border-radius: 12px; text-transform: uppercase;">${formatCategory(rec.record_type)}</span></td>
+              <td>${dateDisplay}</td>
               <td>
-                ${dateStr}
-                <button onclick="downloadDocx('${rec.id}', '${escapeHtml(rec.file_name)}')" style="margin-left: 8px; background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); padding: 3px 8px; border-radius: 5px; font-size: 10px; cursor: pointer;" title="Download as Word document">
-                  <svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:currentColor;vertical-align:middle;margin-right:2px;"><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/></svg>.docx
-                </button>
+                <a href="/dashboard/records/view/${rec.id}" class="btn-pill btn-pill-primary" style="width: auto !important; padding: 5px 14px !important; font-size: 11.5px !important;">
+                  <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                  View
+                </a>
               </td>
             </tr>
           `;
@@ -317,29 +457,6 @@
       }
     }
 
-    async function downloadDocx(recordId, fileName) {
-      showToast('Generating Word document... Please wait.', 'info');
-      try {
-        const response = await fetch(`/api/records/download/${recordId}/docx`, { method: 'GET' });
-        if (!response.ok) {
-          let errMsg = 'Failed to generate Word document.';
-          try { const d = await response.json(); errMsg = d.message || errMsg; } catch(_) {}
-          showToast(errMsg, 'error'); return;
-        }
-        const blob = await response.blob();
-        const baseName = fileName.replace(/\.[^/.]+$/, '');
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `${baseName}.docx`;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-        showToast('Word document downloaded!', 'success');
-      } catch (err) {
-        showToast('An error occurred while downloading the Word document.', 'error');
-      }
-    }
-
-
     function formatCategory(type) {
       switch (type) {
         case 'PATIENT_INFORMATION_SHEET': return 'Information Sheet';
@@ -347,19 +464,18 @@
         case 'IMMUNIZATION_RECORD': return 'Immunization';
         case 'ANTI_RABIES_RECORD': return 'Anti-Rabies';
         case 'MATERNAL_CARE_RECORD': return 'Maternal Care';
-        default: return type;
+        default: return type || 'Record';
       }
     }
 
-
-
     function escapeHtml(str) {
       if (!str) return '';
-      return str.replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
   </script>
 </body>

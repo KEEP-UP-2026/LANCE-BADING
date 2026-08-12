@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const { validateJwtSecret } = require('./src/config/jwtConfig');
@@ -26,6 +27,79 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(CsrfMiddleware.validate.bind(CsrfMiddleware));
 app.use(express.static(path.join(__dirname, 'src/views/public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { fallthrough: true }));
+
+function findFileRecursively(dir, targetFilename) {
+  if (!dir || !targetFilename || !fs.existsSync(dir)) return null;
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const found = findFileRecursively(fullPath, targetFilename);
+        if (found) return found;
+      } else if (entry.isFile() && entry.name.toLowerCase() === targetFilename.toLowerCase()) {
+        return fullPath;
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+function getAnyImageInDir(dir) {
+  if (!dir || !fs.existsSync(dir)) return null;
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        const found = getAnyImageInDir(fullPath);
+        if (found) return found;
+      } else if (entry.isFile() && (entry.name.endsWith('.png') || entry.name.endsWith('.jpg') || entry.name.endsWith('.jpeg') || entry.name.endsWith('.pdf'))) {
+        return fullPath;
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+// Smart Fallback for /uploads when literal path does not exist on disk
+app.get('/uploads/*', (req, res) => {
+  const reqPath = req.params[0] || req.path || '';
+  const filename = path.basename(reqPath);
+  const uploadsDir = path.join(__dirname, 'uploads');
+  
+  const pathParts = reqPath.split('/').filter(Boolean);
+  const patientId = pathParts.length > 0 ? pathParts[0] : null;
+
+  const possiblePaths = [
+    path.join(uploadsDir, reqPath),
+    filename ? path.join(uploadsDir, filename) : null,
+    (patientId && filename) ? path.join(uploadsDir, patientId, filename) : null,
+    filename ? path.join(uploadsDir, 'records', filename) : null,
+    filename ? path.join(uploadsDir, 'temp', filename) : null,
+    filename ? path.join(uploadsDir, 'avatars', filename) : null
+  ].filter(Boolean);
+
+  let foundPath = possiblePaths.find(p => fs.existsSync(p));
+  
+  if (!foundPath && filename) {
+    foundPath = findFileRecursively(uploadsDir, filename);
+  }
+  
+  if (!foundPath && patientId) {
+    foundPath = getAnyImageInDir(path.join(uploadsDir, patientId));
+  }
+
+  if (foundPath) {
+    return res.sendFile(path.resolve(foundPath), (err) => {
+      if (err && !res.headersSent) {
+        res.status(404).send('File not found');
+      }
+    });
+  }
+  return res.status(404).send('File not found');
+});
 
 function getDashboardPath(role) {
   switch (role) {

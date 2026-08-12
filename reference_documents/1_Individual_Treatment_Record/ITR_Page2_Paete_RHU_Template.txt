@@ -1,0 +1,256 @@
+=== PHILHEALTH MEMBERSHIP INFORMATION ===
+Philhealth ID Number: 
+
+Membership Type:
+[ ] Member
+[ ] Dependent
+[ ] Non-Member
+
+Membership Category:
+[ ] Sponsored
+[ ] Individual Paying Program (IPP)
+[ ] Employed
+[ ] Lifetime
+[ ] NHITS
+[ ] LGU
+[ ] Organized Group
+[ ] Government
+[ ] NGA
+[ ] Private
+[ ] OFW
+
+=== VITAL SIGNS ===
+Blood Pressure: 
+Heart Rate: 
+Respiratory Rate: 
+Pulse Rate: 
+Temperature: 
+SpO2: 
+Height (cm): 
+Weight (kg): 
+Waist Circumference (cm): 
+Hip Circumference (cm): 
+
+=== PAST MEDICAL HISTORY ===
+Allergy (specify): 
+Asthma:
+[ ] Yes
+[ ] No
+
+Cancer (specify organ): 
+Cerebrovascular Disease:
+[ ] Yes
+[ ] No
+
+Coronary Artery Disease:
+[ ] Yes
+[ ] No
+
+Diabetes Mellitus:
+[ ] Yes
+[ ] No
+
+Emphysema:
+[ ] Yes
+[ ] No
+
+Epilepsy/Seizure Disorder:
+[ ] Yes
+[ ] No
+
+Hepatitis (specify type): 
+Hyperlipidemia:
+[ ] Yes
+[ ] No
+
+Hypertension:
+[ ] Yes
+[ ] No
+Highest BP Recorded: 
+
+Peptic Ulcer Disease:
+[ ] Yes
+[ ] No
+
+Pneumonia:
+[ ] Yes
+[ ] No
+
+Thyroid Disease:
+[ ] Yes
+[ ] No
+
+Tuberculosis (specify organ): 
+If Pulmonary TB Category: 
+
+Urinary Tract Infection:
+[ ] Yes
+[ ] No
+
+Others: 
+
+=== PAST SURGICAL HISTORY ===
+Operation: 
+Date: 
+
+=== FAMILY HISTORY ===
+Allergy (specify): 
+Asthma:
+[ ] Yes
+[ ] No
+
+Cancer (specify organ): 
+Cerebrovascular Disease:
+[ ] Yes
+[ ] No
+
+Coronary Artery Disease:
+[ ] Yes
+[ ] No
+
+Diabetes Mellitus:
+[ ] Yes
+[ ] No
+
+Emphysema:
+[ ] Yes
+[ ] No
+
+Epilepsy/Seizure Disorder:
+[ ] Yes
+[ ] No
+
+Hepatitis (specify type): 
+Hyperlipidemia:
+[ ] Yes
+[ ] No
+
+Hypertension:
+[ ] Yes
+[ ] No
+Highest BP Recorded: 
+
+Peptic Ulcer Disease:
+[ ] Yes
+[ ] No
+
+Pneumonia:
+[ ] Yes
+[ ] No
+
+Thyroid Disease:
+[ ] Yes
+[ ] No
+
+Pulmonary Tuberculosis:
+[ ] Yes
+[ ] No
+
+Extrapulmonary Tuberculosis:
+[ ] Yes
+[ ] No
+
+Urinary Tract Infection:
+[ ] Yes
+[ ] No
+
+Mental Illness:
+[ ] Yes
+[ ] No
+
+Others: 
+
+=== PERSONAL / SOCIAL HISTORY ===
+Smoking:
+[ ] Yes
+[ ] No
+[ ] Quit
+Pack Years: 
+
+Alcohol:
+[ ] Yes
+[ ] No
+[ ] Quit
+Bottles per Day: 
+
+Illicit Drugs:
+[ ] Yes
+[ ] No
+[ ] Quit
+
+Sexually Active:
+[ ] Yes
+[ ] No
+
+=== IMMUNIZATIONS ===
+
+-- CHILD CARE --
+BCG Date: 
+HepB Birth Date: 
+HepB 24hrs Date: 
+PENTA Date: 
+OPV Date: 
+IPV Date: 
+PCV Date: 
+Measles Vaccine Date: 
+Rotavirus Vaccine Date: 
+Chickenpox Vaccine Date: 
+
+-- GENERAL --
+Flu Vaccine Date: 
+HPV Date: 
+HPV Grade 4 Date: 
+MR Grade 1 Date: 
+MR Grade 7 Date: 
+TD Grade 1 Date: 
+TD Grade 7 Date: 
+Tetanus Toxoid Date: 
+
+-- ANIMAL BITE --
+PCECV1 Date: 
+PVRV1 Date: 
+PVRV2 Date: 
+PVRV3 Date: 
+PVRV4 Date: 
+PCECV2 Date: 
+
+-- NCD --
+Pneumococcal Vaccine Date: 
+Flu Vaccine (NCD) Date: 
+
+-- MATERNAL CARE --
+Tetanus Toxoid (Maternal) Date: 
+
+=== MENSTRUAL HISTORY ===
+Menarche Age: 
+Onset of Sexual Intercourse: 
+Last Menstrual Period: 
+Menstrual Bleeding Pattern: 
+Birth Control Method: 
+Period Duration: 
+Cycle Interval: 
+Pads per Day: 
+
+Menopause:
+[ ] Yes
+[ ] No
+Age of Menopause: 
+
+=== PREGNANCY HISTORY ===
+Gravidity: 
+Parity: 
+Type of Delivery: 
+Full Term: 
+Premature: 
+Abortion: 
+Living Children: 
+
+Pre-eclampsia:
+[ ] Yes
+[ ] No
+
+Age at First Pregnancy: 
+
+Family Planning Counseling:
+[ ] Yes
+[ ] No

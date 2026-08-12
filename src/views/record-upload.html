@@ -621,45 +621,80 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <div class="content-card glass-panel" id="main-content-card" style="margin-top: 20px; max-width: 900px; transition: max-width 0.3s ease;">
-        <div class="card-title-section">
+      <div class="content-card glass-panel" id="main-content-card" style="margin-top: 20px; max-width: 900px; transition: max-width 0.3s ease; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px 28px;">
+        <!-- Header with Circular Red Folder Icon -->
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);">
+            <svg viewBox="0 0 24 24" style="width: 26px; height: 26px; fill: currentColor;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+          </div>
           <div>
-            <h2 class="card-title">Digitize Healthcare Record</h2>
-            <p class="card-subtitle">Upload physical health documents (PNG, JPG, PDF) to scan, OCR-digitize, and auto-classify under the patient's record binder.</p>
+            <h2 style="font-size: 20px; font-weight: 800; color: #1e293b; margin: 0 0 3px;">Digitize Healthcare Record</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0;">Upload physical health documents (PNG, JPG, PDF) to scan, OCR-digitize, and auto-classify under the patient's record binder.</p>
           </div>
         </div>
 
-        <!-- Patient Demographics Summary -->
-        <div class="patient-summary-banner">
-          <div class="summary-item">
-            <span class="summary-label">Patient Number</span>
-            <span class="summary-value" id="summary-number">Loading...</span>
+        <!-- Patient Demographics Summary Bar (4 Columns with Square Icon Containers) -->
+        <div style="background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; margin-bottom: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: center;">
+          <!-- Item 1: Patient Number -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 1px;">PATIENT NUMBER</span>
+              <span id="summary-number" style="font-size: 12px; font-weight: 800; color: #dc2626;">Loading...</span>
+            </div>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Patient Name</span>
-            <span class="summary-value" id="summary-name">Loading...</span>
+
+          <!-- Item 2: Patient Name -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 1px;">PATIENT NAME</span>
+              <span id="summary-name" style="font-size: 12px; font-weight: 800; color: #1e293b;">Loading...</span>
+            </div>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Birth Date</span>
-            <span class="summary-value" id="summary-birthdate">Loading...</span>
+
+          <!-- Item 3: Birth Date -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 1px;">BIRTH DATE</span>
+              <span id="summary-birthdate" style="font-size: 12px; font-weight: 800; color: #1e293b;">Loading...</span>
+            </div>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Sex Assignment</span>
-            <span class="summary-value" id="summary-sex">Loading...</span>
+
+          <!-- Item 4: Sex Assignment -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <div>
+              <span style="font-size: 9.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 1px;">SEX ASSIGNMENT</span>
+              <span id="summary-sex" style="font-size: 12px; font-weight: 800; color: #1e293b;">Loading...</span>
+            </div>
           </div>
         </div>
 
         <!-- STAGE 1: Upload Form -->
         <div id="upload-stage">
           <form id="record-upload-form">
-            <div class="form-group">
-              <label class="form-label">Upload Document *</label>
-              <div class="upload-zone" id="upload-zone">
-                <svg class="upload-icon" viewBox="0 0 24 24">
-                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-                </svg>
-                <span class="upload-text">Drag and drop file here, or click to browse</span>
-                <span class="upload-subtext">Supports PNG, JPG, JPEG, and PDF (Max 10MB)</span>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label" style="font-size: 11px; font-weight: 800; color: #dc2626; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">UPLOAD DOCUMENT *</label>
+              <div class="upload-zone" id="upload-zone" style="background: #fff5f5 !important; border: 1.5px dashed #fca5a5 !important; border-radius: 16px !important; padding: 36px 20px !important; text-align: center !important; cursor: pointer; transition: all 0.2s ease; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: #dc2626; color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);">
+                  <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: currentColor;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                </div>
+                <div>
+                  <span class="upload-text" style="font-size: 15px; font-weight: 700; color: #1e293b; display: block; margin-bottom: 3px;">
+                    Drag and drop file here, or click to <span style="color: #dc2626; font-weight: 800;">browse</span>
+                  </span>
+                  <span class="upload-subtext" style="font-size: 12px; color: #64748b; font-weight: 500;">Supports PNG, JPG, JPEG, and PDF (Max 10MB)</span>
+                </div>
                 <input type="file" class="file-input" id="document" name="document" accept=".png,.jpg,.jpeg,.pdf">
               </div>
 
@@ -682,9 +717,21 @@
               </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
-              <button type="button" class="btn btn-secondary" id="back-profile-btn">Back to Profile</button>
-              <button class="btn btn-primary" type="submit" id="upload-btn">
+            <!-- Instructional Alert Bar -->
+            <div style="background: #fff5f5; border: 1px solid #fee2e2; border-radius: 12px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background: #dc2626; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; flex-shrink: 0;">i</div>
+              <span style="font-size: 12px; color: #64748b; font-weight: 600;">Ensure the document is clear and complete for accurate OCR digitization.</span>
+            </div>
+
+            <!-- Action Buttons Row -->
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+              <button type="button" id="back-profile-btn" style="background: #ffffff !important; color: #1e293b !important; border: 1.5px solid #cbd5e1 !important; border-radius: 30px !important; padding: 10px 24px !important; font-size: 13px !important; font-weight: 700 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s ease !important; outline: none !important;">
+                <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: #dc2626;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Back to Profile
+              </button>
+
+              <button type="submit" id="upload-btn" style="background: #C62828 !important; color: #ffffff !important; border: none !important; border-radius: 30px !important; padding: 10px 26px !important; font-size: 13px !important; font-weight: 700 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; cursor: pointer !important; transition: all 0.2s ease !important; box-shadow: 0 4px 14px rgba(198, 40, 40, 0.3) !important; outline: none !important;">
+                <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: #ffffff;"><path d="M7.5 5.6L5 7l1.4-2.5L5 2l2.5 1.4L10 2 8.6 4.5 10 7 7.5 5.6zm12 9.8L17 14l-1.4 2.5L17 19l-2.5-1.4L13 19l1.4-2.5L13 14l2.5 1.4zM20 2l-1.4 2.5L20 7l-2.5-1.4L15 7l1.4-2.5L15 2l2.5 1.4L20 2z"/></svg>
                 <span class="btn-text">Enhance Document &amp; Preview</span>
                 <span class="spinner"></span>
               </button>
@@ -726,6 +773,66 @@
           <div>
             <h4 class="ocr-status-title" id="ocr-status-title">Processing Document...</h4>
             <p class="ocr-status-subtitle" id="ocr-status-subtitle">Converting document and running classification rules. Please do not navigate away.</p>
+          </div>
+        </div>
+
+        <!-- STAGE 2: Classification Confirmation Modal -->
+        <div class="modal-backdrop" id="modal-classification-confirm" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+          <div style="background: #ffffff; border-radius: 16px; max-width: 540px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; border: 1px solid #e2e8f0;">
+            
+            <!-- Modal Header -->
+            <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="background: rgba(37, 99, 235, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <svg style="width: 22px; height: 22px; fill: #60a5fa;" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <div>
+                  <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #ffffff;">Kumpirmahin ang Classification ng Dokumento</h3>
+                  <p style="margin: 2px 0 0 0; font-size: 12px; color: #94a3b8;">Verifying document page type before data extraction</p>
+                </div>
+              </div>
+              <button type="button" id="modal-class-close-btn" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 22px; padding: 4px; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div style="padding: 24px;">
+              
+              <!-- AI Detection Box -->
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;">AI Classification Result</span>
+                  <span class="badge" id="modal-class-confidence-badge" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; font-size: 11px; padding: 4px 10px; font-weight: 800;">HIGH CONFIDENCE (95%)</span>
+                </div>
+                <div style="font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px;" id="modal-class-detected-text">
+                  <svg style="width: 20px; height: 20px; fill: #2563eb;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                  Individual Treatment Record - Page 2
+                </div>
+              </div>
+
+              <!-- Select Classification Options -->
+              <div style="margin-bottom: 18px;">
+                <label for="modal-class-select" style="display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 8px;">
+                  Pumili ng Tamang Uri ng Dokumento / Classification Target:
+                </label>
+                <select id="modal-class-select" class="form-control" style="width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 14px; font-weight: 700; color: #0f172a; background: #ffffff;">
+                  <option value="1">Individual Treatment Record - Page 1 (Demographics, Lifestyle &amp; Consultation Log)</option>
+                  <option value="2">Individual Treatment Record - Page 2 (Philhealth, Medical History &amp; Immunizations)</option>
+                </select>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b; line-height: 1.4;">
+                  Kapag nabago mo ang classification, gagamitin ng AI ang tamang template at pormat upang makuha ang mga sagot at i-populate ang Extracted Full Text at Form.
+                </p>
+              </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px;">
+              <button type="button" class="btn btn-secondary" id="modal-class-cancel-btn" style="padding: 10px 18px; font-weight: 700; font-size: 13px; color: #475569;">Bumalik</button>
+              <button type="button" class="btn btn-primary" id="modal-class-confirm-btn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; font-weight: 700; font-size: 14px; padding: 10px 22px;">
+                I-confirm at Basahin ang Dokumento
+              </button>
+            </div>
+
           </div>
         </div>
 
@@ -796,7 +903,19 @@
 
             <!-- TAB CONTENT 1: STRUCTURED INFORMATION FORM (OFFICIAL ITR PAPER LAYOUT) -->
             <div id="vtab-content-form" class="vtab-content" style="display: block;">
-              <div class="itr-paper">
+
+              <!-- ITR Page 1 & Page 2 Sub-Nav Buttons -->
+              <div style="display: flex; gap: 8px; margin-bottom: 16px; background: #F5F7FA; padding: 6px; border-radius: 30px; border: 1px solid #e2e8f0; width: fit-content;">
+                <button type="button" id="subtab-itr-p1" class="form-subnav-btn active" onclick="switchItrPaperPage(1)">
+                  ITR Page 1 (Demographics &amp; Consultation)
+                </button>
+                <button type="button" id="subtab-itr-p2" class="form-subnav-btn" onclick="switchItrPaperPage(2)">
+                  ITR Page 2 (Medical History, Immunizations &amp; PhilHealth)
+                </button>
+              </div>
+
+              <!-- PAGE 1 OF ITR -->
+              <div id="itr-paper-page1" class="itr-paper" style="display: block;">
 
                 <!-- HEADER -->
                 <div class="header">
@@ -995,6 +1114,426 @@
                         <!-- Dynamic Consultation Rows inserted here -->
                     </tbody>
                 </table>
+
+              </div>
+
+              <!-- PAGE 2 OF ITR -->
+              <div id="itr-paper-page2" class="itr-paper" style="display: none;">
+                <!-- HEADER -->
+                <div class="header">
+                    <div class="sub-header">Republic of the Philippines</div>
+                    <div class="sub-header">Province of Laguna</div>
+                    <div class="sub-header">Municipality of Paete</div>
+                    <h2>PAETE RURAL HEALTH UNIT</h2>
+                    <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                    <h1>Individual Treatment Record</h1>
+                    <h3>Page 2 — Medical &amp; Clinical History, Immunizations</h3>
+                </div>
+
+                <!-- SECTION 1: PHILHEALTH MEMBERSHIP INFORMATION -->
+                <div class="section-header" style="margin-top: 10px;">=== PHILHEALTH MEMBERSHIP INFORMATION ===</div>
+                <table style="margin-bottom: 16px;">
+                  <tr>
+                    <td style="width: 40%;">
+                      <strong>Philhealth ID Number:</strong>
+                      <input type="text" id="itr2-philhealth-id" style="width: 55%;" placeholder="">
+                    </td>
+                    <td style="width: 60%;">
+                      <strong>Membership Type:</strong><br>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memtype-member"> Member</label> &nbsp;&nbsp;
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memtype-dependent"> Dependent</label> &nbsp;&nbsp;
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-memtype-nonmember"> Non-Member</label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <strong>Membership Category:</strong><br>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; margin-top: 4px;">
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-sponsored"> Sponsored</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-ipp"> IPP</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-employed"> Employed</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-lifetime"> Lifetime</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-nhits"> NHITS</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-lgu"> LGU</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-organized"> Organized Group</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-government"> Government</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-nga"> NGA</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-private"> Private</label>
+                        <label class="checkbox-label"><input type="checkbox" id="itr2-memcat-ofw"> OFW</label>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- SECTION 2: VITAL SIGNS -->
+                <div class="section-header">=== VITAL SIGNS ===</div>
+                <div class="vitals-grid" style="margin-bottom: 16px;">
+                  <div>
+                    <strong>BP:</strong> <input type="text" id="itr2-vs-bp" style="width: 75px;"> &nbsp;
+                    <strong>HR:</strong> <input type="number" id="itr2-vs-hr" style="width: 45px;"> &nbsp;
+                    <strong>RR:</strong> <input type="number" id="itr2-vs-rr" style="width: 45px;"> &nbsp;
+                    <strong>PR:</strong> <input type="number" id="itr2-vs-pr" style="width: 45px;">
+                  </div>
+                  <div>
+                    <strong>TEMP:</strong> <input type="text" id="itr2-vs-temp" style="width: 50px;"> °C &nbsp;
+                    <strong>SpO2:</strong> <input type="number" id="itr2-vs-spo2" style="width: 45px;"> %
+                  </div>
+                  <div>
+                    <strong>HT:</strong> <input type="text" id="itr2-vs-height" style="width: 45px;"> cm &nbsp;
+                    <strong>WT:</strong> <input type="text" id="itr2-vs-weight" style="width: 45px;"> kg<br>
+                    <strong>Waist:</strong> <input type="text" id="itr2-vs-waist" style="width: 45px;"> cm &nbsp;
+                    <strong>Hip:</strong> <input type="text" id="itr2-vs-hip" style="width: 45px;"> cm
+                  </div>
+                </div>
+
+                <!-- SECTION 3: PAST MEDICAL HISTORY vs FAMILY HISTORY -->
+                <div class="grid-2col">
+                  <!-- LEFT COLUMN: PAST MEDICAL & SURGICAL & SOCIAL HISTORY -->
+                  <div class="col-left">
+                    <div class="section-header">=== PAST MEDICAL HISTORY ===</div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Allergy (specify):</strong> <input type="text" id="itr2-pmh-allergy" style="width: 60%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Asthma:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-asthma-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-asthma-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Cancer:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cancer-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cancer-no"> No</label>
+                      Organ: <input type="text" id="itr2-pmh-cancer-organ" style="width: 40%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Cerebrovascular Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cvd-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cvd-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Coronary Artery Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cad-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-cad-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Diabetes Mellitus:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-dm-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-dm-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Emphysema:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-emphysema-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-emphysema-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Epilepsy / Seizure Disorder:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-epilepsy-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-epilepsy-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Hepatitis:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hep-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hep-no"> No</label>
+                      Type: <input type="text" id="itr2-pmh-hep-type" style="width: 40%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Hyperlipidemia:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hyperlipid-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-hyperlipid-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Hypertension:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-htn-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-htn-no"> No</label>
+                      Highest BP: <input type="text" id="itr2-pmh-htn-highest" style="width: 60px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Peptic Ulcer Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pud-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pud-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Pneumonia:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pneu-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-pneu-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Thyroid Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-thyroid-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-thyroid-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Tuberculosis:</strong> Organ: <input type="text" id="itr2-pmh-tb-organ" style="width: 30%;"> Category: <input type="text" id="itr2-pmh-tb-category" style="width: 30%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>UTI:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-uti-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-pmh-uti-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                      <strong>Others:</strong> <input type="text" id="itr2-pmh-others" style="width: 75%;">
+                    </div>
+
+                    <div class="section-header">=== PAST SURGICAL HISTORY ===</div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Operation:</strong> <input type="text" id="itr2-psh-op" style="width: 50%;"> &nbsp;
+                      <strong>Date:</strong> <input type="text" id="itr2-psh-date" style="width: 30%;">
+                    </div>
+
+                    <div class="section-header" style="margin-top: 12px;">=== PERSONAL / SOCIAL HISTORY ===</div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Smoking:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-smk-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-smk-no"> No</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-smk-quit"> Quit</label>
+                      Pack Years: <input type="text" id="itr2-psoc-packyears" style="width: 50px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Alcohol:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-alc-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-alc-no"> No</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-alc-quit"> Quit</label>
+                      Bottles/Day: <input type="text" id="itr2-psoc-bottles" style="width: 45px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Illicit Drugs:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-drugs-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-drugs-no"> No</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-drugs-quit"> Quit</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Sexually Active:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-sex-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-psoc-sex-no"> No</label>
+                    </div>
+                  </div>
+
+                  <!-- RIGHT COLUMN: FAMILY HISTORY -->
+                  <div class="col-right">
+                    <div class="section-header">=== FAMILY HISTORY ===</div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Allergy (specify):</strong> <input type="text" id="itr2-fh-allergy" style="width: 60%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Asthma:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-asthma-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-asthma-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Cancer:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cancer-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cancer-no"> No</label>
+                      Organ: <input type="text" id="itr2-fh-cancer-organ" style="width: 40%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Cerebrovascular Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cvd-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cvd-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Coronary Artery Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cad-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-cad-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Diabetes Mellitus:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-dm-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-dm-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Emphysema:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-emphysema-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-emphysema-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Epilepsy / Seizure Disorder:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-epilepsy-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-epilepsy-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Hepatitis:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hep-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hep-no"> No</label>
+                      Type: <input type="text" id="itr2-fh-hep-type" style="width: 40%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Hyperlipidemia:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hyperlipid-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-hyperlipid-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Hypertension:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-htn-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-htn-no"> No</label>
+                      Highest BP: <input type="text" id="itr2-fh-htn-highest" style="width: 60px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Peptic Ulcer Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pud-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pud-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Pneumonia:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pneu-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-pneu-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Thyroid Disease:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-thyroid-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-thyroid-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Pulmonary TB:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-ptb-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-ptb-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Extrapulmonary TB:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-eptb-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-eptb-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>UTI:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-uti-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-uti-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Mental Illness:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-mental-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-fh-mental-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Others:</strong> <input type="text" id="itr2-fh-others" style="width: 75%;">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SECTION 4: IMMUNIZATIONS TABLE -->
+                <div class="section-header" style="margin-top: 16px;">=== IMMUNIZATIONS ===</div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px;">
+                  <thead>
+                    <tr style="background: #0f172a; color: #ffffff;">
+                      <th style="padding: 6px 10px; width: 20%;">Category</th>
+                      <th style="padding: 6px 10px; width: 80%;">Vaccine Dates Recorded</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight: 700; background: #f1f5f9;">CHILD CARE</td>
+                      <td>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
+                          <div>BCG: <input type="text" id="itr2-imm-bcg" style="width: 90px;"></div>
+                          <div>HepB Birth: <input type="text" id="itr2-imm-hepb-birth" style="width: 80px;"></div>
+                          <div>HepB 24h: <input type="text" id="itr2-imm-hepb-24h" style="width: 80px;"></div>
+                          <div>PENTA: <input type="text" id="itr2-imm-penta" style="width: 90px;"></div>
+                          <div>OPV: <input type="text" id="itr2-imm-opv" style="width: 90px;"></div>
+                          <div>IPV: <input type="text" id="itr2-imm-ipv" style="width: 90px;"></div>
+                          <div>PCV: <input type="text" id="itr2-imm-pcv" style="width: 90px;"></div>
+                          <div>Measles: <input type="text" id="itr2-imm-measles" style="width: 80px;"></div>
+                          <div>Rotavirus: <input type="text" id="itr2-imm-rotavirus" style="width: 70px;"></div>
+                          <div>Chickenpox: <input type="text" id="itr2-imm-chickenpox" style="width: 65px;"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 700; background: #f1f5f9;">GENERAL</td>
+                      <td>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px;">
+                          <div>Flu: <input type="text" id="itr2-imm-flu" style="width: 100px;"></div>
+                          <div>HPV: <input type="text" id="itr2-imm-hpv" style="width: 100px;"></div>
+                          <div>HPV Gr.4: <input type="text" id="itr2-imm-hpv-g4" style="width: 80px;"></div>
+                          <div>MR Gr.1: <input type="text" id="itr2-imm-mr-g1" style="width: 80px;"></div>
+                          <div>MR Gr.7: <input type="text" id="itr2-imm-mr-g7" style="width: 80px;"></div>
+                          <div>TD Gr.1: <input type="text" id="itr2-imm-td-g1" style="width: 80px;"></div>
+                          <div>TD Gr.7: <input type="text" id="itr2-imm-td-g7" style="width: 80px;"></div>
+                          <div>Tetanus Toxoid: <input type="text" id="itr2-imm-tt" style="width: 60px;"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 700; background: #f1f5f9;">ANIMAL BITE</td>
+                      <td>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;">
+                          <div>PCECV1: <input type="text" id="itr2-imm-pcecv1" style="width: 70px;"></div>
+                          <div>PVRV1: <input type="text" id="itr2-imm-pvrv1" style="width: 70px;"></div>
+                          <div>PVRV2: <input type="text" id="itr2-imm-pvrv2" style="width: 70px;"></div>
+                          <div>PVRV3: <input type="text" id="itr2-imm-pvrv3" style="width: 70px;"></div>
+                          <div>PVRV4: <input type="text" id="itr2-imm-pvrv4" style="width: 70px;"></div>
+                          <div>PCECV2: <input type="text" id="itr2-imm-pcecv2" style="width: 70px;"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 700; background: #f1f5f9;">NCD &amp; MATERNAL</td>
+                      <td>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px;">
+                          <div>Pneumococcal: <input type="text" id="itr2-imm-pneumo" style="width: 80px;"></div>
+                          <div>Flu (NCD): <input type="text" id="itr2-imm-flu-ncd" style="width: 100px;"></div>
+                          <div>Tetanus Toxoid (Mat.): <input type="text" id="itr2-imm-tt-mat" style="width: 60px;"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- SECTION 5: MENSTRUAL & PREGNANCY HISTORY -->
+                <div class="grid-2col">
+                  <!-- MENSTRUAL HISTORY -->
+                  <div class="col-left">
+                    <div class="section-header">=== MENSTRUAL HISTORY ===</div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Menarche Age:</strong> <input type="number" id="itr2-men-age" style="width: 45px;"> &nbsp;
+                      <strong>Onset Sexual Intercourse:</strong> <input type="number" id="itr2-men-onset" style="width: 45px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>LMP:</strong> <input type="text" id="itr2-men-lmp" style="width: 120px;"> &nbsp;
+                      <strong>Pattern:</strong> <input type="text" id="itr2-men-pattern" style="width: 100px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Birth Control Method:</strong> <input type="text" id="itr2-men-method" style="width: 50%;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Duration:</strong> <input type="text" id="itr2-men-duration" style="width: 70px;"> &nbsp;
+                      <strong>Cycle Interval:</strong> <input type="text" id="itr2-men-interval" style="width: 70px;"> &nbsp;
+                      <strong>Pads/Day:</strong> <input type="number" id="itr2-men-pads" style="width: 45px;">
+                    </div>
+                    <div>
+                      <strong>Menopause:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-men-meno-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-men-meno-no"> No</label>
+                      Age: <input type="number" id="itr2-men-menoage" style="width: 45px;">
+                    </div>
+                  </div>
+
+                  <!-- PREGNANCY HISTORY -->
+                  <div class="col-right">
+                    <div class="section-header">=== PREGNANCY HISTORY ===</div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Gravidity:</strong> <input type="number" id="itr2-preg-grav" style="width: 40px;"> &nbsp;
+                      <strong>Parity:</strong> <input type="number" id="itr2-preg-par" style="width: 40px;"> &nbsp;
+                      <strong>Type of Delivery:</strong> <input type="text" id="itr2-preg-delivery" style="width: 80px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Full Term:</strong> <input type="number" id="itr2-preg-fullterm" style="width: 40px;"> &nbsp;
+                      <strong>Premature:</strong> <input type="number" id="itr2-preg-premature" style="width: 40px;"> &nbsp;
+                      <strong>Abortion:</strong> <input type="number" id="itr2-preg-abortion" style="width: 40px;"> &nbsp;
+                      <strong>Living:</strong> <input type="number" id="itr2-preg-living" style="width: 40px;">
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Pre-eclampsia:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-preg-preeclamp-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-preg-preeclamp-no"> No</label>
+                    </div>
+                    <div style="margin-bottom: 6px;">
+                      <strong>Age at First Pregnancy:</strong> <input type="number" id="itr2-preg-agefirst" style="width: 45px;">
+                    </div>
+                    <div>
+                      <strong>Family Planning Counseling:</strong>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-preg-fp-yes"> Yes</label>
+                      <label class="checkbox-label"><input type="checkbox" id="itr2-preg-fp-no"> No</label>
+                    </div>
+                  </div>
+                </div>
 
               </div>
             </div>

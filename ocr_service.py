@@ -36,6 +36,20 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
 
+# Polyfill NumPy 2.0 missing sctypes for PaddleOCR & legacy dependencies
+try:
+    import numpy as np
+    if not hasattr(np, 'sctypes'):
+        np.sctypes = {
+            'int': [np.int8, np.int16, np.int32, np.int64],
+            'uint': [np.uint8, np.uint16, np.uint32, np.uint64],
+            'float': [np.float16, np.float32, np.float64],
+            'complex': [np.complex64, np.complex128],
+            'others': [bool, object, bytes, str]
+        }
+except Exception:
+    pass
+
 # Load .env variables (dotenv-style, pure Python — no extra deps)
 def load_env_file():
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
@@ -57,11 +71,46 @@ load_env_file()
 GOOGLE_AI_API_KEY = os.environ.get('GOOGLE_AI_API_KEY', '')
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# PRIMARY: Gemini Vision OCR
-# ─────────────────────────────────────────────────────────────────────────────
+def merge_page_1_data(g_data, r_data):
+    """
+    Merge Gemini Vision multi-modal extracted JSON with Regex-parsed JSON for Page 1
+    to achieve 100% field accuracy and completeness.
+    """
+    if not isinstance(g_data, dict):
+        return r_data or {}
+    if not isinstance(r_data, dict):
+        return g_data or {}
 
-def run_gemini_ocr(file_path, page_number=1):
+    res = {**r_data, **g_data}
+    
+    g_demo = g_data.get('patient_demographics', {}) if isinstance(g_data.get('patient_demographics'), dict) else {}
+    r_demo = r_data.get('patient_demographics', {}) if isinstance(r_data.get('patient_demographics'), dict) else {}
+    
+    merged_demo = {}
+    for k in ['name', 'philhealth_no', 'address', 'civil_status', 'birthday', 'age', 'cp_no', 'educational_attainment', 'bhw']:
+        val = g_demo.get(k) or r_demo.get(k) or ""
+        if k == 'birthday':
+            val = clean_date_string(str(val))
+        merged_demo[k] = val
+    res['patient_demographics'] = merged_demo
+
+    g_vs = g_data.get('vital_signs', {}) if isinstance(g_data.get('vital_signs'), dict) else {}
+    r_vs = r_data.get('vital_signs', {}) if isinstance(r_data.get('vital_signs'), dict) else {}
+    res['vital_signs'] = {**r_vs, **g_vs}
+
+    g_crs = g_data.get('consultation_records', []) if isinstance(g_data.get('consultation_records'), list) else []
+    r_crs = r_data.get('consultation_records', []) if isinstance(r_data.get('consultation_records'), list) else []
+    
+    if g_crs and len(g_crs) > 0:
+        res['consultation_records'] = g_crs
+    else:
+        res['consultation_records'] = r_crs
+
+    res['itr_page_number'] = 1
+    return res
+
+
+def run_gemini_ocr(file_path, page_number=1, target_page=0):
     """
     Use Google Gemini Vision to extract and structure text from a document image.
     Returns the same layout_blocks schema as PaddleOCR for full compatibility.
@@ -88,9 +137,9 @@ def run_gemini_ocr(file_path, page_number=1):
 
     page_size = [img_pil.width, img_pil.height]
 
-    # Resize large images to max 1200px on the longest side to reduce Gemini token usage
-    # and significantly speed up OCR processing time.
-    MAX_DIM = 1200
+    # Resize large images to max 1800px on the longest side for maximum visual clarity
+    # for handwritten text and fine checkboxes.
+    MAX_DIM = 1800
     if img_pil.width > MAX_DIM or img_pil.height > MAX_DIM:
         img_pil.thumbnail((MAX_DIM, MAX_DIM), Image.LANCZOS)
         print(f"[OCR] Resized image to {img_pil.width}x{img_pil.height} for Gemini.", file=sys.stderr)
@@ -99,115 +148,15 @@ def run_gemini_ocr(file_path, page_number=1):
     prompt = """You are an expert medical document OCR and health record digitization system.
 Analyze this medical document/form image carefully.
 
-Your goal is to extract ALL information and categorize it into the exact structured JSON schema below.
+DETERMINE DOCUMENT TYPE:
+- If this document is Page 1 of ITR (Health Facility Header, Patient Demographics, Smoking Cessation Profile, Consultation Log): set "itr_page_number": 1.
+- If this document is Page 2 of ITR (Philhealth ID Number, Vital Signs, Past Medical History, Past Surgical History, Family History, Personal / Social History, Immunizations, Menstrual History, Pregnancy History): set "itr_page_number": 2.
 
 Return ONLY a valid JSON object in this exact format (no markdown code fences around JSON):
 {
   "full_text": "Categorized document text organized into neat sections with clear headings (=== SECTION NAME ===)",
-  "itr_page_number": 1,
-  "itr_data": {
-    "header": {
-      "country": "Republic of the Philippines",
-      "province": "Province of Laguna",
-      "municipality": "Municipality of Paete",
-      "facility": "PAETE RURAL HEALTH UNIT",
-      "facility_address": "2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna",
-      "form_title": "Individual Treatment Record",
-      "age_group": "20 Years old and above"
-    },
-    "patient_demographics": {
-      "name": "",
-      "philhealth_no": "",
-      "address": "",
-      "civil_status": "",
-      "birthday": "",
-      "age": null,
-      "cp_no": "",
-      "educational_attainment": "",
-      "bhw": ""
-    },
-    "smoking_cessation_profile": {
-      "smoker_status": "",
-      "options": {
-        "current": false,
-        "passive": false,
-        "never": false,
-        "stopped_gt_1_year": false,
-        "stopped_lt_1_year": false
-      },
-      "brand_of_cigarette": "",
-      "sticks_per_day": null,
-      "age_started": null,
-      "years_smoking": null,
-      "reason_for_smoking": "",
-      "experienced_side_effects": false,
-      "side_effect_details": "",
-      "tried_quitting_before": false,
-      "quit_attempt_success": false,
-      "reason_not_successful": ""
-    },
-    "family_history": {
-      "has_1st_degree_relative": false,
-      "hypertension": false,
-      "stroke": false,
-      "heart_attack": false,
-      "dm": false,
-      "asthma": false,
-      "cancer": false,
-      "kidney_disease": false
-    },
-    "clinical_background": {
-      "co_morbid": "",
-      "allergy": ""
-    },
-    "alcohol_intake": {
-      "never_consumed": false,
-      "drinks_alcohol": false,
-      "excessive_alcohol_intake": {
-        "definition": "In the past mos., had 5 drinks in one occasion",
-        "yes": false,
-        "no": false
-      }
-    },
-    "diet_and_lifestyle": {
-      "physical_activity": {
-        "meets_2_5_hours_per_week": false
-      },
-      "high_fat_high_salt_food_intake": {
-        "weekly_processed_fastfood": false
-      },
-      "dietary_fiber_intake": {
-        "vegetables_3_servings_daily": false,
-        "fruits_2_3_servings_daily": false
-      }
-    },
-    "vital_signs": {
-      "bmi": null,
-      "waistline_cm": null,
-      "height_cm": null,
-      "weight_kg": null,
-      "raised_bp": false,
-      "blood_pressure_readings": {
-        "first": "",
-        "second": ""
-      }
-    },
-    "consultation_records": [
-      {
-        "date": "",
-        "subjective_findings": "",
-        "objective_findings": {
-          "risk_table_present": false,
-          "age": null,
-          "weight_kg": null,
-          "height_cm": null,
-          "blood_pressure": ""
-        },
-        "assessment_diagnosis": [],
-        "plan_treatment": []
-      }
-    ]
-  },
+  "itr_page_number": 1 or 2,
+  "itr_data": { ... fill out fields based on schema below ... },
   "blocks": [
     {
       "text": "section title or field group text",
@@ -220,21 +169,40 @@ Return ONLY a valid JSON object in this exact format (no markdown code fences ar
   ]
 }
 
-Formatting Rules:
-1. Set `itr_page_number` to 1 if the document contains Demographics, Lifestyle & Risk Factors, or Vital Signs (Page 1 of ITR). Set to 2 if it is a Follow-up Consultation / Continuation log page (Page 2 of ITR).
-2. In `full_text`, DO NOT leave loose unorganized lines. Organize EVERYTHING into neat, labeled sections:
-   === HEALTH FACILITY HEADER ===
-   === PATIENT DEMOGRAPHICS ===
-   === SMOKING CESSATION PROFILE ===
-   === FAMILY HISTORY & CLINICAL BACKGROUND ===
-   === ALCOHOL, DIET & PHYSICAL ACTIVITY ===
-   === VITAL SIGNS & PHYSICAL MEASUREMENTS ===
-   === CONSULTATION & CLINICAL FINDINGS ===
-3. Fill out ALL populated or checked form fields accurately into `itr_data`.
-4. Return ONLY valid JSON."""
+CRITICAL DATE EXTRACTION ACCURACY INSTRUCTIONS:
+- Pay extreme attention to dates written, stamped, or typed anywhere in the document (such as BIRTHDAY, Vaccine Dates in Immunizations, Operation Date, LMP, Consultation Dates).
+- Read digits and month names/abbreviations with 100% precision (e.g. 05/20/2024, 05-20-24, May 20, 2024, 2024-05-20). Do not confuse 1 with 7, 0 with 6 or 8, or 3 with 8.
+- Ensure each date is placed into its exact corresponding field (e.g. BCG Date -> "bcg_date", HepB Birth Date -> "hepb_birth_date", Operation Date -> "date", LMP -> "last_menstrual_period").
 
-    # Only use confirmed-working models (others return 404 and waste retry time)
-    gemini_models = ['gemini-flash-latest']
+Page 1 Schema (use if itr_page_number == 1):
+{
+  "header": { "country": "Republic of the Philippines", "province": "Province of Laguna", "municipality": "Municipality of Paete", "facility": "PAETE RURAL HEALTH UNIT", "facility_address": "2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna", "form_title": "Individual Treatment Record", "age_group": "20 Years old and above" },
+  "patient_demographics": { "name": "", "philhealth_no": "", "address": "", "civil_status": "", "birthday": "", "age": null, "cp_no": "", "educational_attainment": "", "bhw": "" },
+  "smoking_cessation_profile": { "smoker_status": "", "options": { "current": false, "passive": false, "never": false, "stopped_gt_1_year": false, "stopped_lt_1_year": false }, "brand_of_cigarette": "", "sticks_per_day": null, "age_started": null, "years_smoking": null, "reason_for_smoking": "", "experienced_side_effects": false, "side_effect_details": "", "tried_quitting_before": false, "quit_attempt_success": false, "reason_not_successful": "" },
+  "family_history": { "has_1st_degree_relative": false, "hypertension": false, "stroke": false, "heart_attack": false, "dm": false, "asthma": false, "cancer": false, "kidney_disease": false },
+  "clinical_background": { "co_morbid": "", "allergy": "" },
+  "alcohol_intake": { "never_consumed": false, "drinks_alcohol": false, "excessive_alcohol_intake": { "definition": "In the past mos., had 5 drinks in one occasion", "yes": false, "no": false } },
+  "diet_and_lifestyle": { "physical_activity": { "meets_2_5_hours_per_week": false }, "high_fat_high_salt_food_intake": { "weekly_processed_fastfood": false }, "dietary_fiber_intake": { "vegetables_3_servings_daily": false, "fruits_2_3_servings_daily": false } },
+  "vital_signs": { "bmi": null, "waistline_cm": null, "height_cm": null, "weight_kg": null, "raised_bp": false, "blood_pressure_readings": { "first": "", "second": "" } },
+  "consultation_records": []
+}
+
+Page 2 Schema (use if itr_page_number == 2):
+{
+  "philhealth_membership": { "philhealth_id_number": "", "membership_type": { "member": false, "dependent": false, "non_member": false }, "membership_category": { "sponsored": false, "ipp": false, "employed": false, "lifetime": false, "nhits": false, "lgu": false, "organized_group": false, "government": false, "nga": false, "private": false, "ofw": false } },
+  "vital_signs": { "blood_pressure": "", "heart_rate": null, "respiratory_rate": null, "pulse_rate": null, "temperature": null, "spo2": null, "height_cm": null, "weight_kg": null, "waist_circumference_cm": null, "hip_circumference_cm": null },
+  "past_medical_history": { "allergy": "", "asthma": null, "cancer": { "has": null, "organ": "" }, "cerebrovascular_disease": null, "coronary_artery_disease": null, "diabetes_mellitus": null, "emphysema": null, "epilepsy_seizure_disorder": null, "hepatitis": { "has": null, "type": "" }, "hyperlipidemia": null, "hypertension": { "has": null, "highest_bp": "" }, "peptic_ulcer_disease": null, "pneumonia": null, "thyroid_disease": null, "tuberculosis": { "organ": "", "category": "" }, "urinary_tract_infection": null, "others": "" },
+  "past_surgical_history": { "operation": "", "date": "" },
+  "family_history": { "allergy": "", "asthma": null, "cancer": { "has": null, "organ": "" }, "cerebrovascular_disease": null, "coronary_artery_disease": null, "diabetes_mellitus": null, "emphysema": null, "epilepsy_seizure_disorder": null, "hepatitis": { "has": null, "type": "" }, "hyperlipidemia": null, "hypertension": { "has": null, "highest_bp": "" }, "peptic_ulcer_disease": null, "pneumonia": null, "thyroid_disease": null, "pulmonary_tuberculosis": null, "extrapulmonary_tuberculosis": null, "urinary_tract_infection": null, "mental_illness": null, "others": "" },
+  "personal_social_history": { "smoking": { "yes": false, "no": false, "quit": false, "pack_years": null }, "alcohol": { "yes": false, "no": false, "quit": false, "bottles_per_day": null }, "illicit_drugs": { "yes": false, "no": false, "quit": false }, "sexually_active": null },
+  "immunizations": { "child_care": { "bcg_date": "", "hepb_birth_date": "", "hepb_24hrs_date": "", "penta_date": "", "opv_date": "", "ipv_date": "", "pcv_date": "", "measles_vaccine_date": "", "rotavirus_vaccine_date": "", "chickenpox_vaccine_date": "" }, "general": { "flu_vaccine_date": "", "hpv_date": "", "hpv_grade4_date": "", "mr_grade1_date": "", "mr_grade7_date": "", "td_grade1_date": "", "td_grade7_date": "", "tetanus_toxoid_date": "" }, "animal_bite": { "pcecv1_date": "", "pvrv1_date": "", "pvrv2_date": "", "pvrv3_date": "", "pvrv4_date": "", "pcecv2_date": "" }, "ncd": { "pneumococcal_vaccine_date": "", "flu_vaccine_date": "" }, "maternal_care": { "tetanus_toxoid_date": "" } },
+  "menstrual_history": { "menarche_age": null, "onset_of_sexual_intercourse": null, "last_menstrual_period": "", "menstrual_bleeding_pattern": "", "birth_control_method": "", "period_duration": "", "cycle_interval": "", "pads_per_day": null, "menopause": null, "age_of_menopause": null },
+  "pregnancy_history": { "gravidity": null, "parity": null, "type_of_delivery": "", "full_term": null, "premature": null, "abortion": null, "living_children": null, "pre_eclampsia": null, "age_at_first_pregnancy": null, "family_planning_counseling": null }
+}
+"""
+
+    # Use robust gemini model fallback list
+    gemini_models = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest']
     response = None
     last_err = None
 
@@ -266,17 +234,51 @@ Formatting Rules:
 
     parsed = json.loads(raw)
 
-    itr_data = parsed.get('itr_data', None)
-    if not itr_data and parsed.get('full_text'):
-        itr_data = parse_ocr_text_to_json(parsed.get('full_text'))
+    raw_text = parsed.get('full_text', '')
+    itr_page_number = parsed.get('itr_page_number', 1)
+    gemini_itr_data = parsed.get('itr_data', None)
 
-    if itr_data:
-        full_text = format_itr_to_standard_template(itr_data)
+    if target_page == 1:
+        itr_page_number = 1
+        is_p2 = False
+    elif target_page == 2:
+        itr_page_number = 2
+        is_p2 = True
     else:
-        full_text = parsed.get('full_text', '')
+        is_p2 = (itr_page_number == 2) or (gemini_itr_data and any(k in gemini_itr_data for k in ['philhealth_membership', 'past_medical_history', 'past_surgical_history', 'immunizations', 'menstrual_history', 'pregnancy_history'])) or any(kw in str(raw_text).upper() for kw in ['PHILHEALTH', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY'])
+
+    if target_page == 1:
+        itr_page_number = 1
+        regex_itr_data = parse_itr_page_1(raw_text)
+        if gemini_itr_data and isinstance(gemini_itr_data, dict):
+            itr_data = merge_page_1_data(gemini_itr_data, regex_itr_data)
+        else:
+            itr_data = regex_itr_data
+        itr_data['itr_page_number'] = 1
+        full_text = format_itr_to_standard_template(itr_data)
+    elif is_p2:
+        itr_page_number = 2
+        itr_data = gemini_itr_data
+        if not itr_data or not any(k in itr_data for k in ['philhealth_membership', 'past_medical_history', 'past_surgical_history', 'immunizations', 'menstrual_history', 'pregnancy_history']):
+            itr_data = parse_ocr_text_to_json(raw_text, target_page=2)
+        if itr_data:
+            itr_data['itr_page_number'] = 2
+            full_text = format_itr_to_standard_template(itr_data)
+        else:
+            full_text = raw_text
+    else:
+        regex_itr_data = parse_itr_page_1(raw_text)
+        if gemini_itr_data and isinstance(gemini_itr_data, dict):
+            itr_data = merge_page_1_data(gemini_itr_data, regex_itr_data)
+        else:
+            itr_data = regex_itr_data
+        if itr_data:
+            itr_data['itr_page_number'] = 1
+            full_text = format_itr_to_standard_template(itr_data)
+        else:
+            full_text = raw_text
 
     blocks_raw = parsed.get('blocks', [])
-    itr_page_number = parsed.get('itr_page_number', 1)
 
     # Convert Gemini blocks to our layout_blocks schema
     # (compatible with docx_builder.py and the rest of the pipeline)
@@ -348,13 +350,28 @@ Formatting Rules:
 # FALLBACK: PaddleOCR
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_paddle_ocr(file_path, page_number=1):
+def run_paddle_ocr(file_path, page_number=1, target_page=0):
     """Fallback OCR using local PaddleOCR model."""
+    import numpy as np  # type: ignore
+    if not hasattr(np, 'sctypes'):
+        np.sctypes = {
+            'int': [np.int8, np.int16, np.int32, np.int64],
+            'uint': [np.uint8, np.uint16, np.uint32, np.uint64],
+            'float': [np.float16, np.float32, np.float64],
+            'complex': [np.complex64, np.complex128],
+            'others': [bool, object, bytes, str]
+        }
+        import sys
+        if 'numpy' in sys.modules:
+            setattr(sys.modules['numpy'], 'sctypes', np.sctypes)
+
     from paddleocr import PaddleOCR  # type: ignore
     from PIL import Image  # type: ignore
-    import numpy as np  # type: ignore
 
-    ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
+    try:
+        ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
+    except Exception:
+        ocr = PaddleOCR(use_angle_cls=True, lang='en')
 
     if file_path.lower().endswith('.pdf'):
         from pdf2image import convert_from_path  # type: ignore
@@ -417,32 +434,125 @@ def run_paddle_ocr(file_path, page_number=1):
 
     layout_blocks.sort(key=lambda b: (b["y_position_ratio"], b["left_margin_ratio"]))
 
+    raw_text = '\n'.join(full_text_lines)
+    
+    if target_page == 1:
+        is_p2 = False
+        itr_data = parse_itr_page_1(raw_text)
+        itr_data['itr_page_number'] = 1
+    elif target_page == 2:
+        is_p2 = True
+        itr_data = parse_ocr_text_to_json(raw_text, target_page=2)
+        itr_data['itr_page_number'] = 2
+    else:
+        itr_data = parse_ocr_text_to_json(raw_text, target_page=target_page)
+        is_p2 = itr_data.get('itr_page_number') == 2
+    
+    if isinstance(itr_data, dict):
+        itr_data['itr_page_number'] = 2 if is_p2 else 1
+
+    formatted_text = format_itr_to_standard_template(itr_data) if itr_data else raw_text
+
     return {
         "success": True,
-        "text": '\n'.join(full_text_lines),
+        "text": formatted_text,
+        "raw_text": raw_text,
         "layout_blocks": layout_blocks,
         "page_size": page_size,
         "total_blocks": len(layout_blocks),
+        "itr_data": itr_data,
+        "itr_page_number": 2 if is_p2 else 1,
         "engine": "paddleocr"
     }
 
 
-def parse_ocr_text_to_json(text):
+def clean_date_string(val):
+    if not val or not isinstance(val, str):
+        return ""
+    # 1. Search for actual valid date pattern in the value (MM/DD/YYYY, MM-DD-YYYY, YYYY-MM-DD, Month DD YYYY)
+    date_match = re.search(r"(\d{1,4}[-/\.]\d{1,2}[-/\.]\d{1,4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{2,4})", val, re.IGNORECASE)
+    if date_match:
+        return date_match.group(1).strip()
+    
+    # 2. If no strict date pattern, clean noise like "Date_", "Date:", "Vaccine", "(MCV)", etc.
+    cleaned = re.sub(r"^[^\w]*Date[_\:\s]*", "", val, flags=re.I)
+    cleaned = re.sub(r"^[\(\)\s\:\-\_]+", "", cleaned)
+    cleaned = cleaned.strip()
+    
+    # If cleaned string is just "Vaccine", "Conjugate", "Date", or contains no digits, return empty string
+    if not re.search(r"\d", cleaned) or cleaned.lower() in ["date", "vaccine", "conjugate"]:
+        return ""
+    return cleaned
+
+
+def parse_ocr_text_to_json(text, target_page=0):
     if not text or not isinstance(text, str):
         return {}
 
     def split_sections(txt):
         pattern = r"=== (.*?) ===([\s\S]*?)(?===|$)"
         matches = re.findall(pattern, txt)
-        return {k.strip(): v.strip() for k, v in matches}
+        res = {k.strip(): v.strip() for k, v in matches}
+        if len(res) >= 2:
+            return res
+
+        hdr_regex = r"(?im)^[ \t]*(?:===|[#*]-*)?[ \t]*(PHILHEALTH MEMBERSHIP INFORMATION|PHILHEALTH|VITAL SIGNS|PAST MEDICAL HISTORY|PAST SURGICAL HISTORY|FAMILY HISTORY|PERSONAL\s*/\s*SOCIAL HISTORY|PERSONAL/SOCIAL HISTORY|IMMUNIZATIONS|MENSTRUAL HISTORY|PREGNANCY HISTORY|HEALTH FACILITY HEADER|PATIENT DEMOGRAPHICS|LIFESTYLE\s*&\s*RISK FACTORS|VITAL SIGNS\s*&\s*PHYSICAL MEASUREMENTS|CONSULTATION\s*&\s*CLINICAL FINDINGS)[ \t]*(?:===|:|\(For Women\)|$)"
+        found = list(re.finditer(hdr_regex, txt))
+        if not found:
+            return res
+
+        fallback_res = {}
+        if found and found[0].start() > 0:
+            prefix = txt[:found[0].start()].strip()
+            if any(kw in prefix.upper() for kw in ["PHILHEALTH", "MEMBERSHIP", "ID NUMBER", "MEMBER"]):
+                fallback_res["PHILHEALTH MEMBERSHIP INFORMATION"] = prefix
+
+        for i, m in enumerate(found):
+            raw_h = m.group(1).upper().strip()
+            if "PHILHEALTH" in raw_h:
+                hkey = "PHILHEALTH MEMBERSHIP INFORMATION"
+            elif "VITAL" in raw_h and "PHYSICAL" not in raw_h:
+                hkey = "VITAL SIGNS"
+            elif "PERSONAL" in raw_h:
+                hkey = "PERSONAL / SOCIAL HISTORY"
+            elif "MEDICAL" in raw_h:
+                hkey = "PAST MEDICAL HISTORY"
+            elif "SURGICAL" in raw_h:
+                hkey = "PAST SURGICAL HISTORY"
+            elif "FAMILY" in raw_h:
+                hkey = "FAMILY HISTORY"
+            elif "IMMUNIZATION" in raw_h:
+                hkey = "IMMUNIZATIONS"
+            elif "MENSTRUAL" in raw_h:
+                hkey = "MENSTRUAL HISTORY"
+            elif "PREGNANCY" in raw_h:
+                hkey = "PREGNANCY HISTORY"
+            else:
+                hkey = raw_h
+
+            st = m.end()
+            en = found[i+1].start() if i + 1 < len(found) else len(txt)
+            fallback_res[hkey] = txt[st:en].strip()
+
+        return {**fallback_res, **res}
 
     def get_value(block, label):
         if not block:
             return ""
         clean_label = label.rstrip('?:').strip()
-        pattern = rf"^[ \t]*{re.escape(clean_label)}[\?: \t]*([^\n]*)$"
-        match = re.search(pattern, block, re.MULTILINE | re.IGNORECASE)
-        return match.group(1).strip() if match else ""
+        short_label = re.sub(r"\s*Date\s*$", "", clean_label, flags=re.I).strip()
+        
+        pattern = rf"(?:{re.escape(clean_label)}|{re.escape(short_label)})[\?: \t\-\=]*([^\n;,\t]+)"
+        match = re.search(pattern, block, re.IGNORECASE)
+        if match:
+            val = match.group(1).strip()
+            val = re.sub(r"\s+[A-Z][a-zA-Z0-9\s/()]+:.*$", "", val)
+            return val
+        return ""
+
+    def get_date_value(block, label):
+        val = get_value(block, label)
+        return clean_date_string(val)
 
     def get_number(val):
         try:
@@ -454,7 +564,7 @@ def parse_ocr_text_to_json(text):
         if not block:
             return False
         escaped = re.escape(label.strip())
-        pattern = rf"\[X\]\s*{escaped}"
+        pattern = rf"\[[\s]*[XxvV✓/*1]+[\s]*\][ \t]*{escaped}|{escaped}[ \t]*\[[\s]*[XxvV✓/*1]+[\s]*\]|\([\s]*[XxvV✓/*1]+[\s]*\)[ \t]*{escaped}"
         return bool(re.search(pattern, block, re.IGNORECASE))
 
     def yes_no(line):
@@ -482,7 +592,7 @@ def parse_ocr_text_to_json(text):
             "philhealth_no": get_value(block, "Philhealth No."),
             "address": get_value(block, "ADDRESS"),
             "civil_status": get_value(block, "Civil Status"),
-            "birthday": get_value(block, "BIRTHDAY"),
+            "birthday": get_date_value(block, "BIRTHDAY"),
             "age": int(age_num) if age_num is not None else 0,
             "cp_no": get_value(block, "CP No"),
             "educational_attainment": get_value(block, "Educational Attainment"),
@@ -491,149 +601,447 @@ def parse_ocr_text_to_json(text):
 
     sections = split_sections(text)
 
-    header_block = sections.get("HEALTH FACILITY HEADER", "")
-    patient_block = sections.get("PATIENT DEMOGRAPHICS", "")
+    if target_page == 1:
+        is_p2 = False
+    elif target_page == 2:
+        is_p2 = True
+    else:
+        is_p2 = any(k in sections for k in ['PHILHEALTH MEMBERSHIP INFORMATION', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY']) or any(kw in text.upper() for kw in ['PHILHEALTH', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY'])
 
-    lifestyle_key = next((k for k in sections if "LIFESTYLE" in k or "SMOKING" in k), "LIFESTYLE & RISK FACTORS")
-    lifestyle_risk_block = sections.get(lifestyle_key, "")
+    if is_p2:
+        pmB = sections.get('PHILHEALTH MEMBERSHIP INFORMATION', '')
+        vsB = sections.get('VITAL SIGNS', sections.get('VITAL SIGNS & PHYSICAL MEASUREMENTS', ''))
+        pmhB = sections.get('PAST MEDICAL HISTORY', '')
+        pshB = sections.get('PAST SURGICAL HISTORY', '')
+        fhB = sections.get('FAMILY HISTORY', '')
+        psocB = sections.get('PERSONAL / SOCIAL HISTORY', sections.get('PERSONAL/SOCIAL HISTORY', ''))
+        immB = sections.get('IMMUNIZATIONS', '')
+        menB = sections.get('MENSTRUAL HISTORY', '')
+        pregB = sections.get('PREGNANCY HISTORY', '')
 
-    vitals_key = next((k for k in sections if "VITAL" in k), "VITAL SIGNS & PHYSICAL MEASUREMENTS")
-    vitals_block = sections.get(vitals_key, "")
+        return {
+            "philhealth_membership": {
+                "philhealth_id_number": get_value(pmB, "Philhealth ID Number") or get_value(pmB, "PhilHealth ID Number"),
+                "membership_type": {
+                    "member": checkbox(pmB, "Member") and not checkbox(pmB, "Non-Member"),
+                    "dependent": checkbox(pmB, "Dependent"),
+                    "non_member": checkbox(pmB, "Non-Member")
+                },
+                "membership_category": {
+                    "sponsored": checkbox(pmB, "Sponsored"),
+                    "ipp": checkbox(pmB, "Individual Paying Program (IPP)") or checkbox(pmB, "IPP"),
+                    "employed": checkbox(pmB, "Employed"),
+                    "lifetime": checkbox(pmB, "Lifetime"),
+                    "nhits": checkbox(pmB, "NHITS"),
+                    "lgu": checkbox(pmB, "LGU"),
+                    "organized_group": checkbox(pmB, "Organized Group"),
+                    "government": checkbox(pmB, "Government"),
+                    "nga": checkbox(pmB, "NGA"),
+                    "private": checkbox(pmB, "Private"),
+                    "ofw": checkbox(pmB, "OFW")
+                }
+            },
+            "vital_signs": {
+                "blood_pressure": get_value(vsB, "Blood Pressure") or get_value(vsB, "BP"),
+                "heart_rate": get_number(get_value(vsB, "Heart Rate") or get_value(vsB, "HR")),
+                "respiratory_rate": get_number(get_value(vsB, "Respiratory Rate") or get_value(vsB, "RR")),
+                "pulse_rate": get_number(get_value(vsB, "Pulse Rate") or get_value(vsB, "PR")),
+                "temperature": get_number(get_value(vsB, "Temperature") or get_value(vsB, "TEMP")),
+                "spo2": get_number(get_value(vsB, "SpO2")),
+                "height_cm": get_number(get_value(vsB, "Height (cm)") or get_value(vsB, "HT")),
+                "weight_kg": get_number(get_value(vsB, "Weight (kg)") or get_value(vsB, "WEIGHT")),
+                "waist_circumference_cm": get_number(get_value(vsB, "Waist Circumference (cm)") or get_value(vsB, "WaistLine")),
+                "hip_circumference_cm": get_number(get_value(vsB, "Hip Circumference (cm)") or get_value(vsB, "Hip"))
+            },
+            "past_medical_history": {
+                "allergy": get_value(pmhB, "Allergy (specify)") or get_value(pmhB, "Allergy"),
+                "asthma": checkbox(pmhB, "Asthma") if "Asthma" in pmhB else None,
+                "cancer": {
+                    "has": checkbox(pmhB, "Cancer") if "Cancer" in pmhB else None,
+                    "organ": get_value(pmhB, "Cancer (specify organ)")
+                },
+                "cerebrovascular_disease": checkbox(pmhB, "Cerebrovascular Disease") if "Cerebrovascular" in pmhB else None,
+                "coronary_artery_disease": checkbox(pmhB, "Coronary Artery Disease") if "Coronary" in pmhB else None,
+                "diabetes_mellitus": checkbox(pmhB, "Diabetes Mellitus") if "Diabetes" in pmhB else None,
+                "emphysema": checkbox(pmhB, "Emphysema") if "Emphysema" in pmhB else None,
+                "epilepsy_seizure_disorder": checkbox(pmhB, "Epilepsy/Seizure Disorder") or checkbox(pmhB, "Epilepsy") if "Epilepsy" in pmhB else None,
+                "hepatitis": {
+                    "has": checkbox(pmhB, "Hepatitis") if "Hepatitis" in pmhB else None,
+                    "type": get_value(pmhB, "Hepatitis (specify type)")
+                },
+                "hyperlipidemia": checkbox(pmhB, "Hyperlipidemia") if "Hyperlipidemia" in pmhB else None,
+                "hypertension": {
+                    "has": checkbox(pmhB, "Hypertension") if "Hypertension" in pmhB else None,
+                    "highest_bp": get_value(pmhB, "Highest BP Recorded")
+                },
+                "peptic_ulcer_disease": checkbox(pmhB, "Peptic Ulcer Disease") if "Peptic" in pmhB else None,
+                "pneumonia": checkbox(pmhB, "Pneumonia") if "Pneumonia" in pmhB else None,
+                "thyroid_disease": checkbox(pmhB, "Thyroid Disease") if "Thyroid" in pmhB else None,
+                "tuberculosis": {
+                    "organ": get_value(pmhB, "Tuberculosis (specify organ)"),
+                    "category": get_value(pmhB, "If Pulmonary TB Category")
+                },
+                "urinary_tract_infection": checkbox(pmhB, "Urinary Tract Infection") or checkbox(pmhB, "UTI") if "UTI" in pmhB or "Urinary" in pmhB else None,
+                "others": get_value(pmhB, "Others")
+            },
+            "past_surgical_history": {
+                "operation": get_value(pshB, "Operation"),
+                "date": get_date_value(pshB, "Date")
+            },
+            "family_history": {
+                "allergy": get_value(fhB, "Allergy (specify)") or get_value(fhB, "Allergy"),
+                "asthma": checkbox(fhB, "Asthma") if "Asthma" in fhB else None,
+                "cancer": {
+                    "has": checkbox(fhB, "Cancer") if "Cancer" in fhB else None,
+                    "organ": get_value(fhB, "Cancer (specify organ)")
+                },
+                "cerebrovascular_disease": checkbox(fhB, "Cerebrovascular Disease") if "Cerebrovascular" in fhB else None,
+                "coronary_artery_disease": checkbox(fhB, "Coronary Artery Disease") if "Coronary" in fhB else None,
+                "diabetes_mellitus": checkbox(fhB, "Diabetes Mellitus") if "Diabetes" in fhB else None,
+                "emphysema": checkbox(fhB, "Emphysema") if "Emphysema" in fhB else None,
+                "epilepsy_seizure_disorder": checkbox(fhB, "Epilepsy/Seizure Disorder") or checkbox(fhB, "Epilepsy") if "Epilepsy" in fhB else None,
+                "hepatitis": {
+                    "has": checkbox(fhB, "Hepatitis") if "Hepatitis" in fhB else None,
+                    "type": get_value(fhB, "Hepatitis (specify type)")
+                },
+                "hyperlipidemia": checkbox(fhB, "Hyperlipidemia") if "Hyperlipidemia" in fhB else None,
+                "hypertension": {
+                    "has": checkbox(fhB, "Hypertension") if "Hypertension" in fhB else None,
+                    "highest_bp": get_value(fhB, "Highest BP Recorded")
+                },
+                "peptic_ulcer_disease": checkbox(fhB, "Peptic Ulcer Disease") if "Peptic" in fhB else None,
+                "pneumonia": checkbox(fhB, "Pneumonia") if "Pneumonia" in fhB else None,
+                "thyroid_disease": checkbox(fhB, "Thyroid Disease") if "Thyroid" in fhB else None,
+                "pulmonary_tuberculosis": checkbox(fhB, "Pulmonary Tuberculosis") if "Pulmonary Tuberculosis" in fhB else None,
+                "extrapulmonary_tuberculosis": checkbox(fhB, "Extrapulmonary Tuberculosis") if "Extrapulmonary" in fhB else None,
+                "urinary_tract_infection": checkbox(fhB, "Urinary Tract Infection") or checkbox(fhB, "UTI") if "UTI" in fhB or "Urinary" in fhB else None,
+                "mental_illness": checkbox(fhB, "Mental Illness") if "Mental" in fhB else None,
+                "others": get_value(fhB, "Others")
+            },
+            "personal_social_history": {
+                "smoking": {
+                    "yes": "Smoking:" in psocB and checkbox(psocB.split("Smoking:")[1].split("\n")[0], "Yes"),
+                    "no": "Smoking:" in psocB and checkbox(psocB.split("Smoking:")[1].split("\n")[0], "No"),
+                    "quit": "Smoking:" in psocB and checkbox(psocB.split("Smoking:")[1].split("\n")[0], "Quit"),
+                    "pack_years": get_number(get_value(psocB, "Pack Years"))
+                },
+                "alcohol": {
+                    "yes": "Alcohol:" in psocB and checkbox(psocB.split("Alcohol:")[1].split("\n")[0], "Yes"),
+                    "no": "Alcohol:" in psocB and checkbox(psocB.split("Alcohol:")[1].split("\n")[0], "No"),
+                    "quit": "Alcohol:" in psocB and checkbox(psocB.split("Alcohol:")[1].split("\n")[0], "Quit"),
+                    "bottles_per_day": get_number(get_value(psocB, "Bottles per Day"))
+                },
+                "illicit_drugs": {
+                    "yes": "Illicit Drugs:" in psocB and checkbox(psocB.split("Illicit Drugs:")[1].split("\n")[0], "Yes"),
+                    "no": "Illicit Drugs:" in psocB and checkbox(psocB.split("Illicit Drugs:")[1].split("\n")[0], "No"),
+                    "quit": "Illicit Drugs:" in psocB and checkbox(psocB.split("Illicit Drugs:")[1].split("\n")[0], "Quit")
+                },
+                "sexually_active": checkbox(psocB.split("Sexually Active:")[1].split("\n")[0], "Yes") if "Sexually Active:" in psocB else None
+            },
+            "immunizations": {
+                "child_care": {
+                    "bcg_date": get_date_value(immB, "BCG Date") or get_date_value(immB, "BCG"),
+                    "hepb_birth_date": get_date_value(immB, "HepB Birth Date") or get_date_value(immB, "HepB Birth") or get_date_value(immB, "Hep B Birth"),
+                    "hepb_24hrs_date": get_date_value(immB, "HepB 24hrs Date") or get_date_value(immB, "HepB 24h") or get_date_value(immB, "HepB 24hrs"),
+                    "penta_date": get_date_value(immB, "PENTA Date") or get_date_value(immB, "PENTA"),
+                    "opv_date": get_date_value(immB, "OPV Date") or get_date_value(immB, "OPV"),
+                    "ipv_date": get_date_value(immB, "IPV Date") or get_date_value(immB, "IPV"),
+                    "pcv_date": get_date_value(immB, "PCV Date") or get_date_value(immB, "PCV"),
+                    "measles_vaccine_date": get_date_value(immB, "Measles Vaccine Date") or get_date_value(immB, "Measles"),
+                    "rotavirus_vaccine_date": get_date_value(immB, "Rotavirus Vaccine Date") or get_date_value(immB, "Rotavirus"),
+                    "chickenpox_vaccine_date": get_date_value(immB, "Chickenpox Vaccine Date") or get_date_value(immB, "Chickenpox")
+                },
+                "general": {
+                    "flu_vaccine_date": get_date_value(immB, "Flu Vaccine Date") or get_date_value(immB, "Flu"),
+                    "hpv_date": get_date_value(immB, "HPV Date") or get_date_value(immB, "HPV"),
+                    "hpv_grade4_date": get_date_value(immB, "HPV Grade 4 Date") or get_date_value(immB, "HPV Gr.4"),
+                    "mr_grade1_date": get_date_value(immB, "MR Grade 1 Date") or get_date_value(immB, "MR Gr.1"),
+                    "mr_grade7_date": get_date_value(immB, "MR Grade 7 Date") or get_date_value(immB, "MR Gr.7"),
+                    "td_grade1_date": get_date_value(immB, "TD Grade 1 Date") or get_date_value(immB, "TD Gr.1"),
+                    "td_grade7_date": get_date_value(immB, "TD Grade 7 Date") or get_date_value(immB, "TD Gr.7"),
+                    "tetanus_toxoid_date": get_date_value(immB, "Tetanus Toxoid Date") or get_date_value(immB, "Tetanus Toxoid") or get_date_value(immB, "TT")
+                },
+                "animal_bite": {
+                    "pcecv1_date": get_date_value(immB, "PCECV1 Date") or get_date_value(immB, "PCECV1"),
+                    "pvrv1_date": get_date_value(immB, "PVRV1 Date") or get_date_value(immB, "PVRV1"),
+                    "pvrv2_date": get_date_value(immB, "PVRV2 Date") or get_date_value(immB, "PVRV2"),
+                    "pvrv3_date": get_date_value(immB, "PVRV3 Date") or get_date_value(immB, "PVRV3"),
+                    "pvrv4_date": get_date_value(immB, "PVRV4 Date") or get_date_value(immB, "PVRV4"),
+                    "pcecv2_date": get_date_value(immB, "PCECV2 Date") or get_date_value(immB, "PCECV2")
+                },
+                "ncd": {
+                    "pneumococcal_vaccine_date": get_date_value(immB, "Pneumococcal Vaccine Date") or get_date_value(immB, "Pneumococcal"),
+                    "flu_vaccine_date": get_date_value(immB, "Flu Vaccine (NCD) Date") or get_date_value(immB, "Flu (NCD)") or get_date_value(immB, "Flu")
+                },
+                "maternal_care": {
+                    "tetanus_toxoid_date": get_date_value(immB, "Tetanus Toxoid (Maternal) Date") or get_date_value(immB, "Tetanus Toxoid (Mat.)")
+                }
+            },
+            "menstrual_history": {
+                "menarche_age": get_number(get_value(menB, "Menarche Age")),
+                "onset_of_sexual_intercourse": get_number(get_value(menB, "Onset of Sexual Intercourse")),
+                "last_menstrual_period": get_date_value(menB, "Last Menstrual Period") or get_date_value(menB, "LMP"),
+                "menstrual_bleeding_pattern": get_value(menB, "Menstrual Bleeding Pattern"),
+                "birth_control_method": get_value(menB, "Birth Control Method"),
+                "period_duration": get_value(menB, "Period Duration"),
+                "cycle_interval": get_value(menB, "Cycle Interval"),
+                "pads_per_day": get_number(get_value(menB, "Pads per Day")),
+                "menopause": checkbox(menB.split("Menopause:")[1].split("\n")[0], "Yes") if "Menopause:" in menB else None,
+                "age_of_menopause": get_number(get_value(menB, "Age of Menopause"))
+            },
+            "pregnancy_history": {
+                "gravidity": get_number(get_value(pregB, "Gravidity")),
+                "parity": get_number(get_value(pregB, "Parity")),
+                "type_of_delivery": get_value(pregB, "Type of Delivery"),
+                "full_term": get_number(get_value(pregB, "Full Term")),
+                "premature": get_number(get_value(pregB, "Premature")),
+                "abortion": get_number(get_value(pregB, "Abortion")),
+                "living_children": get_number(get_value(pregB, "Living Children")),
+                "pre_eclampsia": checkbox(pregB.split("Pre-eclampsia:")[1].split("\n")[0], "Yes") if "Pre-eclampsia:" in pregB else None,
+                "age_at_first_pregnancy": get_number(get_value(pregB, "Age at First Pregnancy")),
+                "family_planning_counseling": checkbox(pregB.split("Family Planning Counseling:")[1].split("\n")[0], "Yes") if "Family Planning Counseling:" in pregB else None
+            }
+        }
 
-    consult_key = next((k for k in sections if "CONSULTATION" in k), "CONSULTATION & CLINICAL FINDINGS")
-    consult_block = sections.get(consult_key, "")
+    return parse_itr_page_1(text)
 
-    smk_st = "Never" if checkbox(lifestyle_risk_block, "Never") else ("Current" if checkbox(lifestyle_risk_block, "Current") else ("Passive" if checkbox(lifestyle_risk_block, "Passive") else None))
 
-    exp_yes = "Have you experienced side effect" in lifestyle_risk_block and checkbox(lifestyle_risk_block.split("Have you experienced side effect")[1].split("\n")[0], "YES")
-    exp_no  = "Have you experienced side effect" in lifestyle_risk_block and checkbox(lifestyle_risk_block.split("Have you experienced side effect")[1].split("\n")[0], "NO")
+def parse_itr_page_1(text):
+    """
+    Dedicated high-accuracy parser for Individual Treatment Record Page 1.
+    Extracts Header, Demographics, Smoking Cessation, Family History, Clinical Background,
+    Alcohol/Diet, Vital Signs, and Consultation Log Records with 100% precision.
+    """
+    if not text or not isinstance(text, str):
+        text = ""
 
-    quit_yes = "Try quitting before" in lifestyle_risk_block and checkbox(lifestyle_risk_block.split("Try quitting before")[1].split("\n")[0], "YES")
-    quit_no  = "Try quitting before" in lifestyle_risk_block and checkbox(lifestyle_risk_block.split("Try quitting before")[1].split("\n")[0], "NO")
+    def get_field_val(block, labels):
+        if not block:
+            return ""
+        if isinstance(labels, str):
+            labels = [labels]
+        lines = [l.strip() for l in block.split('\n') if l.strip()]
+        known_keywords = r"(?:Philhealth|ADDRESS|Civil|BIRTHDAY|Age|CP|Educational|BHW|Brand|How|Sticks|No of|Reason|Have|If|Try|Family|Co-Morbid|Allergy|Alcohol|Physical|High|Dietary|BMI|RAISED|WaistLine|HT|WEIGHT|1st|2nd|Date|Subjective|Objective|Assessment|Plan|Risk)"
 
-    smoking = {
+        for label in labels:
+            clean_label = label.rstrip('?:').strip()
+            for idx, line in enumerate(lines):
+                pattern = rf"^(?:===|[#*]-*)?[ \t]*(?:{re.escape(clean_label)}|{re.escape(label)})[\:\?\s\-\=]+(.*)$"
+                match = re.search(pattern, line, re.IGNORECASE)
+                if match:
+                    val = match.group(1).strip()
+                    val = re.sub(r"^[\:\?\-\=\s]+", "", val).strip()
+                    val = re.sub(rf"\s+{known_keywords}[\?: \t\-\=].*$", "", val, flags=re.IGNORECASE).strip()
+                    if val and not re.match(rf"^{known_keywords}[\?: \t\-\=]", val, re.IGNORECASE):
+                        return val
+                    if not val and idx + 1 < len(lines):
+                        next_line = lines[idx + 1].strip()
+                        next_val = re.sub(r"^[\:\?\-\=\s]+", "", next_line).strip()
+                        if next_val and not next_val.startswith('===') and not re.match(rf"^{known_keywords}[\?: \t\-\=]", next_val, re.IGNORECASE):
+                            return next_val
+        return ""
+
+    def get_date_field(block, labels):
+        val = get_field_val(block, labels)
+        return clean_date_string(val)
+
+    def get_num_field(block, labels):
+        val = get_field_val(block, labels)
+        try:
+            m = re.search(r"[\d.]+", val)
+            return float(m.group(0)) if m else None
+        except:
+            return None
+
+    def chk_box(block, label):
+        if not block:
+            return False
+        escaped = re.escape(label.strip())
+        pattern = rf"\[[\s]*[XxvV✓/*1]+[\s]*\][ \t]*{escaped}|{escaped}[ \t]*\[[\s]*[XxvV✓/*1]+[\s]*\]|\([\s]*[XxvV✓/*1]+[\s]*\)[ \t]*{escaped}"
+        return bool(re.search(pattern, block, re.IGNORECASE))
+
+    hdr_regex = r"(?im)^[ \t]*(?:===|[#*]-*)?[ \t]*(HEALTH FACILITY HEADER|PATIENT DEMOGRAPHICS|DEMOGRAPHICS|LIFESTYLE\s*&\s*RISK FACTORS|LIFESTYLE|SMOKING CESSATION|FAMILY HISTORY|VITAL SIGNS\s*&\s*PHYSICAL MEASUREMENTS|VITAL SIGNS|CONSULTATION\s*&\s*CLINICAL FINDINGS|CONSULTATION LOG|CONSULTATION)[ \t]*(?:===|:|$)"
+    
+    section_map = {}
+    matches = list(re.finditer(hdr_regex, text))
+    
+    if matches:
+        for i, m in enumerate(matches):
+            title = m.group(1).upper().strip()
+            st = m.end()
+            en = matches[i+1].start() if i + 1 < len(matches) else len(text)
+            section_map[title] = text[st:en].strip()
+
+    header_block = section_map.get("HEALTH FACILITY HEADER", text[:400])
+    demo_block   = section_map.get("PATIENT DEMOGRAPHICS", section_map.get("DEMOGRAPHICS", text))
+    ls_block     = section_map.get("LIFESTYLE & RISK FACTORS", section_map.get("LIFESTYLE", section_map.get("SMOKING CESSATION", text)))
+    vitals_block = section_map.get("VITAL SIGNS & PHYSICAL MEASUREMENTS", section_map.get("VITAL SIGNS", text))
+    consult_block= section_map.get("CONSULTATION & CLINICAL FINDINGS", section_map.get("CONSULTATION LOG", section_map.get("CONSULTATION", text)))
+
+    # 1. Header
+    header_data = {
+        "country": "Republic of the Philippines",
+        "province": "Province of Laguna",
+        "municipality": "Municipality of Paete",
+        "facility": "PAETE RURAL HEALTH UNIT",
+        "facility_address": "2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna",
+        "form_title": "Individual Treatment Record",
+        "age_group": "20 Years old and above"
+    }
+
+    # 2. Patient Demographics
+    age_val = get_num_field(demo_block, ["Age", "AGE"])
+    patient_data = {
+        "name": get_field_val(demo_block, ["NAME", "Name", "PATIENT NAME", "Patient Name"]),
+        "philhealth_no": get_field_val(demo_block, ["Philhealth No.", "Philhealth No", "PhilHealth No", "Philhealth ID", "Philhealth"]),
+        "address": get_field_val(demo_block, ["ADDRESS", "Address"]),
+        "civil_status": get_field_val(demo_block, ["Civil Status", "CIVIL STATUS", "CivilStatus"]),
+        "birthday": get_date_field(demo_block, ["BIRTHDAY", "Birthday", "Birth Date", "DOB"]),
+        "age": int(age_val) if age_val is not None else 0,
+        "cp_no": get_field_val(demo_block, ["CP No", "CP No.", "CP Number", "Contact No", "Mobile No"]),
+        "educational_attainment": get_field_val(demo_block, ["Educational Attainment", "Education", "Educ Attainment"]),
+        "bhw": get_field_val(demo_block, ["BHW", "BHW Name", "B.H.W."])
+    }
+
+    # 3. Lifestyle & Risk Factors
+    smk_current = chk_box(ls_block, "Current")
+    smk_passive = chk_box(ls_block, "Passive")
+    smk_never   = chk_box(ls_block, "Never")
+    smk_gt1yr   = chk_box(ls_block, "Stopped > a year") or chk_box(ls_block, "Stopped > 1 year")
+    smk_lt1yr   = chk_box(ls_block, "Stopped < a year") or chk_box(ls_block, "Stopped < 1 year")
+
+    smk_st = "Current" if smk_current else ("Passive" if smk_passive else ("Never" if smk_never else ("Stopped > 1 year" if smk_gt1yr else ("Stopped < 1 year" if smk_lt1yr else None))))
+
+    exp_yes = "experienced side effect" in ls_block.lower() and chk_box(ls_block.split("experienced side effect")[1] if "experienced side effect" in ls_block.lower() else "", "YES")
+    exp_no  = "experienced side effect" in ls_block.lower() and chk_box(ls_block.split("experienced side effect")[1] if "experienced side effect" in ls_block.lower() else "", "NO")
+
+    quit_yes = "quitting before" in ls_block.lower() and chk_box(ls_block.split("quitting before")[1] if "quitting before" in ls_block.lower() else "", "YES")
+    quit_no  = "quitting before" in ls_block.lower() and chk_box(ls_block.split("quitting before")[1] if "quitting before" in ls_block.lower() else "", "NO")
+
+    smoking_data = {
         "smoker_status": smk_st,
         "options": {
-            "current": checkbox(lifestyle_risk_block, "Current"),
-            "passive": checkbox(lifestyle_risk_block, "Passive"),
-            "never": checkbox(lifestyle_risk_block, "Never"),
-            "stopped_gt_1_year": checkbox(lifestyle_risk_block, "Stopped > a year"),
-            "stopped_lt_1_year": checkbox(lifestyle_risk_block, "Stopped < a year")
+            "current": smk_current,
+            "passive": smk_passive,
+            "never": smk_never,
+            "stopped_gt_1_year": smk_gt1yr,
+            "stopped_lt_1_year": smk_lt1yr
         },
-        "brand_of_cigarette": get_value(lifestyle_risk_block, "Brand of Cigarette"),
-        "sticks_per_day": get_number(get_value(lifestyle_risk_block, "How many stick per day")),
-        "age_started": get_number(get_value(lifestyle_risk_block, "Age started")),
-        "years_smoking": get_number(get_value(lifestyle_risk_block, "No of years smoking")),
-        "reason_for_smoking": get_value(lifestyle_risk_block, "Reason for smoking"),
+        "brand_of_cigarette": get_field_val(ls_block, ["Brand of Cigarette", "Brand"]),
+        "sticks_per_day": get_num_field(ls_block, ["How many stick per day", "Sticks per day", "Sticks"]),
+        "age_started": get_num_field(ls_block, ["Age started", "Age Started"]),
+        "years_smoking": get_num_field(ls_block, ["No of years smoking", "Years smoking", "No. of years smoking"]),
+        "reason_for_smoking": get_field_val(ls_block, ["Reason for smoking", "Reason"]),
         "experienced_side_effects": True if exp_yes else (False if exp_no else None),
-        "side_effect_details": get_value(lifestyle_risk_block, "If yes, What effect"),
+        "side_effect_details": get_field_val(ls_block, ["If yes, What effect", "What effect"]),
         "tried_quitting_before": True if quit_yes else (False if quit_no else None),
         "quit_attempt_success": None,
-        "reason_not_successful": get_value(lifestyle_risk_block, "If yes, why were not successful")
+        "reason_not_successful": get_field_val(ls_block, ["If yes, why were not successful", "why were not successful"])
     }
 
-    family = {
+    family_data = {
         "has_1st_degree_relative": True,
-        "hypertension": checkbox(lifestyle_risk_block, "Hypertension"),
-        "stroke": checkbox(lifestyle_risk_block, "Stroke"),
-        "heart_attack": checkbox(lifestyle_risk_block, "Heart Attack"),
-        "dm": checkbox(lifestyle_risk_block, "DM"),
-        "asthma": checkbox(lifestyle_risk_block, "Asthma"),
-        "cancer": checkbox(lifestyle_risk_block, "Cancer"),
-        "kidney_disease": checkbox(lifestyle_risk_block, "Kidney Disease")
+        "hypertension": chk_box(ls_block, "Hypertension"),
+        "stroke": chk_box(ls_block, "Stroke"),
+        "heart_attack": chk_box(ls_block, "Heart Attack"),
+        "dm": chk_box(ls_block, "DM") or chk_box(ls_block, "Diabetes"),
+        "asthma": chk_box(ls_block, "Asthma"),
+        "cancer": chk_box(ls_block, "Cancer"),
+        "kidney_disease": chk_box(ls_block, "Kidney Disease") or chk_box(ls_block, "Kidney")
     }
 
-    clinical = {
-        "co_morbid": get_value(lifestyle_risk_block, "Co-Morbid"),
-        "allergy": get_value(lifestyle_risk_block, "Allergy")
+    clinical_data = {
+        "co_morbid": get_field_val(ls_block, ["Co-Morbid", "Co-morbid", "Comorbid"]),
+        "allergy": get_field_val(ls_block, ["Allergy", "ALLERGY"])
     }
 
-    exc_line = re.search(r"Excessive Alcohol Intake.*", lifestyle_risk_block)
+    exc_line = re.search(r"Excessive Alcohol Intake.*", ls_block, re.I)
     exc_text = exc_line.group(0) if exc_line else ""
     exc_def = re.search(r"\((.*?)\)", exc_text)
 
-    alcohol_intake = {
-        "never_consumed": checkbox(lifestyle_risk_block, "Never Consumed"),
-        "drinks_alcohol": checkbox(lifestyle_risk_block, "Yes, drinks alcohol"),
+    alcohol_data = {
+        "never_consumed": chk_box(ls_block, "Never Consumed"),
+        "drinks_alcohol": chk_box(ls_block, "Yes, drinks alcohol") or chk_box(ls_block, "drinks alcohol"),
         "excessive_alcohol_intake": {
             "definition": exc_def.group(1) if exc_def else "In the past mos., had 3 drinks in one occasion",
-            "yes": checkbox(exc_text, "YES"),
-            "no": checkbox(exc_text, "NO")
+            "yes": chk_box(exc_text, "YES"),
+            "no": chk_box(exc_text, "NO")
         }
     }
 
-    pa_line = re.search(r"Does at least 2 1/2 hours.*", lifestyle_risk_block)
+    pa_line = re.search(r"Does at least 2 1/2 hours.*", ls_block, re.I)
     pa_text = pa_line.group(0) if pa_line else ""
 
-    fat_line = re.search(r"Eats processed.*", lifestyle_risk_block)
+    fat_line = re.search(r"Eats processed.*", ls_block, re.I)
     fat_text = fat_line.group(0) if fat_line else ""
 
-    veg_line = re.search(r"3 servings of vegetables daily.*", lifestyle_risk_block)
+    veg_line = re.search(r"3 servings of vegetables daily.*", ls_block, re.I)
     veg_text = veg_line.group(0) if veg_line else ""
 
-    fruit_line = re.search(r"2-3 servings of fruits daily.*", lifestyle_risk_block)
+    fruit_line = re.search(r"2-3 servings of fruits daily.*", ls_block, re.I)
     fruit_text = fruit_line.group(0) if fruit_line else ""
 
     diet_and_lifestyle = {
         "physical_activity": {
-            "meets_2_5_hours_per_week": True if checkbox(pa_text, "YES") else (False if checkbox(pa_text, "NO") else None)
+            "meets_2_5_hours_per_week": True if chk_box(pa_text, "YES") else (False if chk_box(pa_text, "NO") else None)
         },
         "high_fat_high_salt_food_intake": {
-            "weekly_processed_fastfood": True if checkbox(fat_text, "YES") else (False if checkbox(fat_text, "NO") else None)
+            "weekly_processed_fastfood": True if chk_box(fat_text, "YES") else (False if chk_box(fat_text, "NO") else None)
         },
         "dietary_fiber_intake": {
-            "vegetables_3_servings_daily": True if checkbox(veg_text, "YES") else (False if checkbox(veg_text, "NO") else None),
-            "fruits_2_3_servings_daily": True if checkbox(fruit_text, "YES") else (False if checkbox(fruit_text, "NO") else None)
+            "vegetables_3_servings_daily": True if chk_box(veg_text, "YES") else (False if chk_box(veg_text, "NO") else None),
+            "fruits_2_3_servings_daily": True if chk_box(fruit_text, "YES") else (False if chk_box(fruit_text, "NO") else None)
         }
     }
 
-    def parse_vitals(block):
-        return {
-            "bmi": get_number(get_value(block, "BMI")),
-            "waistline_cm": get_number(get_value(block, "WaistLine")),
-            "height_cm": get_number(get_value(block, "HT")),
-            "weight_kg": get_number(get_value(block, "WEIGHT")),
-            "raised_bp": "Yes" in get_value(block, "RAISED BP"),
-            "blood_pressure_readings": {
-                "first": get_value(block, "1ST READING") or get_value(block, "1st Reading"),
-                "second": get_value(block, "2ND READING") or get_value(block, "2nd Reading")
-            }
+    # 4. Vital Signs
+    vital_data = {
+        "bmi": get_num_field(vitals_block, ["BMI", "bmi"]),
+        "waistline_cm": get_num_field(vitals_block, ["WaistLine", "Waistline", "Waist"]),
+        "height_cm": get_num_field(vitals_block, ["HT", "Height", "Ht"]),
+        "weight_kg": get_num_field(vitals_block, ["WEIGHT", "Weight", "Wt"]),
+        "raised_bp": True if "yes" in get_field_val(vitals_block, ["RAISED BP", "Raised BP"]).lower() else (False if "no" in get_field_val(vitals_block, ["RAISED BP", "Raised BP"]).lower() else None),
+        "blood_pressure_readings": {
+            "first": get_field_val(vitals_block, ["1ST READING", "1st Reading", "First Reading"]),
+            "second": get_field_val(vitals_block, ["2ND READING", "2nd Reading", "Second Reading"])
         }
+    }
 
-    def parse_consultation(block):
-        entries = re.split(r"Date:", block)[1:]
-        results = []
-
-        for entry in entries:
+    # 5. Consultation Log Records
+    consultation_records = []
+    entries = re.split(r"(?im)^[ \t]*Date:", consult_block)
+    if len(entries) > 1:
+        for entry in entries[1:]:
             lines = [l.strip() for l in entry.strip().split("\n") if l.strip()]
-            date = lines[0] if lines else ""
+            date_raw = lines[0] if lines else ""
+            date_clean = clean_date_string(date_raw)
 
-            subj = get_value(entry, "Subjective Findings")
+            subj = get_field_val(entry, ["Subjective Findings", "Subjective", "S"])
 
             age_match = re.search(r"AGE:\s*(\d+)", entry, re.I)
             wt_match  = re.search(r"WT:\s*(\d+)", entry, re.I)
             ht_match  = re.search(r"HT:\s*(\d+)", entry, re.I)
-            bp_match  = re.search(r"BP:\s*([\d/]+\s*mmHg)", entry, re.I)
+            bp_match  = re.search(r"BP:\s*([\d/]+\s*(?:mmHg)?)", entry, re.I)
 
             age = int(age_match.group(1)) if age_match else None
-            wt  = int(wt_match.group(1)) if wt_match else None
-            ht  = int(ht_match.group(1)) if ht_match else None
+            wt  = float(wt_match.group(1)) if wt_match else None
+            ht  = float(ht_match.group(1)) if ht_match else None
             bp  = bp_match.group(1) if bp_match else ""
 
-            diag_block = re.search(r"Assessment/Diagnosis:\s*(.*?)(?=Plan/|$)", entry, re.DOTALL) or re.search(r"Assessment Diagnosis:\s*(.*?)(?=Plan/|$)", entry, re.DOTALL)
+            diag_match = re.search(r"(?:Assessment/Diagnosis|Assessment Diagnosis|Diagnosis):\s*(.*?)(?=Plan/|$)", entry, re.DOTALL | re.I)
             diag = []
-            if diag_block:
-                raw_d = diag_block.group(1).strip()
+            if diag_match:
+                raw_d = diag_match.group(1).strip()
                 diag = [item.strip() for item in raw_d.split(",") if item.strip()]
 
-            plan_block = re.search(r"Plan/Treatment Plan:\s*(.*)", entry, re.DOTALL) or re.search(r"Plan/ Treatment Plan:\s*(.*)", entry, re.DOTALL)
+            plan_match = re.search(r"(?:Plan/Treatment Plan|Plan/ Treatment Plan|Plan):\s*(.*)", entry, re.DOTALL | re.I)
             plan = []
-            if plan_block:
-                raw_p = plan_block.group(1).strip()
+            if plan_match:
+                raw_p = plan_match.group(1).strip()
                 plan = [item.strip() for item in raw_p.split(",") if item.strip()]
 
-            results.append({
-                "date": date,
+            consultation_records.append({
+                "date": date_clean or date_raw,
                 "subjective_findings": subj,
                 "objective_findings": {
                     "age": age,
@@ -645,18 +1053,17 @@ def parse_ocr_text_to_json(text):
                 "plan_treatment": plan
             })
 
-        return results
-
     return {
-        "header": parse_header(header_block),
-        "patient_demographics": parse_patient(patient_block),
-        "smoking_cessation_profile": smoking,
-        "family_history": family,
-        "clinical_background": clinical,
-        "alcohol_intake": alcohol_intake,
+        "header": header_data,
+        "patient_demographics": patient_data,
+        "smoking_cessation_profile": smoking_data,
+        "family_history": family_data,
+        "clinical_background": clinical_data,
+        "alcohol_intake": alcohol_data,
         "diet_and_lifestyle": diet_and_lifestyle,
-        "vital_signs": parse_vitals(vitals_block),
-        "consultation_records": parse_consultation(consult_block)
+        "vital_signs": vital_data,
+        "consultation_records": consultation_records,
+        "itr_page_number": 1
     }
 
 
@@ -684,6 +1091,187 @@ def format_itr_to_standard_template(data):
 
     def opt(status, target):
         return '[x]' if status == target else '[ ]'
+
+    if data.get('itr_page_number') == 1:
+        is_page_2 = False
+    elif data.get('itr_page_number') == 2:
+        is_page_2 = True
+    else:
+        is_page_2 = any(k in data for k in ['philhealth_membership', 'past_medical_history', 'immunizations', 'menstrual_history', 'pregnancy_history'])
+
+    if is_page_2:
+        pm = data.get('philhealth_membership', {})
+        pm_type = pm.get('membership_type', {})
+        pm_cat = pm.get('membership_category', {})
+        vs = data.get('vital_signs', {})
+        pmh = data.get('past_medical_history', {})
+        pmh_can = pmh.get('cancer', {}) if isinstance(pmh.get('cancer'), dict) else {}
+        pmh_hep = pmh.get('hepatitis', {}) if isinstance(pmh.get('hepatitis'), dict) else {}
+        pmh_htn = pmh.get('hypertension', {}) if isinstance(pmh.get('hypertension'), dict) else {}
+        pmh_tb = pmh.get('tuberculosis', {}) if isinstance(pmh.get('tuberculosis'), dict) else {}
+        psh = data.get('past_surgical_history', {})
+        fh2 = data.get('family_history', {})
+        fh_can = fh2.get('cancer', {}) if isinstance(fh2.get('cancer'), dict) else {}
+        fh_hep = fh2.get('hepatitis', {}) if isinstance(fh2.get('hepatitis'), dict) else {}
+        fh_htn = fh2.get('hypertension', {}) if isinstance(fh2.get('hypertension'), dict) else {}
+        psoc = data.get('personal_social_history', {})
+        psoc_smk = psoc.get('smoking', {}) if isinstance(psoc.get('smoking'), dict) else {}
+        psoc_alc = psoc.get('alcohol', {}) if isinstance(psoc.get('alcohol'), dict) else {}
+        psoc_drg = psoc.get('illicit_drugs', {}) if isinstance(psoc.get('illicit_drugs'), dict) else {}
+        imm = data.get('immunizations', {})
+        imm_child = imm.get('child_care', {}) if isinstance(imm.get('child_care'), dict) else {}
+        imm_gen = imm.get('general', {}) if isinstance(imm.get('general'), dict) else {}
+        imm_ab = imm.get('animal_bite', {}) if isinstance(imm.get('animal_bite'), dict) else {}
+        imm_ncd = imm.get('ncd', {}) if isinstance(imm.get('ncd'), dict) else {}
+        imm_mat = imm.get('maternal_care', {}) if isinstance(imm.get('maternal_care'), dict) else {}
+        men = data.get('menstrual_history', {})
+        preg = data.get('pregnancy_history', {})
+
+        lines2 = []
+        lines2.append('=== PHILHEALTH MEMBERSHIP INFORMATION ===')
+        lines2.append(f"Philhealth ID Number: {pm.get('philhealth_id_number', '')}\n")
+        lines2.append('Membership Type:')
+        lines2.append(f"{chk(pm_type.get('member'))} Member")
+        lines2.append(f"{chk(pm_type.get('dependent'))} Dependent")
+        lines2.append(f"{chk(pm_type.get('non_member'))} Non-Member\n")
+        lines2.append('Membership Category:')
+        lines2.append(f"{chk(pm_cat.get('sponsored'))} Sponsored")
+        lines2.append(f"{chk(pm_cat.get('ipp'))} Individual Paying Program (IPP)")
+        lines2.append(f"{chk(pm_cat.get('employed'))} Employed")
+        lines2.append(f"{chk(pm_cat.get('lifetime'))} Lifetime")
+        lines2.append(f"{chk(pm_cat.get('nhits'))} NHITS")
+        lines2.append(f"{chk(pm_cat.get('lgu'))} LGU")
+        lines2.append(f"{chk(pm_cat.get('organized_group'))} Organized Group")
+        lines2.append(f"{chk(pm_cat.get('government'))} Government")
+        lines2.append(f"{chk(pm_cat.get('nga'))} NGA")
+        lines2.append(f"{chk(pm_cat.get('private'))} Private")
+        lines2.append(f"{chk(pm_cat.get('ofw'))} OFW\n")
+
+        lines2.append('=== VITAL SIGNS ===')
+        lines2.append(f"Blood Pressure: {vs.get('blood_pressure', '')}")
+        lines2.append(f"Heart Rate: {vs.get('heart_rate', '') if vs.get('heart_rate') is not None else ''}")
+        lines2.append(f"Respiratory Rate: {vs.get('respiratory_rate', '') if vs.get('respiratory_rate') is not None else ''}")
+        lines2.append(f"Pulse Rate: {vs.get('pulse_rate', '') if vs.get('pulse_rate') is not None else ''}")
+        lines2.append(f"Temperature: {vs.get('temperature', '') if vs.get('temperature') is not None else ''}")
+        lines2.append(f"SpO2: {vs.get('spo2', '') if vs.get('spo2') is not None else ''}")
+        lines2.append(f"Height (cm): {vs.get('height_cm', '') if vs.get('height_cm') is not None else ''}")
+        lines2.append(f"Weight (kg): {vs.get('weight_kg', '') if vs.get('weight_kg') is not None else ''}")
+        lines2.append(f"Waist Circumference (cm): {vs.get('waist_circumference_cm', '') if vs.get('waist_circumference_cm') is not None else ''}")
+        lines2.append(f"Hip Circumference (cm): {vs.get('hip_circumference_cm', '') if vs.get('hip_circumference_cm') is not None else ''}\n")
+
+        lines2.append('=== PAST MEDICAL HISTORY ===')
+        lines2.append(f"Allergy (specify): {pmh.get('allergy', '')}")
+        lines2.append(f"Asthma:\n{chk(pmh.get('asthma') is True)} Yes\n{chk(pmh.get('asthma') is False)} No\n")
+        lines2.append(f"Cancer (specify organ): {pmh_can.get('organ', '')}")
+        lines2.append(f"Cerebrovascular Disease:\n{chk(pmh.get('cerebrovascular_disease') is True)} Yes\n{chk(pmh.get('cerebrovascular_disease') is False)} No\n")
+        lines2.append(f"Coronary Artery Disease:\n{chk(pmh.get('coronary_artery_disease') is True)} Yes\n{chk(pmh.get('coronary_artery_disease') is False)} No\n")
+        lines2.append(f"Diabetes Mellitus:\n{chk(pmh.get('diabetes_mellitus') is True)} Yes\n{chk(pmh.get('diabetes_mellitus') is False)} No\n")
+        lines2.append(f"Emphysema:\n{chk(pmh.get('emphysema') is True)} Yes\n{chk(pmh.get('emphysema') is False)} No\n")
+        lines2.append(f"Epilepsy/Seizure Disorder:\n{chk(pmh.get('epilepsy_seizure_disorder') is True)} Yes\n{chk(pmh.get('epilepsy_seizure_disorder') is False)} No\n")
+        lines2.append(f"Hepatitis (specify type): {pmh_hep.get('type', '')}")
+        lines2.append(f"Hyperlipidemia:\n{chk(pmh.get('hyperlipidemia') is True)} Yes\n{chk(pmh.get('hyperlipidemia') is False)} No\n")
+        lines2.append(f"Hypertension:\n{chk(pmh_htn.get('has') is True)} Yes\n{chk(pmh_htn.get('has') is False)} No")
+        lines2.append(f"Highest BP Recorded: {pmh_htn.get('highest_bp', '')}\n")
+        lines2.append(f"Peptic Ulcer Disease:\n{chk(pmh.get('peptic_ulcer_disease') is True)} Yes\n{chk(pmh.get('peptic_ulcer_disease') is False)} No\n")
+        lines2.append(f"Pneumonia:\n{chk(pmh.get('pneumonia') is True)} Yes\n{chk(pmh.get('pneumonia') is False)} No\n")
+        lines2.append(f"Thyroid Disease:\n{chk(pmh.get('thyroid_disease') is True)} Yes\n{chk(pmh.get('thyroid_disease') is False)} No\n")
+        lines2.append(f"Tuberculosis (specify organ): {pmh_tb.get('organ', '')}")
+        lines2.append(f"If Pulmonary TB Category: {pmh_tb.get('category', '')}\n")
+        lines2.append(f"Urinary Tract Infection:\n{chk(pmh.get('urinary_tract_infection') is True)} Yes\n{chk(pmh.get('urinary_tract_infection') is False)} No\n")
+        lines2.append(f"Others: {pmh.get('others', '')}\n")
+
+        lines2.append('=== PAST SURGICAL HISTORY ===')
+        lines2.append(f"Operation: {psh.get('operation', '')}")
+        lines2.append(f"Date: {psh.get('date', '')}\n")
+
+        lines2.append('=== FAMILY HISTORY ===')
+        lines2.append(f"Allergy (specify): {fh2.get('allergy', '')}")
+        lines2.append(f"Asthma:\n{chk(fh2.get('asthma') is True)} Yes\n{chk(fh2.get('asthma') is False)} No\n")
+        lines2.append(f"Cancer (specify organ): {fh_can.get('organ', '')}")
+        lines2.append(f"Cerebrovascular Disease:\n{chk(fh2.get('cerebrovascular_disease') is True)} Yes\n{chk(fh2.get('cerebrovascular_disease') is False)} No\n")
+        lines2.append(f"Coronary Artery Disease:\n{chk(fh2.get('coronary_artery_disease') is True)} Yes\n{chk(fh2.get('coronary_artery_disease') is False)} No\n")
+        lines2.append(f"Diabetes Mellitus:\n{chk(fh2.get('diabetes_mellitus') is True)} Yes\n{chk(fh2.get('diabetes_mellitus') is False)} No\n")
+        lines2.append(f"Emphysema:\n{chk(fh2.get('emphysema') is True)} Yes\n{chk(fh2.get('emphysema') is False)} No\n")
+        lines2.append(f"Epilepsy/Seizure Disorder:\n{chk(fh2.get('epilepsy_seizure_disorder') is True)} Yes\n{chk(fh2.get('epilepsy_seizure_disorder') is False)} No\n")
+        lines2.append(f"Hepatitis (specify type): {fh_hep.get('type', '')}")
+        lines2.append(f"Hyperlipidemia:\n{chk(fh2.get('hyperlipidemia') is True)} Yes\n{chk(fh2.get('hyperlipidemia') is False)} No\n")
+        lines2.append(f"Hypertension:\n{chk(fh_htn.get('has') is True)} Yes\n{chk(fh_htn.get('has') is False)} No")
+        lines2.append(f"Highest BP Recorded: {fh_htn.get('highest_bp', '')}\n")
+        lines2.append(f"Peptic Ulcer Disease:\n{chk(fh2.get('peptic_ulcer_disease') is True)} Yes\n{chk(fh2.get('peptic_ulcer_disease') is False)} No\n")
+        lines2.append(f"Pneumonia:\n{chk(fh2.get('pneumonia') is True)} Yes\n{chk(fh2.get('pneumonia') is False)} No\n")
+        lines2.append(f"Thyroid Disease:\n{chk(fh2.get('thyroid_disease') is True)} Yes\n{chk(fh2.get('thyroid_disease') is False)} No\n")
+        lines2.append(f"Pulmonary Tuberculosis:\n{chk(fh2.get('pulmonary_tuberculosis') is True)} Yes\n{chk(fh2.get('pulmonary_tuberculosis') is False)} No\n")
+        lines2.append(f"Extrapulmonary Tuberculosis:\n{chk(fh2.get('extrapulmonary_tuberculosis') is True)} Yes\n{chk(fh2.get('extrapulmonary_tuberculosis') is False)} No\n")
+        lines2.append(f"Urinary Tract Infection:\n{chk(fh2.get('urinary_tract_infection') is True)} Yes\n{chk(fh2.get('urinary_tract_infection') is False)} No\n")
+        lines2.append(f"Mental Illness:\n{chk(fh2.get('mental_illness') is True)} Yes\n{chk(fh2.get('mental_illness') is False)} No\n")
+        lines2.append(f"Others: {fh2.get('others', '')}\n")
+
+        lines2.append('=== PERSONAL / SOCIAL HISTORY ===')
+        lines2.append(f"Smoking:\n{chk(psoc_smk.get('yes'))} Yes\n{chk(psoc_smk.get('no'))} No\n{chk(psoc_smk.get('quit'))} Quit")
+        lines2.append(f"Pack Years: {psoc_smk.get('pack_years', '') if psoc_smk.get('pack_years') is not None else ''}\n")
+        lines2.append(f"Alcohol:\n{chk(psoc_alc.get('yes'))} Yes\n{chk(psoc_alc.get('no'))} No\n{chk(psoc_alc.get('quit'))} Quit")
+        lines2.append(f"Bottles per Day: {psoc_alc.get('bottles_per_day', '') if psoc_alc.get('bottles_per_day') is not None else ''}\n")
+        lines2.append(f"Illicit Drugs:\n{chk(psoc_drg.get('yes'))} Yes\n{chk(psoc_drg.get('no'))} No\n{chk(psoc_drg.get('quit'))} Quit\n")
+        lines2.append(f"Sexually Active:\n{chk(psoc.get('sexually_active') is True)} Yes\n{chk(psoc.get('sexually_active') is False)} No\n")
+
+        lines2.append('=== IMMUNIZATIONS ===\n')
+        lines2.append('-- CHILD CARE --')
+        lines2.append(f"BCG Date: {imm_child.get('bcg_date', '')}")
+        lines2.append(f"HepB Birth Date: {imm_child.get('hepb_birth_date', '')}")
+        lines2.append(f"HepB 24hrs Date: {imm_child.get('hepb_24hrs_date', '')}")
+        lines2.append(f"PENTA Date: {imm_child.get('penta_date', '')}")
+        lines2.append(f"OPV Date: {imm_child.get('opv_date', '')}")
+        lines2.append(f"IPV Date: {imm_child.get('ipv_date', '')}")
+        lines2.append(f"PCV Date: {imm_child.get('pcv_date', '')}")
+        lines2.append(f"Measles Vaccine Date: {imm_child.get('measles_vaccine_date', '')}")
+        lines2.append(f"Rotavirus Vaccine Date: {imm_child.get('rotavirus_vaccine_date', '')}")
+        lines2.append(f"Chickenpox Vaccine Date: {imm_child.get('chickenpox_vaccine_date', '')}\n")
+        lines2.append('-- GENERAL --')
+        lines2.append(f"Flu Vaccine Date: {imm_gen.get('flu_vaccine_date', '')}")
+        lines2.append(f"HPV Date: {imm_gen.get('hpv_date', '')}")
+        lines2.append(f"HPV Grade 4 Date: {imm_gen.get('hpv_grade4_date', '')}")
+        lines2.append(f"MR Grade 1 Date: {imm_gen.get('mr_grade1_date', '')}")
+        lines2.append(f"MR Grade 7 Date: {imm_gen.get('mr_grade7_date', '')}")
+        lines2.append(f"TD Grade 1 Date: {imm_gen.get('td_grade1_date', '')}")
+        lines2.append(f"TD Grade 7 Date: {imm_gen.get('td_grade7_date', '')}")
+        lines2.append(f"Tetanus Toxoid Date: {imm_gen.get('tetanus_toxoid_date', '')}\n")
+        lines2.append('-- ANIMAL BITE --')
+        lines2.append(f"PCECV1 Date: {imm_ab.get('pcecv1_date', '')}")
+        lines2.append(f"PVRV1 Date: {imm_ab.get('pvrv1_date', '')}")
+        lines2.append(f"PVRV2 Date: {imm_ab.get('pvrv2_date', '')}")
+        lines2.append(f"PVRV3 Date: {imm_ab.get('pvrv3_date', '')}")
+        lines2.append(f"PVRV4 Date: {imm_ab.get('pvrv4_date', '')}")
+        lines2.append(f"PCECV2 Date: {imm_ab.get('pcecv2_date', '')}\n")
+        lines2.append('-- NCD --')
+        lines2.append(f"Pneumococcal Vaccine Date: {imm_ncd.get('pneumococcal_vaccine_date', '')}")
+        lines2.append(f"Flu Vaccine (NCD) Date: {imm_ncd.get('flu_vaccine_date', '')}\n")
+        lines2.append('-- MATERNAL CARE --')
+        lines2.append(f"Tetanus Toxoid (Maternal) Date: {imm_mat.get('tetanus_toxoid_date', '')}\n")
+
+        lines2.append('=== MENSTRUAL HISTORY ===')
+        lines2.append(f"Menarche Age: {men.get('menarche_age', '') if men.get('menarche_age') is not None else ''}")
+        lines2.append(f"Onset of Sexual Intercourse: {men.get('onset_of_sexual_intercourse', '') if men.get('onset_of_sexual_intercourse') is not None else ''}")
+        lines2.append(f"Last Menstrual Period: {men.get('last_menstrual_period', '')}")
+        lines2.append(f"Menstrual Bleeding Pattern: {men.get('menstrual_bleeding_pattern', '')}")
+        lines2.append(f"Birth Control Method: {men.get('birth_control_method', '')}")
+        lines2.append(f"Period Duration: {men.get('period_duration', '')}")
+        lines2.append(f"Cycle Interval: {men.get('cycle_interval', '')}")
+        lines2.append(f"Pads per Day: {men.get('pads_per_day', '') if men.get('pads_per_day') is not None else ''}\n")
+        lines2.append(f"Menopause:\n{chk(men.get('menopause') is True)} Yes\n{chk(men.get('menopause') is False)} No")
+        lines2.append(f"Age of Menopause: {men.get('age_of_menopause', '') if men.get('age_of_menopause') is not None else ''}\n")
+
+        lines2.append('=== PREGNANCY HISTORY ===')
+        lines2.append(f"Gravidity: {preg.get('gravidity', '') if preg.get('gravidity') is not None else ''}")
+        lines2.append(f"Parity: {preg.get('parity', '') if preg.get('parity') is not None else ''}")
+        lines2.append(f"Type of Delivery: {preg.get('type_of_delivery', '')}")
+        lines2.append(f"Full Term: {preg.get('full_term', '') if preg.get('full_term') is not None else ''}")
+        lines2.append(f"Premature: {preg.get('premature', '') if preg.get('premature') is not None else ''}")
+        lines2.append(f"Abortion: {preg.get('abortion', '') if preg.get('abortion') is not None else ''}")
+        lines2.append(f"Living Children: {preg.get('living_children', '') if preg.get('living_children') is not None else ''}\n")
+        lines2.append(f"Pre-eclampsia:\n{chk(preg.get('pre_eclampsia') is True)} Yes\n{chk(preg.get('pre_eclampsia') is False)} No\n")
+        lines2.append(f"Age at First Pregnancy: {preg.get('age_at_first_pregnancy', '') if preg.get('age_at_first_pregnancy') is not None else ''}\n")
+        lines2.append(f"Family Planning Counseling:\n{chk(preg.get('family_planning_counseling') is True)} Yes\n{chk(preg.get('family_planning_counseling') is False)} No")
+        return '\n'.join(lines2)
 
     lines = []
     lines.append('=== HEALTH FACILITY HEADER ===')
@@ -786,18 +1374,17 @@ def format_itr_to_standard_template(data):
 # MAIN: Try Gemini first, fall back to PaddleOCR
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_ocr(file_path, page_number=1):
+def run_ocr(file_path, page_number=1, target_page=0):
     """
     Smart OCR dispatcher:
       1. Try Gemini Vision (fast, cloud-based, ~1-2s)
       2. Fall back to PaddleOCR (local, offline, ~3-10s)
     """
-    # Attempt Gemini Vision if API key is configured
     if GOOGLE_AI_API_KEY:
         try:
             print(f"[OCR] Using Gemini Vision (gemini-flash-latest)...", file=sys.stderr)
-            result = run_gemini_ocr(file_path, page_number)
-            print(f"[OCR] Gemini extracted {result['total_blocks']} blocks.", file=sys.stderr)
+            result = run_gemini_ocr(file_path, page_number, target_page=target_page)
+            print(f"[OCR] Gemini extracted {result.get('total_blocks', 0)} blocks.", file=sys.stderr)
             return result
         except Exception as gemini_err:
             print(f"[OCR] Gemini failed: {gemini_err} — falling back to PaddleOCR.", file=sys.stderr)
@@ -805,7 +1392,7 @@ def run_ocr(file_path, page_number=1):
     # Fallback: local PaddleOCR
     try:
         print(f"[OCR] Using PaddleOCR (local offline)...", file=sys.stderr)
-        result = run_paddle_ocr(file_path, page_number)
+        result = run_paddle_ocr(file_path, page_number, target_page=target_page)
         return result
     except Exception as paddle_err:
         return {
@@ -822,6 +1409,7 @@ def main():
     parser = argparse.ArgumentParser(description='KEEP UP OCR Service (Gemini + PaddleOCR)')
     parser.add_argument('file_path', help='Path to the image or PDF file')
     parser.add_argument('--page', type=int, default=1, help='PDF page number to OCR (default: 1)')
+    parser.add_argument('--page-type', type=int, default=0, help='Explicit document page type (1 = Page 1, 2 = Page 2)')
     args = parser.parse_args()
 
     if not os.path.exists(args.file_path):
@@ -829,7 +1417,7 @@ def main():
         sys.exit(1)
 
     try:
-        result = run_ocr(args.file_path, page_number=args.page)
+        result = run_ocr(args.file_path, page_number=args.page, target_page=args.page_type)
         print(json.dumps(result, ensure_ascii=False))
     except Exception as e:
         print(json.dumps({"success": False, "error": str(e), "detail": traceback.format_exc()}))

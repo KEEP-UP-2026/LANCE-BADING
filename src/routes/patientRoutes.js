@@ -16,6 +16,7 @@ router.get('/:id', AuthMiddleware.requireApiAuth(ALLOWED_READ_ROLES), PatientCon
 
 // Write operations (add, edit, archive, restore, delete) - Records Staff only
 router.post('/', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.createPatient);
+router.post('/:id/photo', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.uploadPhoto);
 router.put('/:id/archive', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.archivePatient);
 router.put('/:id/restore', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.restorePatient);
 router.put('/:id', AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), PatientController.updatePatient);

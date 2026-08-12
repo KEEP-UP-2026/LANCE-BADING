@@ -160,12 +160,48 @@
     </main>
   </div>
 
+  <!-- View Profile Picture Modal -->
+  <div id="view-photo-modal" class="modal-backdrop" onclick="if(event.target === this) closeViewPhotoModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px); z-index: 1050; justify-content: center; align-items: center; padding: 20px;">
+    <div class="content-card glass-panel" style="position: relative; max-width: 440px; width: 100%; padding: 24px; text-align: center; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+      <button type="button" onclick="closeViewPhotoModal()" style="position: absolute; top: 12px; right: 14px; background: rgba(0,0,0,0.06); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 20px; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center;" title="Close">&times;</button>
+      <h3 style="margin-top: 0; margin-bottom: 4px; font-size: 16px; font-weight: 800; color: var(--text-primary);" id="view-photo-name">Patient Profile Picture</h3>
+      <p style="margin-bottom: 16px; font-size: 12px; color: var(--text-muted);" id="view-photo-sub">Full resolution photo</p>
+      
+      <div style="width: 100%; max-height: 360px; border-radius: 12px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+        <img id="view-photo-img" src="" alt="Profile Picture" style="max-width: 100%; max-height: 360px; object-fit: contain;">
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" class="btn btn-secondary" style="padding: 8px 20px; font-size: 13px;" onclick="closeViewPhotoModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="/js/toast.js"></script>
   <script src="/js/api.js"></script>
   <script>
     let allPatients = [];
     let currentUser = null;
+
+    function openViewPhotoModal(photoUrl, fullName, patientNumber) {
+      const modal = document.getElementById('view-photo-modal');
+      const img = document.getElementById('view-photo-img');
+      const nameElem = document.getElementById('view-photo-name');
+      const subElem = document.getElementById('view-photo-sub');
+
+      if (!photoUrl) return;
+
+      img.src = photoUrl;
+      nameElem.textContent = fullName || 'Patient Profile Picture';
+      subElem.textContent = patientNumber ? `Patient No: ${patientNumber}` : 'Full resolution picture';
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeViewPhotoModal() {
+      document.getElementById('view-photo-modal').style.display = 'none';
+    }
 
     document.addEventListener('DOMContentLoaded', async () => {
       // 1. Load user profile details
@@ -256,15 +292,6 @@
               <a href="/dashboard/patients/profile/${patient.id}" class="action-icon-btn btn-view" title="View Profile">
                 <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
               </a>
-              <a href="/dashboard/records/upload/${patient.id}" class="action-icon-btn btn-scan" title="Scan / Upload File" style="color: var(--color-success); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.15); display: inline-flex; align-items: center; justify-content: center;">
-                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-              </a>
-              <a href="/dashboard/patients/edit/${patient.id}" class="action-icon-btn btn-edit" title="Edit Patient Details">
-                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-              </a>
-              <button onclick="handleArchivePatient('${patient.id}', '${escapeJs(fullName)}')" class="action-icon-btn btn-archive" title="Archive Record">
-                <svg viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.01 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.49-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.82-1h12.06l.82 1H5.12z"/></svg>
-              </button>
               <button onclick="handleDeletePatient('${patient.id}', '${escapeJs(fullName)}')" class="action-icon-btn btn-archive" title="Permanently Delete Patient" style="color: var(--color-danger); border-color: rgba(239, 68, 68, 0.3);">
                 <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
               </button>
@@ -272,10 +299,15 @@
           `;
         }
 
+        const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'PT';
+        const avatarHtml = patient.photo_url 
+          ? `<img src="${patient.photo_url}" onclick="openViewPhotoModal('${patient.photo_url}', '${escapeJs(fullName)}', '${escapeJs(patient.patient_number)}')" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--color-primary); margin-right: 10px; vertical-align: middle; cursor: pointer;" title="Click to view profile picture">`
+          : `<span style="width: 32px; height: 32px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; vertical-align: middle; background: #F5F7FA; color: #25282D; font-weight: 800; border-radius: 50%; border: 1px solid #cbd5e1;">${initials}</span>`;
+
         return `
           <tr id="row-${patient.id}">
             <td style="font-weight: 700; color: var(--color-primary);">${escapeHtml(patient.patient_number)}</td>
-            <td style="font-weight: 600;">${escapeHtml(fullName)}</td>
+            <td style="font-weight: 600;">${avatarHtml}${escapeHtml(fullName)}</td>
             <td>${formatDate(patient.birth_date)}</td>
             <td><span class="badge badge-sex">${escapeHtml(patient.sex)}</span></td>
             <td style="color: var(--text-secondary); max-width: 200px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${escapeHtml(patient.address)}</td>

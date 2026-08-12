@@ -1,7 +1,39 @@
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
 const PatientModel = require('../models/patientModel');
 const DuplicateModel = require('../models/duplicateModel');
 const AuditMiddleware = require('../middleware/auditMiddleware');
 const { FuzzyMatcher } = require('../utils/fuzzyMatcher');
+
+// Configure Avatar upload storage
+const avatarUploadDir = path.join(process.cwd(), 'uploads', 'avatars');
+if (!fs.existsSync(avatarUploadDir)) {
+  fs.mkdirSync(avatarUploadDir, { recursive: true });
+}
+
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, avatarUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `avatar_${req.params.id || Date.now()}_${Date.now()}${ext}`);
+  }
+});
+
+const avatarUpload = multer({
+  storage: avatarStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (allowed.includes(file.mimetype.toLowerCase())) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (JPG, PNG, WEBP) are allowed for profile photos.'), false);
+    }
+  }
+}).single('photo');
 
 // Helper to run duplicate checking on a patient object
 async function runDuplicateCheck(patient) {
@@ -115,7 +147,8 @@ const PatientController = {
         is_4ps_beneficiary,
         emergency_contact_name,
         emergency_relationship,
-        emergency_contact_number
+        emergency_contact_number,
+        photo_url
       } = req.body;
 
       // 1. Validate required fields (First Name, Last Name, Date of Birth, Sex, Contact Number)
@@ -194,6 +227,7 @@ const PatientController = {
         emergency_contact_name: emergency_contact_name ? emergency_contact_name.trim() : null,
         emergency_relationship: emergency_relationship ? emergency_relationship.trim() : null,
         emergency_contact_number: emergency_contact_number ? emergency_contact_number.trim() : null,
+        photo_url: photo_url ? photo_url.trim() : null,
         created_by: req.user.id
       });
 
@@ -244,7 +278,8 @@ const PatientController = {
         is_4ps_beneficiary,
         emergency_contact_name,
         emergency_relationship,
-        emergency_contact_number
+        emergency_contact_number,
+        photo_url
       } = req.body;
 
       // 1. Verify existence
@@ -456,6 +491,47 @@ const PatientController = {
         message: 'An internal server error occurred while fetching archived patients.'
       });
     }
+  },
+
+  // Upload patient profile photo
+  uploadPhoto(req, res) {
+    avatarUpload(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ success: false, message: err.message });
+      }
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: 'Please select an image file to upload.' });
+      }
+
+      try {
+        const { id } = req.params;
+        const patient = await PatientModel.findById(id);
+        if (!patient) {
+          return res.status(404).json({ success: false, message: 'Patient profile not found.' });
+        }
+
+        const photoUrl = `/uploads/avatars/${req.file.filename}`;
+        const updated = await PatientModel.update(id, { photo_url: photoUrl });
+
+        await AuditMiddleware.logActivity(
+          req.user.id,
+          req.user.email,
+          'PATIENT_UPDATED',
+          `Updated profile picture for patient: ${patient.first_name} ${patient.last_name} (${patient.patient_number})`,
+          req
+        );
+
+        return res.status(200).json({
+          success: true,
+          message: 'Profile photo updated successfully.',
+          photo_url: photoUrl,
+          patient: updated
+        });
+      } catch (error) {
+        console.error('Upload photo error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to upload patient profile photo.' });
+      }
+    });
   }
 };
 

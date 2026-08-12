@@ -14,9 +14,12 @@ const OCR_SCRIPT = path.join(process.cwd(), 'ocr_service.py');
  * Run PaddleOCR on a single image/PDF file via Python subprocess.
  * Returns structured OCR result: { text, layout_blocks, page_size, success }
  */
-function runPaddleOCR(filePath, pageNumber = 1) {
+function runPaddleOCR(filePath, pageNumber = 1, pageType = 0) {
   return new Promise((resolve, reject) => {
     const args = [OCR_SCRIPT, filePath, '--page', String(pageNumber)];
+    if (pageType > 0) {
+      args.push('--page-type', String(pageType));
+    }
     // NOTE: Do NOT use spawn's built-in timeout option — it kills the process with
     // SIGTERM which causes close to emit with code=null even when JSON was already
     // written to stdout. The controller's Promise.race() handles overall timeouts.
@@ -79,7 +82,7 @@ const PDFProcessor = {
    * Extract text (and layout blocks) from a PDF or image file.
    * Returns: { text: string, layout_blocks: Array, page_size: [w,h] }
    */
-  async extractTextFromPdf(filePath) {
+  async extractTextFromPdf(filePath, pageType = 0) {
     if (!fs.existsSync(filePath)) {
       throw new Error('File not found on disk.');
     }
@@ -89,8 +92,8 @@ const PDFProcessor = {
 
     // For image files, run PaddleOCR directly
     if (isImage) {
-      console.log(`[OCR] Running PaddleOCR on image: ${path.basename(filePath)}`);
-      return await runPaddleOCR(filePath, 1);
+      console.log(`[OCR] Running PaddleOCR on image: ${path.basename(filePath)} (pageType: ${pageType})`);
+      return await runPaddleOCR(filePath, 1, pageType);
     }
 
     // For PDFs: first try digital-native text extraction
@@ -146,7 +149,7 @@ const PDFProcessor = {
       for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
         try {
           console.log(`[OCR] PaddleOCR processing PDF page ${pageNum}...`);
-          const pageResult = await runPaddleOCR(filePath, pageNum);
+          const pageResult = await runPaddleOCR(filePath, pageNum, pageType);
 
           if (!pageResult.text && pageNum > 1) break; // No more pages
 

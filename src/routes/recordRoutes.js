@@ -11,6 +11,7 @@ router.use(AuthMiddleware.authenticate);
 
 router.post('/enhance-preview', RateLimitMiddleware.upload, AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), RecordController.uploadMiddleware, RecordController.enhancePreview);
 router.get('/temp-image/:token', AuthMiddleware.requireApiAuth(ALLOWED_READ_ROLES), RecordController.getTempImage);
+router.post('/classify-preview', RateLimitMiddleware.upload, AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), RecordController.classifyPreview);
 router.post('/ocr-preview', RateLimitMiddleware.upload, AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), RecordController.ocrPreview);
 router.post('/upload', RateLimitMiddleware.upload, AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), RecordController.uploadMiddleware, RecordController.upload);
 router.post('/confirm-upload', RateLimitMiddleware.upload, AuthMiddleware.requireApiAuth(ALLOWED_WRITE_ROLES), RecordController.confirmUpload);
