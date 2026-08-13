@@ -641,6 +641,7 @@
     let allPatientRecords = [];
     let selectedCategoryType = '';
     let currentPatientPhotoUrl = null;
+    let currentPatientSex = null;
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -717,21 +718,38 @@
       // 4. Inject Navigation Links
       injectSidebarLinks(currentUser.role);
 
-      // 5. If RECORDS_STAFF, show action buttons
-      if (currentUser.role === 'RECORDS_STAFF') {
+      // 5. If RECORDS_STAFF, configure action buttons
+      if (currentUser && currentUser.role === 'RECORDS_STAFF') {
         const scanBtn = document.getElementById('scan-document-action-btn');
-        scanBtn.href = `/dashboard/records/upload/${patientId}`;
-        scanBtn.style.display = 'inline-flex';
+        if (scanBtn) {
+          scanBtn.href = `/dashboard/records/upload/${patientId}`;
+          scanBtn.style.setProperty('display', 'inline-flex', 'important');
+        }
 
         const editBtn = document.getElementById('edit-patient-action-btn');
-        editBtn.href = `/dashboard/patients/edit/${patientId}`;
-        editBtn.style.display = 'block';
+        if (editBtn) {
+          editBtn.href = `/dashboard/patients/edit/${patientId}`;
+          editBtn.style.setProperty('display', 'block', 'important');
+        }
 
         const archiveBtn = document.getElementById('archive-patient-action-btn');
         if (archiveBtn) archiveBtn.addEventListener('click', archivePatientProfile);
 
         const restoreBtn = document.getElementById('restore-patient-action-btn');
         if (restoreBtn) restoreBtn.addEventListener('click', restorePatientProfile);
+      } else {
+        const scanBtn = document.getElementById('scan-document-action-btn');
+        if (scanBtn) scanBtn.style.setProperty('display', 'none', 'important');
+
+        const editBtn = document.getElementById('edit-patient-action-btn');
+        if (editBtn) editBtn.style.setProperty('display', 'none', 'important');
+
+        const archiveBtn = document.getElementById('archive-patient-action-btn');
+        if (archiveBtn) archiveBtn.style.setProperty('display', 'none', 'important');
+
+        const restoreBtn = document.getElementById('restore-patient-action-btn');
+        if (restoreBtn) restoreBtn.style.setProperty('display', 'none', 'important');
+      }
 
         // Avatar container & overlay click handlers
         const avatarContainer = document.getElementById('avatar-container');
@@ -775,7 +793,6 @@
             }
           });
         }
-      }
 
       // 6. Fetch and render patient profile data
       await loadPatientProfile();
@@ -835,6 +852,13 @@
             .toUpperCase();
           document.getElementById('patient-initials').textContent = initials || 'PT';
 
+          currentPatientSex = p.sex ? String(p.sex).toUpperCase().trim() : '';
+          const isMale = currentPatientSex && ((currentPatientSex.includes('MALE') && !currentPatientSex.includes('FEMALE')) || currentPatientSex === 'M');
+          const maternalCard = document.getElementById('card-MATERNAL_CARE_RECORD');
+          if (maternalCard) {
+            maternalCard.style.setProperty('display', isMale ? 'none' : 'flex', 'important');
+          }
+
           currentPatientPhotoUrl = p.photo_url || null;
           const photoImg = document.getElementById('patient-photo-img');
           const initialsSpan = document.getElementById('patient-initials');
@@ -860,16 +884,28 @@
           if (currentUser && currentUser.role === 'RECORDS_STAFF') {
             const isArchived = p.status === 'ARCHIVED';
             const scanBtn = document.getElementById('scan-document-action-btn');
-            if (scanBtn) scanBtn.style.display = isArchived ? 'none' : 'inline-flex';
+            if (scanBtn) scanBtn.style.setProperty('display', isArchived ? 'none' : 'inline-flex', 'important');
 
             const editBtn = document.getElementById('edit-patient-action-btn');
-            if (editBtn) editBtn.style.display = isArchived ? 'none' : 'block';
+            if (editBtn) editBtn.style.setProperty('display', isArchived ? 'none' : 'block', 'important');
 
             const archiveBtn = document.getElementById('archive-patient-action-btn');
-            if (archiveBtn) archiveBtn.style.display = isArchived ? 'none' : 'block';
+            if (archiveBtn) archiveBtn.style.setProperty('display', isArchived ? 'none' : 'block', 'important');
 
             const restoreBtn = document.getElementById('restore-patient-action-btn');
-            if (restoreBtn) restoreBtn.style.display = isArchived ? 'block' : 'none';
+            if (restoreBtn) restoreBtn.style.setProperty('display', isArchived ? 'block' : 'none', 'important');
+          } else {
+            const scanBtn = document.getElementById('scan-document-action-btn');
+            if (scanBtn) scanBtn.style.setProperty('display', 'none', 'important');
+
+            const editBtn = document.getElementById('edit-patient-action-btn');
+            if (editBtn) editBtn.style.setProperty('display', 'none', 'important');
+
+            const archiveBtn = document.getElementById('archive-patient-action-btn');
+            if (archiveBtn) archiveBtn.style.setProperty('display', 'none', 'important');
+
+            const restoreBtn = document.getElementById('restore-patient-action-btn');
+            if (restoreBtn) restoreBtn.style.setProperty('display', 'none', 'important');
           }
         }
       } catch (error) {
@@ -910,13 +946,20 @@
           allPatientRecords = rawRecords.filter(r => r.status === 'ACTIVE');
 
           // Reset count labels on binders
-          const categories = [
+          let categories = [
             'PATIENT_INFORMATION_SHEET',
             'CONSULTATION_RECORD',
             'IMMUNIZATION_RECORD',
             'MATERNAL_CARE_RECORD',
             'OTHER'
           ];
+
+          const isMale = currentPatientSex && ((currentPatientSex.includes('MALE') && !currentPatientSex.includes('FEMALE')) || currentPatientSex === 'M');
+          if (isMale) {
+            categories = categories.filter(cat => cat !== 'MATERNAL_CARE_RECORD');
+            const maternalCard = document.getElementById('card-MATERNAL_CARE_RECORD');
+            if (maternalCard) maternalCard.style.setProperty('display', 'none', 'important');
+          }
           
           categories.forEach(cat => {
             const count = allPatientRecords.filter(r => isCategoryMatch(r.record_type, cat)).length;
@@ -937,6 +980,11 @@
 
     // Select category binder and render documents
     async function selectCategory(type) {
+      const isMale = currentPatientSex && ((currentPatientSex.includes('MALE') && !currentPatientSex.includes('FEMALE')) || currentPatientSex === 'M');
+      if (isMale && type === 'MATERNAL_CARE_RECORD') {
+        type = 'PATIENT_INFORMATION_SHEET';
+      }
+
       selectedCategoryType = type;
       
       // Update card visual active styling
@@ -957,11 +1005,13 @@
       
       // Manage "+ Add Document" button visibility and link
       const addBtn = document.getElementById('add-document-btn');
-      if (currentUser && currentUser.role === 'RECORDS_STAFF') {
-        addBtn.href = `/dashboard/records/upload/${patientId}`;
-        addBtn.style.display = 'inline-flex';
-      } else {
-        addBtn.style.display = 'none';
+      if (addBtn) {
+        if (currentUser && currentUser.role === 'RECORDS_STAFF') {
+          addBtn.href = `/dashboard/records/upload/${patientId}`;
+          addBtn.style.setProperty('display', 'inline-flex', 'important');
+        } else {
+          addBtn.style.setProperty('display', 'none', 'important');
+        }
       }
       
       renderBinderRecords();

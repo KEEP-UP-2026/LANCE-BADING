@@ -349,7 +349,7 @@
       if (!currentUser) return;
 
       // Restrict access on frontend
-      const allowedRoles = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL'];
+      const allowedRoles = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
       if (!allowedRoles.includes(currentUser.role)) {
         window.location.href = '/dashboard/administrative?error=unauthorized';
         return;

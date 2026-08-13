@@ -1511,7 +1511,7 @@
         }
 
         // Hide edit/archive/delete controls if not RECORDS_STAFF
-        if (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'RHU_ADMINISTRATOR') {
+        if (currentUser.role !== 'RECORDS_STAFF') {
           document.getElementById('save-changes-btn').style.display = 'none';
           document.getElementById('archive-record-btn').style.display = 'none';
           document.getElementById('delete-record-btn').style.display = 'none';

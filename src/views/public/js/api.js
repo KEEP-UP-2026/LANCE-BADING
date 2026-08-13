@@ -222,12 +222,7 @@ function injectSidebarLinks(role) {
   if (role === 'RHU_ADMINISTRATOR') {
     links = [
       { href: '/dashboard/admin', label: 'Admin Overview', icon: '<path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>' },
-      { href: '/dashboard/admin/users', label: 'User Accounts', icon: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>' },
-      { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' },
-      { href: '/dashboard/duplicates', label: 'Duplicate Warnings', icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>' },
-      { href: '/dashboard/archives', label: 'Archives Directory', icon: '<path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5l-4 4-4-4 1.41-1.41L11 13.67V10h2v3.67l1.59-1.58L16 13.5z"/>' },
-      { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' }
+      { href: '/dashboard/admin/users', label: 'User Accounts', icon: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>' }
     ];
   } else if (role === 'RECORDS_STAFF') {
     links = [
@@ -244,6 +239,12 @@ function injectSidebarLinks(role) {
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
       { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' }
     ];
+  } else if (role === 'ADMINISTRATIVE_STAFF') {
+    links = [
+      { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' }
+    ];
   } else {
     links = [
       { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
@@ -252,11 +253,13 @@ function injectSidebarLinks(role) {
     ];
   }
 
+  const exactMatch = links.find(item => item.href === currentPath);
+
   navContainer.innerHTML = links.map(item => {
     let isActive = false;
-    if (currentPath === item.href) {
-      isActive = true;
-    } else if (item.href !== '/dashboard' && currentPath.startsWith(item.href) && (currentPath.length === item.href.length || currentPath[item.href.length] === '/')) {
+    if (exactMatch) {
+      isActive = (item === exactMatch);
+    } else if (item.href !== '/dashboard' && item.href !== '/dashboard/admin' && currentPath.startsWith(item.href + '/')) {
       isActive = true;
     }
 

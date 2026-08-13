@@ -18,31 +18,32 @@ function escapeHtml(str) {
 function generateSnippet(text, query) {
   if (!text || !query) return '';
   
-  const cleanQuery = query.trim();
-  if (!cleanQuery) return text.substring(0, 100) + (text.length > 100 ? '...' : '');
+  // Clean structural header titles and sanitize formatting
+  const cleanText = text
+    .replace(/===\s*[^=]+\s*===/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-  const index = text.toLowerCase().indexOf(cleanQuery.toLowerCase());
+  const cleanQuery = query.trim();
+  if (!cleanQuery) return cleanText.substring(0, 100) + (cleanText.length > 100 ? '...' : '');
+
+  const index = cleanText.toLowerCase().indexOf(cleanQuery.toLowerCase());
   if (index === -1) {
-    return text.substring(0, 100) + (text.length > 100 ? '...' : '');
+    return cleanText.substring(0, 100) + (cleanText.length > 100 ? '...' : '');
   }
 
-  const start = Math.max(0, index - 50);
-  const end = Math.min(text.length, index + cleanQuery.length + 50);
+  const start = Math.max(0, index - 35);
+  const end = Math.min(cleanText.length, index + cleanQuery.length + 50);
   
-  let snippet = text.substring(start, end);
+  let snippet = cleanText.substring(start, end);
   if (start > 0) snippet = '...' + snippet;
-  if (end < text.length) snippet = snippet + '...';
+  if (end < cleanText.length) snippet = snippet + '...';
 
   return snippet;
 }
 
 function highlightTerm(escapedText, query) {
-  if (!escapedText || !query) return escapedText;
-  const escapedQuery = escapeHtml(query.trim());
-  if (!escapedQuery) return escapedText;
-  
-  const regex = new RegExp(`(${escapeRegExp(escapedQuery)})`, 'gi');
-  return escapedText.replace(regex, '<mark class="bg-yellow-100 font-semibold">$1</mark>');
+  return escapedText;
 }
 
 const SearchController = {
@@ -86,7 +87,7 @@ const SearchController = {
       const queryStr = q.trim().toLowerCase();
 
       // Authorization checks
-      const canReadRecords = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL'].includes(req.user.role);
+      const canReadRecords = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'].includes(req.user.role);
       const canReadArchived = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF'].includes(req.user.role);
 
       // Date range parsing
@@ -140,14 +141,13 @@ const SearchController = {
             const patient = allPatients.find(p => p.id === rec.patient_id);
             if (!patient) continue; // Skip orphan records or inaccessible patients
 
-            const escapedSnippet = escapeHtml(generateSnippet(rec.extracted_text || '', queryStr));
-            const highlightedSnippet = highlightTerm(escapedSnippet, queryStr);
+            const snippetText = generateSnippet(rec.extracted_text || '', queryStr);
 
             matchedRecordsList.push({
               ...rec,
               patient_name: `${patient.first_name} ${patient.last_name}`,
               patient_number: patient.patient_number,
-              snippet: highlightedSnippet
+              snippet: snippetText
             });
           }
         }

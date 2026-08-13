@@ -591,16 +591,21 @@
       try {
         const res = await API.fetchJson('/api/reports/stats?report_type=overview');
         if (res && res.success) {
-          const s = res.stats;
-          document.getElementById('overview-active-patients').textContent = s.patients.active;
-          document.getElementById('overview-archived-patients').textContent = s.patients.archived;
-          document.getElementById('overview-total-records').textContent = s.binders.total_active;
-          document.getElementById('overview-duplicate-flags').textContent = s.duplicates.total;
+          const s = res.stats || {};
+          const setTxt = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = (val !== undefined && val !== null) ? val : 0;
+          };
 
-          document.getElementById('overview-consultations').textContent = s.binders.consultation;
-          document.getElementById('overview-immunizations').textContent = s.binders.immunization;
-          document.getElementById('overview-anti-rabies').textContent = s.binders.anti_rabies;
-          document.getElementById('overview-maternal-care').textContent = s.binders.maternal_care;
+          setTxt('overview-active-patients', s.patients?.active);
+          setTxt('overview-archived-patients', s.patients?.archived);
+          setTxt('overview-total-records', s.binders?.total_active);
+          setTxt('overview-duplicate-flags', s.duplicates?.total);
+
+          setTxt('overview-itr', s.binders?.patient_information_sheet || s.binders?.itr || 0);
+          setTxt('overview-consultations', s.binders?.consultation || s.binders?.consultation_record || 0);
+          setTxt('overview-immunizations', s.binders?.immunization || s.binders?.immunization_record || 0);
+          setTxt('overview-maternal-care', s.binders?.maternal_care || s.binders?.maternal_care_record || 0);
         }
       } catch (err) {
         console.error('Failed to load overview statistics', err);
