@@ -128,5 +128,28 @@ router.get('/archives',
   }
 );
 
+// Fast Document Lists by Category
+router.get('/documents',
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/documents-list.html'));
+  }
+);
+
+router.get('/documents/:category',
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/documents-list.html'));
+  }
+);
+
+router.get('/records/category/:category',
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/documents-list.html'));
+  }
+);
+
 module.exports = router;
+
 

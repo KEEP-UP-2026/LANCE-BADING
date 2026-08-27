@@ -95,6 +95,28 @@
       font-size: 14px;
       font-weight: 800;
     }
+    .form-subnav-btn {
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 20px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .form-subnav-btn:hover {
+      background: #fff5f5;
+      color: #C62828;
+      border-color: #fca5a5;
+    }
+    .form-subnav-btn.active {
+      background: #C62828;
+      color: #ffffff;
+      border-color: #C62828;
+      box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -190,6 +212,7 @@
                 <option value="PATIENT_INFORMATION_SHEET">Individual Treatment Record</option>
                 <option value="CONSULTATION_RECORD">Consultation Records</option>
                 <option value="IMMUNIZATION_RECORD">Immunizations</option>
+                <option value="MEDICAL_CERTIFICATE">Medical Certificate</option>
                 <option value="MATERNAL_CARE_RECORD">Maternal Care</option>
                 <option value="OTHER">Other Health Records</option>
               </select>
@@ -215,6 +238,25 @@
           <!-- TAB CONTENT 1: STRUCTURED INFORMATION FORM (OFFICIAL ITR PAPER LAYOUT) -->
           <div id="vtab-content-form" class="vtab-content" style="display: block;">
             
+            <!-- Page Sub-navigation -->
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
+              <button type="button" class="form-subnav-btn active" id="subtab-itr-p1" onclick="switchItrPaperPage(1)">
+                Page 1: Demographics, Lifestyle &amp; Consultations
+              </button>
+              <button type="button" class="form-subnav-btn" id="subtab-itr-p2" onclick="switchItrPaperPage(2)">
+                Page 2: Medical History, Vitals &amp; Immunizations
+              </button>
+              <button type="button" class="form-subnav-btn" id="subtab-consult-sheet" onclick="switchItrPaperPage('consult')">
+                Clinical Consultation Sheet
+              </button>
+              <button type="button" class="form-subnav-btn" id="subtab-immunize-sheet" onclick="switchItrPaperPage('immunize')">
+                Immunization &amp; Vaccine Sheet
+              </button>
+              <button type="button" class="form-subnav-btn" id="subtab-medcert-sheet" onclick="switchItrPaperPage('medcert')">
+                Medical Certificate Sheet
+              </button>
+            </div>
+
             <!-- PAGE 1 OF ITR -->
             <div id="itr-paper-page1" class="itr-paper" style="display: block;">
               <!-- HEADER -->
@@ -835,6 +877,454 @@
               </div>
 
             </div>
+
+            <!-- CLINICAL CONSULTATION SHEET -->
+            <div id="consultation-paper-sheet" class="itr-paper" style="display: none;">
+              <!-- HEADER -->
+              <div class="header">
+                <div class="sub-header">Republic of the Philippines</div>
+                <div class="sub-header">Province of Laguna</div>
+                <div class="sub-header">Municipality of Paete</div>
+                <h2>PAETE RURAL HEALTH UNIT</h2>
+                <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                <h1>Clinical Consultation Record</h1>
+                <h3>Physician &amp; Clinical Findings Assessment</h3>
+              </div>
+
+              <!-- DEMOGRAPHICS SUMMARY -->
+              <div class="section-header" style="margin-top: 10px;">=== IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===</div>
+              <table style="margin-bottom: 16px;">
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>NAME:</strong> <input type="text" id="view-cs-patient-name" style="width: 80%;">
+                  </td>
+                  <td style="width: 50%;">
+                    <strong>PATIENT ID:</strong> <input type="text" id="view-cs-patient-id" style="width: 60%;">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>AGE / SEX:</strong> <input type="text" id="view-cs-age" style="width: 45px;"> / <input type="text" id="view-cs-sex" style="width: 70px;">
+                  </td>
+                  <td>
+                    <strong>BIRTHDAY:</strong> <input type="text" id="view-cs-birthday" style="width: 120px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>ADDRESS:</strong> <input type="text" id="view-cs-address" style="width: 75%;">
+                  </td>
+                  <td>
+                    <strong>CP NO:</strong> <input type="text" id="view-cs-cpno" style="width: 70%;">
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 1: CONSULTATION DETAILS -->
+              <div class="section-header">=== DETALYE NG KONSULTA (CONSULTATION DETAILS) ===</div>
+              <table style="margin-bottom: 16px;">
+                <tr>
+                  <td style="width: 35%;">
+                    <strong>Petsa (Visit Date):</strong>
+                    <input type="date" id="view-cs-visit-date" style="width: 130px;">
+                  </td>
+                  <td style="width: 25%;">
+                    <strong>Oras (Time):</strong>
+                    <input type="time" id="view-cs-visit-time" style="width: 100px;">
+                  </td>
+                  <td style="width: 40%;">
+                    <strong>Attending Doctor / Provider:</strong>
+                    <input type="text" id="view-cs-attending-doctor" style="width: 60%;">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <strong>Dahilan ng Konsulta (Chief Complaint):</strong><br>
+                    <textarea id="view-cs-chief-complaint" style="width: 100%; min-height: 50px; margin-top: 4px; padding: 6px; font-size: 12.5px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 2: MEDICAL HISTORY -->
+              <div class="section-header">=== KASAYSAYAN NG MEDISINA (MEDICAL HISTORY) ===</div>
+              <table style="margin-bottom: 16px;">
+                <tr>
+                  <td colspan="2">
+                    <strong>Kasaysayan ng Kasalukuyang Sakit (History of Present Illness - HPI):</strong><br>
+                    <textarea id="view-cs-hpi" style="width: 100%; min-height: 48px; margin-top: 4px; padding: 6px; font-size: 12.5px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>Dating Sakit / Operasyon / Na-admit:</strong><br>
+                    <textarea id="view-cs-past-history" style="width: 100%; min-height: 44px; margin-top: 4px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                  <td style="width: 50%;">
+                    <strong>Listahan ng mga Iniinom na Gamot (Current Medications):</strong><br>
+                    <textarea id="view-cs-current-meds" style="width: 100%; min-height: 44px; margin-top: 4px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Allergies sa Pagkain o Gamot:</strong>
+                    <input type="text" id="view-cs-allergies" style="width: 95%; margin-top: 2px;">
+                  </td>
+                  <td>
+                    <strong>Sakit sa Pamilya (Family History):</strong>
+                    <input type="text" id="view-cs-family-history" style="width: 95%; margin-top: 2px;">
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 3: PHYSICAL FINDINGS & ASSESSMENT -->
+              <div class="section-header">=== RESULTA NG PAGSUSURI (PHYSICAL FINDINGS &amp; ASSESSMENT) ===</div>
+              <div class="vitals-grid" style="margin-bottom: 12px;">
+                <div>
+                  <strong>BP:</strong> <input type="text" id="view-cs-vs-bp" style="width: 75px;"> mmHg &nbsp;
+                  <strong>HR:</strong> <input type="number" id="view-cs-vs-hr" style="width: 45px;"> bpm &nbsp;
+                  <strong>RR:</strong> <input type="number" id="view-cs-vs-rr" style="width: 45px;"> cpm
+                </div>
+                <div>
+                  <strong>TEMP:</strong> <input type="text" id="view-cs-vs-temp" style="width: 50px;"> °C &nbsp;
+                  <strong>SpO2:</strong> <input type="number" id="view-cs-vs-spo2" style="width: 45px;"> %
+                </div>
+                <div>
+                  <strong>WT:</strong> <input type="text" id="view-cs-vs-wt" style="width: 45px;"> kg &nbsp;
+                  <strong>HT:</strong> <input type="text" id="view-cs-vs-ht" style="width: 45px;"> cm
+                </div>
+              </div>
+
+              <table style="margin-bottom: 16px;">
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>Resulta ng Pisikal na Eksaminasyon (Physical Examination):</strong><br>
+                    <textarea id="view-cs-pe-findings" style="width: 100%; min-height: 48px; margin-top: 4px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                  <td style="width: 50%;">
+                    <strong>Resulta ng mga Laboratoryo / Test (Lab &amp; Diagnostics):</strong><br>
+                    <textarea id="view-cs-lab-results" style="width: 100%; min-height: 48px; margin-top: 4px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 4: PLANO AT REKOMENDASYON -->
+              <div class="section-header">=== PLANO AT REKOMENDASYON (DIAGNOSIS &amp; MANAGEMENT PLAN) ===</div>
+              <table style="margin-bottom: 6px;">
+                <tr>
+                  <td colspan="2">
+                    <strong style="color: #0f172a;">Tiyak na Diagnosis / Assessment (Final / Working Diagnosis):</strong><br>
+                    <textarea id="view-cs-diagnosis" style="width: 100%; min-height: 48px; margin-top: 4px; font-weight: 700; padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>Reseta / Ipinainom na Gamot (Prescriptions &amp; Medications Given):</strong><br>
+                    <textarea id="view-cs-rx-meds" style="width: 100%; min-height: 56px; margin-top: 4px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                  <td style="width: 50%;">
+                    <strong>Payo at Plano sa Pagpapagaling (Treatment Plan &amp; Advice):</strong><br>
+                    <textarea id="view-cs-treatment-plan" style="width: 100%; min-height: 56px; margin-top: 4px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px;"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 40%;">
+                    <strong>Sunod na Balik (Follow-up Check-up Date):</strong><br>
+                    <input type="date" id="view-cs-followup-date" style="padding: 4px 6px; font-size: 12px; margin-top: 4px;">
+                  </td>
+                  <td style="width: 60%;">
+                    <strong>Follow-up Instructions / Notes:</strong><br>
+                    <input type="text" id="view-cs-followup-notes" style="width: 95%; margin-top: 4px;">
+                  </td>
+                </tr>
+              </table>
+
+            </div>
+
+            <!-- IMMUNIZATION & VACCINE RECORD SHEET -->
+            <div id="immunization-paper-sheet" class="itr-paper" style="display: none;">
+              <!-- HEADER -->
+              <div class="header">
+                <div class="sub-header">Republic of the Philippines</div>
+                <div class="sub-header">Province of Laguna</div>
+                <div class="sub-header">Municipality of Paete</div>
+                <h2>PAETE RURAL HEALTH UNIT</h2>
+                <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                <h3 style="margin-top: 10px; color: #065f46; font-weight: 800; font-size: 17px; text-transform: uppercase;">
+                  Immunization &amp; Vaccine Administration Record
+                </h3>
+              </div>
+
+              <!-- PATIENT INFORMATION -->
+              <div class="section-header" style="background: #065f46; color: #ffffff;">=== IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 60%;">
+                    <strong>NAME (Pangalan):</strong><br>
+                    <input type="text" id="view-imm-patient-name" style="width: 95%; font-weight: bold; margin-top: 4px;">
+                  </td>
+                  <td style="width: 40%;">
+                    <strong>PATIENT ID:</strong><br>
+                    <input type="text" id="view-imm-patient-id" style="width: 95%; margin-top: 4px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>AGE / SEX (Edad / Kasarian):</strong><br>
+                    <input type="number" id="view-imm-age" style="width: 70px; margin-top: 4px;" placeholder="Age"> yrs /
+                    <input type="text" id="view-imm-sex" style="width: 100px; margin-top: 4px;" placeholder="Sex">
+                  </td>
+                  <td>
+                    <strong>BIRTHDAY (Kaarawan):</strong><br>
+                    <input type="date" id="view-imm-birthday" style="width: 95%; margin-top: 4px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>ADDRESS (Tirahan):</strong><br>
+                    <input type="text" id="view-imm-address" style="width: 95%; margin-top: 4px;">
+                  </td>
+                  <td>
+                    <strong>CP NO. (Contact Details):</strong><br>
+                    <input type="text" id="view-imm-cpno" style="width: 95%; margin-top: 4px;">
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 1: DETALYE NG BAKUNA -->
+              <div class="section-header" style="background: #065f46; color: #ffffff;">=== 1. DETALYE NG BAKUNA (VACCINE INFORMATION) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>Pangalan ng Bakuna (Vaccine Name):</strong><br>
+                    <input type="text" id="view-imm-vaccine-name" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="e.g. BCG, MMR, Hepatitis B, Influenza, COVID-19">
+                  </td>
+                  <td style="width: 50%;">
+                    <strong>Uri / Brand at Manufacturer:</strong><br>
+                    <input type="text" id="view-imm-vaccine-brand" style="width: 95%; margin-top: 4px;" placeholder="e.g. Vaxigrip Tetra (Sanofi)">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong style="color: #b91c1c;">* Batch / Lot Number ng Vial:</strong><br>
+                    <input type="text" id="view-imm-lot-number" style="width: 95%; font-weight: 700; margin-top: 4px; border: 1.5px solid #cbd5e1;" placeholder="e.g. LOT-AB12345 (Para sa safety tracing)">
+                  </td>
+                  <td>
+                    <strong>Expiration Date ng Vial:</strong><br>
+                    <input type="date" id="view-imm-exp-date" style="width: 95%; margin-top: 4px;">
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 2: DETALYE NG PAGBIBIGAY -->
+              <div class="section-header" style="background: #065f46; color: #ffffff;">=== 2. DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 35%;">
+                    <strong>Petsa kung Kailan Ibinigay (Date):</strong><br>
+                    <input type="date" id="view-imm-admin-date" style="width: 95%; margin-top: 4px;">
+                  </td>
+                  <td style="width: 30%;">
+                    <strong>Oras (Time):</strong><br>
+                    <input type="time" id="view-imm-admin-time" style="width: 95%; margin-top: 4px;">
+                  </td>
+                  <td style="width: 35%;">
+                    <strong>Numero ng Dosis (Dose #):</strong><br>
+                    <input type="text" id="view-imm-dose-number" style="width: 95%; margin-top: 4px;" placeholder="e.g. Dose 1, Dose 2, Booster 1">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Saan Itinurok (Injection Site):</strong><br>
+                    <input type="text" id="view-imm-admin-site" style="width: 95%; margin-top: 4px;" placeholder="e.g. Left Deltoid, Right Thigh, Oral">
+                  </td>
+                  <td>
+                    <strong>Paraan ng Pagbibigay (Route):</strong><br>
+                    <input type="text" id="view-imm-admin-route" style="width: 95%; margin-top: 4px;" placeholder="e.g. Intramuscular, Subcutaneous, Oral">
+                  </td>
+                  <td>
+                    <strong>Dami / Dosis (Dosage Volume):</strong><br>
+                    <input type="text" id="view-imm-admin-dosage" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0.5 mL, 2 drops">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Susunod na Balik (Next Due Date):</strong><br>
+                    <input type="date" id="view-imm-next-due-date" style="width: 95%; margin-top: 4px;">
+                  </td>
+                  <td colspan="2">
+                    <strong>Adverse Reactions / Remarks:</strong><br>
+                    <input type="text" id="view-imm-remarks" style="width: 98%; margin-top: 4px;" placeholder="e.g. No adverse reaction noted / Paracetamol advised">
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 3: IMPORMASYON NG NAGBAKUNA -->
+              <div class="section-header" style="background: #065f46; color: #ffffff;">=== 3. IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 40%;">
+                    <strong>Pangalan ng Nagbakuna (Vaccinator Name / Role):</strong><br>
+                    <input type="text" id="view-imm-provider-name" style="width: 95%; margin-top: 4px;" placeholder="Doctor / Nurse / BHW Name">
+                  </td>
+                  <td style="width: 25%;">
+                    <strong>PRC License Number:</strong><br>
+                    <input type="text" id="view-imm-provider-license" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0123456">
+                  </td>
+                  <td style="width: 35%;">
+                    <strong>Klinika / Health Center / Ospital:</strong><br>
+                    <input type="text" id="view-imm-facility-name" style="width: 95%; margin-top: 4px;" value="PAETE RURAL HEALTH UNIT (Paete, Laguna)">
+                  </td>
+                </tr>
+              </table>
+
+            </div>
+
+            <!-- MEDICAL CERTIFICATE PAPER SHEET -->
+            <div id="medcert-paper-sheet" class="itr-paper" style="display: none;">
+              <!-- HEADER -->
+              <div class="header" style="border-bottom: 2px solid #312e81; padding-bottom: 12px;">
+                <div class="sub-header">Republic of the Philippines</div>
+                <div class="sub-header">Province of Laguna</div>
+                <div class="sub-header">Municipality of Paete</div>
+                <h2 style="color: #1e1b4b; margin: 4px 0;">PAETE RURAL HEALTH UNIT</h2>
+                <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                <div class="sub-header" style="font-weight: 600;">Contact: (049) 557-0123 / paete_rhu@laguna.gov.ph</div>
+                <div style="margin-top: 14px; padding: 6px 16px; background: #e0e7ff; color: #1e1b4b; font-size: 15px; font-weight: 900; border: 1.5px solid #a5b4fc; border-radius: 6px; display: inline-block; letter-spacing: 0.05em;">
+                  MEDICAL CERTIFICATE (SERTIPIKONG MEDIKAL)
+                </div>
+              </div>
+
+              <!-- SECTION 1: IMPORMASYON NG PASYENTE -->
+              <div class="section-header" style="background: #312e81; color: #ffffff;">=== 1. IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>Pangalan ng Pasyente (Patient Name):</strong><br>
+                    <input type="text" id="view-mc-patient-name" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="Full Name">
+                  </td>
+                  <td style="width: 25%;">
+                    <strong>Patient ID / Number:</strong><br>
+                    <input type="text" id="view-mc-patient-id" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0001-2026-XXXX">
+                  </td>
+                  <td style="width: 25%;">
+                    <strong>Edad / Kasarian (Age / Sex):</strong><br>
+                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                      <input type="number" id="view-mc-age" style="width: 50px;" placeholder="Age">
+                      <select id="view-mc-sex" style="flex: 1;">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <strong>Tirahan ng Pasyente (Address):</strong><br>
+                    <input type="text" id="view-mc-address" style="width: 98%; margin-top: 4px;" placeholder="Address">
+                  </td>
+                  <td>
+                    <strong>Contact Number:</strong><br>
+                    <input type="text" id="view-mc-contact" style="width: 95%; margin-top: 4px;" placeholder="Contact Number">
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 2: KLINIKAL NA DETALYE -->
+              <div class="section-header" style="background: #312e81; color: #ffffff;">=== 2. KLINIKAL NA DETALYE (CLINICAL FINDINGS) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 35%;">
+                    <strong>Petsa ng Pagsusuri (Exam Date):</strong><br>
+                    <input type="date" id="view-mc-exam-date" style="width: 95%; margin-top: 4px;">
+                  </td>
+                  <td style="width: 65%;">
+                    <strong style="color: #b91c1c;">* Diagnosis / Medikal na Kondisyon:</strong><br>
+                    <input type="text" id="view-mc-diagnosis" style="width: 95%; font-weight: 700; margin-top: 4px; border: 1.5px solid #cbd5e1;" placeholder="Diagnosis / Condition">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <strong>Mga Sintomas / Reklamo (Symptoms &amp; Complaints):</strong><br>
+                    <textarea id="view-mc-symptoms" rows="2" style="width: 98%; margin-top: 4px;" placeholder="Symptoms"></textarea>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 3: REKOMENDASYON NG DOKTOR -->
+              <div class="section-header" style="background: #312e81; color: #ffffff;">=== 3. REKOMENDASYON NG DOKTOR (MEDICAL OPINION &amp; RECOMMENDATIONS) ===</div>
+              <table>
+                <tr>
+                  <td colspan="3">
+                    <strong>Katayuan / Rekomendasyon (Fitness Status):</strong><br>
+                    <select id="view-mc-fitness-status" style="width: 98%; font-weight: 700; margin-top: 4px;">
+                      <option value="Fit to Work">Fit to Work (Maaari nang magtrabaho)</option>
+                      <option value="Fit to School / Study">Fit to School / Study (Maaari nang pumasok sa eskwela)</option>
+                      <option value="Needs Rest / Sick Leave">Needs Rest / Sick Leave (Kailangang magpahinga sa bahay)</option>
+                      <option value="Fit to Resume Normal Activities">Fit to Resume Normal Activities (Maaari nang magpatuloy ng mga gawain)</option>
+                      <option value="Fit for Sports / Physical Activities">Fit for Sports / Physical Activities (Medical Clearance sa Palakasan)</option>
+                      <option value="Under Medical Observation">Under Medical Observation (Kasalukuyang inoobserbahan / Gamutan)</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 50%;">
+                    <strong>Bilang ng Araw ng Pahinga (Sick Leave Days):</strong><br>
+                    <input type="number" id="view-mc-sick-leave-days" style="width: 95%; margin-top: 4px;" placeholder="e.g. 3">
+                  </td>
+                  <td style="width: 50%;" colspan="2">
+                    <strong>Petsa ng Pagbalik (Resume Date):</strong><br>
+                    <input type="date" id="view-mc-resume-date" style="width: 95%; margin-top: 4px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <strong>Mga Restriksyon sa Gawain (Activity Restrictions):</strong><br>
+                    <input type="text" id="view-mc-restrictions" style="width: 98%; margin-top: 4px;" placeholder="Restrictions">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <strong>Iba pang Tagubilin / Paalala (Doctor's Advice):</strong><br>
+                    <textarea id="view-mc-remarks" rows="2" style="width: 98%; margin-top: 4px;" placeholder="Remarks / Advice"></textarea>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SECTION 4: PAGPAPATUNAY NG DOKTOR -->
+              <div class="section-header" style="background: #312e81; color: #ffffff;">=== 4. PAGPAPATUNAY AT LEGAL NA DETALYE NG DOKTOR (AUTHENTICATION) ===</div>
+              <table>
+                <tr>
+                  <td style="width: 40%;">
+                    <strong>Buong Pangalan ng Lisensyadong Doktor:</strong><br>
+                    <input type="text" id="view-mc-physician-name" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="Dr. Maria Santos, MD">
+                  </td>
+                  <td style="width: 30%;">
+                    <strong>PRC License Number:</strong><br>
+                    <input type="text" id="view-mc-prc-license" style="width: 95%; margin-top: 4px;" placeholder="PRC-0123456">
+                  </td>
+                  <td style="width: 30%;">
+                    <strong>PTR Number:</strong><br>
+                    <input type="text" id="view-mc-ptr-number" style="width: 95%; margin-top: 4px;" placeholder="PTR-9876543">
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Pangalan ng Klinika / RHU:</strong><br>
+                    <input type="text" id="view-mc-facility-name" style="width: 95%; margin-top: 4px;" value="PAETE RURAL HEALTH UNIT">
+                  </td>
+                  <td>
+                    <strong>Address ng Klinika:</strong><br>
+                    <input type="text" id="view-mc-facility-address" style="width: 95%; margin-top: 4px;" value="2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna">
+                  </td>
+                  <td>
+                    <strong>Contact Number ng Klinika:</strong><br>
+                    <input type="text" id="view-mc-facility-contact" style="width: 95%; margin-top: 4px;" value="(049) 557-0123 / paete_rhu@laguna.gov.ph">
+                  </td>
+                </tr>
+              </table>
+            </div>
+
           </div>
 
           <!-- TAB CONTENT 2: ORIGINAL DOCUMENT SCAN -->
@@ -1503,6 +1993,9 @@
 
         // Populate Form Fields (either from saved structured_json or converted from text)
         let structuredJson = currentRecord.structured_json;
+        if (typeof structuredJson === 'string') {
+          try { structuredJson = JSON.parse(structuredJson); } catch (e) {}
+        }
         if (!structuredJson && currentRecord.extracted_text) {
           structuredJson = convertExtractedTextToAccurateJson(currentRecord.extracted_text);
         }
@@ -1539,24 +2032,36 @@
       }
     }
 
-    // ITR Paper Page 1 / Page 2 Switcher
+    // ITR Paper Page 1 / Page 2 / Consultation / Immunization / MedCert Switcher
     window.switchItrPaperPage = function(page) {
       const p1 = document.getElementById('itr-paper-page1');
       const p2 = document.getElementById('itr-paper-page2');
+      const pc = document.getElementById('consultation-paper-sheet');
+      const pi = document.getElementById('immunization-paper-sheet');
+      const pmc = document.getElementById('medcert-paper-sheet');
       const btn1 = document.getElementById('subtab-itr-p1');
       const btn2 = document.getElementById('subtab-itr-p2');
+      const btnc = document.getElementById('subtab-consult-sheet');
+      const btni = document.getElementById('subtab-immunize-sheet');
+      const btnmc = document.getElementById('subtab-medcert-sheet');
       
-      if (page === 1) {
-        if (p1) p1.style.display = 'block';
-        if (p2) p2.style.display = 'none';
-        if (btn1) btn1.classList.add('active');
-        if (btn2) btn2.classList.remove('active');
-      } else {
-        if (p1) p1.style.display = 'none';
-        if (p2) p2.style.display = 'block';
-        if (btn1) btn1.classList.remove('active');
-        if (btn2) btn2.classList.add('active');
-      }
+      const isP1 = (page === 1 || page === '1');
+      const isP2 = (page === 2 || page === '2');
+      const isConsult = (page === 'consult' || page === 3 || page === '3');
+      const isImmunize = (page === 'immunize' || page === 'vaccine' || page === 4 || page === '4');
+      const isMedCert = (page === 'medcert' || page === 'med_cert' || page === 'certificate' || page === 5 || page === '5');
+
+      if (p1) p1.style.display = isP1 ? 'block' : 'none';
+      if (p2) p2.style.display = isP2 ? 'block' : 'none';
+      if (pc) pc.style.display = isConsult ? 'block' : 'none';
+      if (pi) pi.style.display = isImmunize ? 'block' : 'none';
+      if (pmc) pmc.style.display = isMedCert ? 'block' : 'none';
+
+      if (btn1) btn1.classList.toggle('active', isP1);
+      if (btn2) btn2.classList.toggle('active', isP2);
+      if (btnc) btnc.classList.toggle('active', isConsult);
+      if (btni) btni.classList.toggle('active', isImmunize);
+      if (btnmc) btnmc.classList.toggle('active', isMedCert);
     };
 
     // Tab Switcher
@@ -1641,6 +2146,8 @@
     function populateFormFieldsFromJson(data) {
       if (!data || typeof data !== 'object') return;
 
+      const d = data.patient_demographics || data.demographics || {};
+
       function setField(id, val) {
         const el = document.getElementById(id);
         if (el) el.value = (val !== undefined && val !== null) ? val : '';
@@ -1651,28 +2158,64 @@
         if (el) el.checked = !!boolVal;
       }
 
-      // Auto-display Page 1, Page 2, or both based on record data
-      const p1El = document.getElementById('itr-paper-page1');
-      const p2El = document.getElementById('itr-paper-page2');
-
-      const hasP2Data = !!(data.philhealth_membership || data.past_medical_history || data.immunizations || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2);
+      // Auto-display MedCert, Immunization, Consultation, Page 2 or Page 1 based on record data
+      const isMedCertRecord = (currentRecord && (currentRecord.record_type === 'MEDICAL_CERTIFICATE' || currentRecord.record_type === 'MEDCERT' || currentRecord.record_type === 'MED_CERT' || currentRecord.record_type === 'CERTIFICATE')) ||
+                              data.record_type === 'MEDICAL_CERTIFICATE' ||
+                              !!data.clinical_findings ||
+                              !!data.medical_opinion;
+      const isImmunizeRecord = (currentRecord && (currentRecord.record_type === 'IMMUNIZATION_RECORD' || currentRecord.record_type === 'IMMUNIZATION' || currentRecord.record_type === 'VACCINATION')) ||
+                               data.record_type === 'IMMUNIZATION_RECORD' ||
+                               !!data.vaccine_information;
+      const isConsultRecord = (currentRecord && (currentRecord.record_type === 'CONSULTATION_RECORD' || currentRecord.record_type === 'CONSULTATION')) ||
+                              data.record_type === 'CONSULTATION_RECORD' ||
+                              !!data.consultation_details;
+      const hasP2Data = !!(data.philhealth_membership || data.past_medical_history || data.immunizations || data.immunization_history || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2);
       const hasP1Data = !!(data.header || (data.patient_demographics && data.patient_demographics.name) || data.smoking_cessation_profile || (data.consultation_records && data.consultation_records.length > 0) || data.itr_page_number === 1);
 
-      if (hasP2Data && !hasP1Data) {
-        if (p1El) p1El.style.display = 'none';
-        if (p2El) p2El.style.display = 'block';
-      } else if (hasP1Data && !hasP2Data) {
-        if (p1El) p1El.style.display = 'block';
-        if (p2El) p2El.style.display = 'none';
+      if (isMedCertRecord) {
+        switchItrPaperPage('medcert');
+      } else if (isImmunizeRecord) {
+        switchItrPaperPage('immunize');
+      } else if (isConsultRecord) {
+        switchItrPaperPage('consult');
+      } else if (hasP2Data && !hasP1Data) {
+        switchItrPaperPage(2);
       } else {
-        if (p1El) p1El.style.display = 'block';
-        if (p2El) p2El.style.display = 'block';
+        switchItrPaperPage(1);
       }
 
+      // --- MEDICAL CERTIFICATE POPULATION ---
+      const cf = data.clinical_findings || data.clinical_details || {};
+      const mo = data.medical_opinion || data.recommendations || {};
+      const pd = data.physician_details || data.authentication || {};
+
+      setField('view-mc-patient-name', d.name || (data.patient_name || ''));
+      setField('view-mc-patient-id', d.patient_number || d.patient_id || (currentRecord && currentRecord.patient_id) || '');
+      setField('view-mc-age', d.age !== undefined && d.age !== null ? d.age : '');
+      setField('view-mc-sex', d.gender || d.sex || 'Male');
+      setField('view-mc-address', d.address || '');
+      setField('view-mc-contact', d.contact_number || d.cp_no || '');
+
+      setField('view-mc-exam-date', cf.examination_date || '');
+      setField('view-mc-diagnosis', cf.diagnosis || '');
+      setField('view-mc-symptoms', cf.symptoms || '');
+
+      setField('view-mc-fitness-status', mo.fitness_status || 'Fit to Work');
+      setField('view-mc-sick-leave-days', mo.sick_leave_days || '');
+      setField('view-mc-resume-date', mo.resume_date || '');
+      setField('view-mc-restrictions', mo.restrictions || '');
+      setField('view-mc-remarks', mo.remarks || '');
+
+      setField('view-mc-physician-name', pd.physician_name || '');
+      setField('view-mc-prc-license', pd.prc_license_number || '');
+      setField('view-mc-ptr-number', pd.ptr_number || '');
+      setField('view-mc-facility-name', pd.facility_name || 'PAETE RURAL HEALTH UNIT');
+      setField('view-mc-facility-address', pd.facility_address || '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna');
+      setField('view-mc-facility-contact', pd.facility_contact || '(049) 557-0123 / paete_rhu@laguna.gov.ph');
+
       // --- PAGE 1 POPULATION ---
-      const d = data.patient_demographics || {};
-      setField('itr-field-name', d.name || '');
-      setField('itr-field-philhealth', d.philhealth_no || '');
+      setField('itr-field-name', d.name || (data.patient_name || ''));
+      setField('itr-field-philhealth', d.philhealth_no || (data.philhealth_membership && (data.philhealth_membership.philhealth_id_number || data.philhealth_membership.philhealth_id)) || '');
       setField('itr-field-address', d.address || '');
       setField('itr-field-civilstatus', d.civil_status || '');
       setField('itr-field-birthday', d.birthday || '');
@@ -1682,13 +2225,13 @@
       setField('itr-field-bhw', d.bhw || '');
 
       const sc = data.smoking_cessation_profile || {};
-      const opts = sc.options || {};
+      const opts = sc.options || sc;
       const smkSt = sc.smoker_status || '';
-      setCheck('itr-smk-current', opts.current || smkSt === 'Current');
-      setCheck('itr-smk-passive', opts.passive || smkSt === 'Passive');
-      setCheck('itr-smk-never', opts.never || smkSt === 'Never');
-      setCheck('itr-smk-gt1yr', opts.stopped_gt_1_year || (typeof smkSt === 'string' && smkSt.includes('>')));
-      setCheck('itr-smk-lt1yr', opts.stopped_lt_1_year || (typeof smkSt === 'string' && smkSt.includes('<')));
+      setCheck('itr-smk-current', opts.current === true || smkSt === 'Current');
+      setCheck('itr-smk-passive', opts.passive === true || smkSt === 'Passive');
+      setCheck('itr-smk-never', opts.never === true || smkSt === 'Never');
+      setCheck('itr-smk-gt1yr', opts.stopped_gt_1_year === true || (typeof smkSt === 'string' && smkSt.includes('>')));
+      setCheck('itr-smk-lt1yr', opts.stopped_lt_1_year === true || (typeof smkSt === 'string' && smkSt.includes('<')));
       setField('itr-field-smoking-brand', sc.brand_of_cigarette || '');
       setField('itr-field-smoking-sticks', sc.sticks_per_day !== undefined && sc.sticks_per_day !== null ? sc.sticks_per_day : '');
       setField('itr-field-smoking-agestarted', sc.age_started !== undefined && sc.age_started !== null ? sc.age_started : '');
@@ -1703,16 +2246,16 @@
 
       const dl = data.diet_and_lifestyle || {};
       const pa = dl.physical_activity || {};
-      setCheck('itr-pa-yes', pa.meets_2_5_hours_per_week === true);
-      setCheck('itr-pa-no', pa.meets_2_5_hours_per_week === false);
+      setCheck('itr-pa-yes', pa.meets_2_5_hours_per_week === true || dl.physical_activity_adequate === true);
+      setCheck('itr-pa-no', pa.meets_2_5_hours_per_week === false || dl.physical_activity_adequate === false);
 
       const fh = data.family_history || {};
       setCheck('itr-fh-htn', fh.hypertension === true);
       setCheck('itr-fh-stroke', fh.stroke === true);
       setCheck('itr-fh-heart', fh.heart_attack === true);
-      setCheck('itr-fh-dm', fh.dm === true);
+      setCheck('itr-fh-dm', fh.dm === true || fh.diabetes_mellitus === true);
       setCheck('itr-fh-asthma', fh.asthma === true);
-      setCheck('itr-fh-cancer', fh.cancer === true);
+      setCheck('itr-fh-cancer', fh.cancer === true || (fh.cancer && fh.cancer.has === true));
       setCheck('itr-fh-kidney', fh.kidney_disease === true);
 
       const cb = data.clinical_background || {};
@@ -1727,23 +2270,23 @@
       setCheck('itr-alc-excess-no', alcExc.no === true);
 
       const fat = dl.high_fat_high_salt_food_intake || {};
-      setCheck('itr-fat-yes', fat.weekly_processed_fastfood === true);
-      setCheck('itr-fat-no', fat.weekly_processed_fastfood === false);
+      setCheck('itr-fat-yes', fat.weekly_processed_fastfood === true || dl.high_fat_salt_weekly === true);
+      setCheck('itr-fat-no', fat.weekly_processed_fastfood === false || dl.high_fat_salt_weekly === false);
 
       const fiber = dl.dietary_fiber_intake || {};
-      setCheck('itr-fiber-veg-yes', fiber.vegetables_3_servings_daily === true);
-      setCheck('itr-fiber-veg-no', fiber.vegetables_3_servings_daily === false);
-      setCheck('itr-fiber-fruit-yes', fiber.fruits_2_3_servings_daily === true);
-      setCheck('itr-fiber-fruit-no', fiber.fruits_2_3_servings_daily === false);
+      setCheck('itr-fiber-veg-yes', fiber.vegetables_3_servings_daily === true || dl.vegetables_3_servings_daily === true);
+      setCheck('itr-fiber-veg-no', fiber.vegetables_3_servings_daily === false || dl.vegetables_3_servings_daily === false);
+      setCheck('itr-fiber-fruit-yes', fiber.fruits_2_3_servings_daily === true || dl.fruits_2_3_servings_daily === true);
+      setCheck('itr-fiber-fruit-no', fiber.fruits_2_3_servings_daily === false || dl.fruits_2_3_servings_daily === false);
 
       const vs = data.vital_signs || {};
       const bpr = vs.blood_pressure_readings || {};
       setField('itr-field-bmi', vs.bmi !== undefined && vs.bmi !== null ? vs.bmi : '');
-      setField('itr-field-raisedbp', vs.raised_bp === true ? 'Yes' : (vs.raised_bp === false ? 'No' : ''));
-      setField('itr-field-waist', vs.waistline_cm !== undefined && vs.waistline_cm !== null ? vs.waistline_cm : '');
+      setField('itr-field-raisedbp', vs.raised_bp === true ? 'Yes' : (vs.raised_bp === false ? 'No' : (vs.raised_bp || '')));
+      setField('itr-field-waist', vs.waistline_cm !== undefined && vs.waistline_cm !== null ? vs.waistline_cm : (vs.waist_circumference_cm || ''));
       setField('itr-field-ht', vs.height_cm !== undefined && vs.height_cm !== null ? vs.height_cm : '');
       setField('itr-field-wt', vs.weight_kg !== undefined && vs.weight_kg !== null ? vs.weight_kg : '');
-      setField('itr-field-bp1', bpr.first || '');
+      setField('itr-field-bp1', bpr.first || vs.blood_pressure || '');
       setField('itr-field-bp2', bpr.second || '');
 
       const consults = data.consultation_records || [];
@@ -1751,38 +2294,38 @@
 
       // --- PAGE 2 POPULATION ---
       const pm = data.philhealth_membership || {};
-      setField('itr2-philhealth-id', pm.philhealth_id_number || '');
+      setField('itr2-philhealth-id', pm.philhealth_id_number || pm.philhealth_id || (d && d.philhealth_no) || '');
       const mt = pm.membership_type || {};
-      setCheck('itr2-memtype-member', mt.member);
-      setCheck('itr2-memtype-dependent', mt.dependent);
-      setCheck('itr2-memtype-nonmember', mt.non_member);
+      setCheck('itr2-memtype-member', mt.member === true || pm.membership_type === 'Member');
+      setCheck('itr2-memtype-dependent', mt.dependent === true || pm.membership_type === 'Dependent');
+      setCheck('itr2-memtype-nonmember', mt.non_member === true || pm.membership_type === 'Non-Member');
 
-      const mc = pm.membership_category || {};
-      setCheck('itr2-memcat-sponsored', mc.sponsored);
-      setCheck('itr2-memcat-ipp', mc.ipp);
-      setCheck('itr2-memcat-employed', mc.employed);
-      setCheck('itr2-memcat-lifetime', mc.lifetime);
-      setCheck('itr2-memcat-nhits', mc.nhits);
-      setCheck('itr2-memcat-lgu', mc.lgu);
-      setCheck('itr2-memcat-organized', mc.organized_group);
-      setCheck('itr2-memcat-government', mc.government);
-      setCheck('itr2-memcat-nga', mc.nga);
-      setCheck('itr2-memcat-private', mc.private);
-      setCheck('itr2-memcat-ofw', mc.ofw);
+      const mc = pm.membership_category || pm.categories || {};
+      setCheck('itr2-memcat-sponsored', mc.sponsored === true);
+      setCheck('itr2-memcat-ipp', mc.ipp === true);
+      setCheck('itr2-memcat-employed', mc.employed === true);
+      setCheck('itr2-memcat-lifetime', mc.lifetime === true);
+      setCheck('itr2-memcat-nhits', mc.nhits === true);
+      setCheck('itr2-memcat-lgu', mc.lgu === true);
+      setCheck('itr2-memcat-organized', mc.organized_group === true || mc.organized === true);
+      setCheck('itr2-memcat-government', mc.government === true);
+      setCheck('itr2-memcat-nga', mc.nga === true);
+      setCheck('itr2-memcat-private', mc.private === true);
+      setCheck('itr2-memcat-ofw', mc.ofw === true);
 
-      setField('itr2-vs-bp', vs.blood_pressure || '');
+      setField('itr2-vs-bp', vs.blood_pressure || bpr.first || '');
       setField('itr2-vs-hr', vs.heart_rate);
       setField('itr2-vs-rr', vs.respiratory_rate);
       setField('itr2-vs-pr', vs.pulse_rate);
-      setField('itr2-vs-temp', vs.temperature);
-      setField('itr2-vs-spo2', vs.spo2);
+      setField('itr2-vs-temp', vs.temperature || vs.temperature_c);
+      setField('itr2-vs-spo2', vs.spo2 || vs.spo2_percent);
       setField('itr2-vs-height', vs.height_cm);
       setField('itr2-vs-weight', vs.weight_kg);
-      setField('itr2-vs-waist', vs.waist_circumference_cm);
+      setField('itr2-vs-waist', vs.waist_circumference_cm || vs.waistline_cm);
       setField('itr2-vs-hip', vs.hip_circumference_cm);
 
       const pmh = data.past_medical_history || {};
-      setField('itr2-pmh-allergy', pmh.allergy || '');
+      setField('itr2-pmh-allergy', pmh.allergy || (cb && cb.allergy) || '');
       setCheck('itr2-pmh-asthma-yes', pmh.asthma === true);
       setCheck('itr2-pmh-asthma-no', pmh.asthma === false);
 
@@ -1803,16 +2346,16 @@
       setCheck('itr2-pmh-epilepsy-no', pmh.epilepsy_seizure_disorder === false);
 
       const pmhHep = pmh.hepatitis || {};
-      setCheck('itr2-pmh-hep-yes', pmhHep.has === true);
-      setCheck('itr2-pmh-hep-no', pmhHep.has === false);
+      setCheck('itr2-pmh-hep-yes', pmhHep.has === true || pmh.hepatitis === true);
+      setCheck('itr2-pmh-hep-no', pmhHep.has === false || pmh.hepatitis === false);
       setField('itr2-pmh-hep-type', pmhHep.type || '');
 
       setCheck('itr2-pmh-hyperlipid-yes', pmh.hyperlipidemia === true);
       setCheck('itr2-pmh-hyperlipid-no', pmh.hyperlipidemia === false);
 
       const pmhHtn = pmh.hypertension || {};
-      setCheck('itr2-pmh-htn-yes', pmhHtn.has === true);
-      setCheck('itr2-pmh-htn-no', pmhHtn.has === false);
+      setCheck('itr2-pmh-htn-yes', pmhHtn.has === true || pmh.hypertension === true);
+      setCheck('itr2-pmh-htn-no', pmhHtn.has === false || pmh.hypertension === false);
       setField('itr2-pmh-htn-highest', pmhHtn.highest_bp || '');
 
       setCheck('itr2-pmh-pud-yes', pmh.peptic_ulcer_disease === true);
@@ -1823,7 +2366,7 @@
       setCheck('itr2-pmh-thyroid-no', pmh.thyroid_disease === false);
 
       const pmhTb = pmh.tuberculosis || {};
-      setField('itr2-pmh-tb-organ', pmhTb.organ || '');
+      setField('itr2-pmh-tb-organ', pmhTb.organ || (typeof pmh.tuberculosis === 'string' ? pmh.tuberculosis : ''));
       setField('itr2-pmh-tb-category', pmhTb.category || '');
 
       setCheck('itr2-pmh-uti-yes', pmh.urinary_tract_infection === true);
@@ -1861,32 +2404,32 @@
       setCheck('itr2-fh-asthma-no', fh2.asthma === false);
 
       const fhCancer = fh2.cancer || {};
-      setCheck('itr2-fh-cancer-yes', fhCancer.has === true);
-      setCheck('itr2-fh-cancer-no', fhCancer.has === false);
+      setCheck('itr2-fh-cancer-yes', fhCancer.has === true || fh2.cancer === true);
+      setCheck('itr2-fh-cancer-no', fhCancer.has === false || fh2.cancer === false);
       setField('itr2-fh-cancer-organ', fhCancer.organ || '');
 
       setCheck('itr2-fh-cvd-yes', fh2.cerebrovascular_disease === true);
       setCheck('itr2-fh-cvd-no', fh2.cerebrovascular_disease === false);
       setCheck('itr2-fh-cad-yes', fh2.coronary_artery_disease === true);
       setCheck('itr2-fh-cad-no', fh2.coronary_artery_disease === false);
-      setCheck('itr2-fh-dm-yes', fh2.diabetes_mellitus === true);
-      setCheck('itr2-fh-dm-no', fh2.diabetes_mellitus === false);
+      setCheck('itr2-fh-dm-yes', fh2.diabetes_mellitus === true || fh2.dm === true);
+      setCheck('itr2-fh-dm-no', fh2.diabetes_mellitus === false || fh2.dm === false);
       setCheck('itr2-fh-emphysema-yes', fh2.emphysema === true);
       setCheck('itr2-fh-emphysema-no', fh2.emphysema === false);
       setCheck('itr2-fh-epilepsy-yes', fh2.epilepsy_seizure_disorder === true);
       setCheck('itr2-fh-epilepsy-no', fh2.epilepsy_seizure_disorder === false);
 
       const fhHep = fh2.hepatitis || {};
-      setCheck('itr2-fh-hep-yes', fhHep.has === true);
-      setCheck('itr2-fh-hep-no', fhHep.has === false);
+      setCheck('itr2-fh-hep-yes', fhHep.has === true || fh2.hepatitis === true);
+      setCheck('itr2-fh-hep-no', fhHep.has === false || fh2.hepatitis === false);
       setField('itr2-fh-hep-type', fhHep.type || '');
 
       setCheck('itr2-fh-hyperlipid-yes', fh2.hyperlipidemia === true);
       setCheck('itr2-fh-hyperlipid-no', fh2.hyperlipidemia === false);
 
       const fhHtn = fh2.hypertension || {};
-      setCheck('itr2-fh-htn-yes', fhHtn.has === true);
-      setCheck('itr2-fh-htn-no', fhHtn.has === false);
+      setCheck('itr2-fh-htn-yes', fhHtn.has === true || fh2.hypertension === true);
+      setCheck('itr2-fh-htn-no', fhHtn.has === false || fh2.hypertension === false);
       setField('itr2-fh-htn-highest', fhHtn.highest_bp || '');
 
       setCheck('itr2-fh-pud-yes', fh2.peptic_ulcer_disease === true);
@@ -1905,7 +2448,7 @@
       setCheck('itr2-fh-mental-no', fh2.mental_illness === false);
       setField('itr2-fh-others', fh2.others || '');
 
-      const imm = data.immunizations || {};
+      const imm = data.immunizations || data.immunization_history || {};
       const child = imm.child_care || {};
       setField('itr2-imm-bcg', child.bcg_date || '');
       setField('itr2-imm-hepb-birth', child.hepb_birth_date || '');
@@ -1919,14 +2462,14 @@
       setField('itr2-imm-chickenpox', child.chickenpox_vaccine_date || '');
 
       const gen = imm.general || {};
-      setField('itr2-imm-flu', gen.flu_vaccine_date || '');
+      setField('itr2-imm-flu', gen.flu_vaccine_date || (imm.flu_vaccine ? 'Yes' : ''));
       setField('itr2-imm-hpv', gen.hpv_date || '');
       setField('itr2-imm-hpv-g4', gen.hpv_grade4_date || '');
       setField('itr2-imm-mr-g1', gen.mr_grade1_date || '');
       setField('itr2-imm-mr-g7', gen.mr_grade7_date || '');
       setField('itr2-imm-td-g1', gen.td_grade1_date || '');
       setField('itr2-imm-td-g7', gen.td_grade7_date || '');
-      setField('itr2-imm-tt', gen.tetanus_toxoid_date || '');
+      setField('itr2-imm-tt', gen.tetanus_toxoid_date || (imm.tetanus_toxoid ? 'Yes' : ''));
 
       const ab = imm.animal_bite || {};
       setField('itr2-imm-pcecv1', ab.pcecv1_date || '');
@@ -1937,7 +2480,7 @@
       setField('itr2-imm-pcecv2', ab.pcecv2_date || '');
 
       const ncd = imm.ncd || {};
-      setField('itr2-imm-pneumo', ncd.pneumococcal_vaccine_date || '');
+      setField('itr2-imm-pneumo', ncd.pneumococcal_vaccine_date || (imm.pneumococcal ? 'Yes' : ''));
       setField('itr2-imm-flu-ncd', ncd.flu_vaccine_date || '');
 
       const mat = imm.maternal_care || {};
@@ -1953,8 +2496,11 @@
       setField('itr2-men-interval', men.cycle_interval || '');
       setField('itr2-men-pads', men.pads_per_day);
       setCheck('itr2-men-meno-yes', men.menopause === true);
+      setCheck('itr2-men-menopause-yes', men.menopause === true);
       setCheck('itr2-men-meno-no', men.menopause === false);
+      setCheck('itr2-men-menopause-no', men.menopause === false);
       setField('itr2-men-menoage', men.age_of_menopause);
+      setField('itr2-men-age-meno', men.age_of_menopause);
 
       const preg = data.pregnancy_history || {};
       setField('itr2-preg-grav', preg.gravidity);
@@ -1969,6 +2515,82 @@
       setField('itr2-preg-agefirst', preg.age_at_first_pregnancy);
       setCheck('itr2-preg-fp-yes', preg.family_planning_counseling === true);
       setCheck('itr2-preg-fp-no', preg.family_planning_counseling === false);
+
+      // --- CONSULTATION SHEET POPULATION ---
+      const cd = data.consultation_details || {};
+      const mh = data.medical_history || {};
+      const pfa = data.physical_findings_assessment || {};
+      const pfaVs = pfa.vital_signs || vs;
+      const dm = data.diagnosis_and_management || {};
+
+      setField('view-cs-patient-name', d.name || data.patient_name || '');
+      setField('view-cs-patient-id', d.patient_number || d.patient_id || (currentRecord && currentRecord.patient_id) || '');
+      setField('view-cs-age', d.age !== undefined && d.age !== null ? d.age : '');
+      setField('view-cs-sex', d.gender || d.sex || '');
+      setField('view-cs-birthday', d.birthday || '');
+      setField('view-cs-address', d.address || '');
+      setField('view-cs-cpno', d.contact_number || d.cp_no || '');
+
+      setField('view-cs-visit-date', cd.visit_date || (data.consultation_records && data.consultation_records[0] && data.consultation_records[0].date) || '');
+      setField('view-cs-visit-time', cd.visit_time || '');
+      setField('view-cs-attending-doctor', cd.attending_physician || dm.attending_physician || (data.consultation_records && data.consultation_records[0] && data.consultation_records[0].provider) || '');
+      setField('view-cs-chief-complaint', cd.chief_complaint || (data.consultation_records && data.consultation_records[0] && data.consultation_records[0].subjective_findings) || '');
+
+      setField('view-cs-hpi', mh.history_of_present_illness || '');
+      setField('view-cs-past-history', mh.past_medical_surgical_history || '');
+      setField('view-cs-current-meds', mh.current_medications || '');
+      setField('view-cs-allergies', mh.allergies || pmh.allergy || (cb && cb.allergy) || '');
+      setField('view-cs-family-history', mh.family_history || '');
+
+      setField('view-cs-vs-bp', pfaVs.blood_pressure || vs.blood_pressure || bpr.first || '');
+      setField('view-cs-vs-hr', pfaVs.heart_rate !== undefined ? pfaVs.heart_rate : vs.heart_rate);
+      setField('view-cs-vs-rr', pfaVs.respiratory_rate !== undefined ? pfaVs.respiratory_rate : vs.respiratory_rate);
+      setField('view-cs-vs-temp', pfaVs.temperature !== undefined ? pfaVs.temperature : (vs.temperature || vs.temperature_c));
+      setField('view-cs-vs-wt', pfaVs.weight_kg !== undefined ? pfaVs.weight_kg : vs.weight_kg);
+      setField('view-cs-vs-ht', pfaVs.height_cm !== undefined ? pfaVs.height_cm : vs.height_cm);
+      setField('view-cs-vs-spo2', pfaVs.spo2 !== undefined ? pfaVs.spo2 : (vs.spo2 || vs.spo2_percent));
+      setField('view-cs-pe-findings', pfa.physical_examination || '');
+      setField('view-cs-lab-results', pfa.laboratory_diagnostic_results || '');
+
+      const diagVal = dm.diagnosis || (data.consultation_records && data.consultation_records[0] && (Array.isArray(data.consultation_records[0].assessment_diagnosis) ? data.consultation_records[0].assessment_diagnosis.join(', ') : data.consultation_records[0].assessment_diagnosis)) || '';
+      setField('view-cs-diagnosis', diagVal);
+      setField('view-cs-rx-meds', dm.prescriptions_medications || '');
+      setField('view-cs-treatment-plan', dm.treatment_plan_and_advice || (data.consultation_records && data.consultation_records[0] && (Array.isArray(data.consultation_records[0].plan_treatment) ? data.consultation_records[0].plan_treatment.join('\n') : data.consultation_records[0].plan_treatment)) || '');
+      setField('view-cs-followup-date', dm.follow_up_date || '');
+      setField('view-cs-followup-notes', dm.follow_up_instructions || '');
+
+      // --- IMMUNIZATION SHEET POPULATION ---
+      const vi = data.vaccine_information || {};
+      const ad = data.administration_details || {};
+      const pi = data.provider_information || {};
+      const immList = data.immunization_entries || data.immunizations || [];
+      const firstImm = (Array.isArray(immList) && immList[0]) || {};
+
+      setField('view-imm-patient-name', d.name || data.patient_name || '');
+      setField('view-imm-patient-id', d.patient_number || d.patient_id || '');
+      setField('view-imm-age', d.age !== undefined && d.age !== null ? d.age : '');
+      setField('view-imm-sex', d.gender || d.sex || '');
+      setField('view-imm-birthday', d.birthday || d.birth_date || '');
+      setField('view-imm-cpno', d.contact_number || d.cp_no || '');
+      setField('view-imm-address', d.address || '');
+
+      setField('view-imm-vaccine-name', vi.vaccine_name || firstImm.vaccine || '');
+      setField('view-imm-vaccine-brand', vi.brand_and_manufacturer || firstImm.brand || '');
+      setField('view-imm-lot-number', vi.lot_batch_number || firstImm.lot_no || firstImm.batch_no || '');
+      setField('view-imm-exp-date', vi.expiration_date || '');
+
+      setField('view-imm-admin-date', ad.date_administered || firstImm.date || '');
+      setField('view-imm-admin-time', ad.time_administered || '');
+      setField('view-imm-dose-number', ad.dose_number || firstImm.dose || '');
+      setField('view-imm-admin-site', ad.injection_site || firstImm.site || '');
+      setField('view-imm-admin-route', ad.route_of_administration || firstImm.route || '');
+      setField('view-imm-admin-dosage', ad.dosage_volume || firstImm.dosage || '');
+      setField('view-imm-next-due-date', ad.next_due_date || '');
+      setField('view-imm-remarks', ad.remarks_adverse_reactions || '');
+
+      setField('view-imm-provider-name', pi.vaccinator_name || firstImm.vaccinator || '');
+      setField('view-imm-provider-license', pi.prc_license_number || firstImm.license || '');
+      setField('view-imm-facility-name', pi.facility_name || firstImm.facility || 'PAETE RURAL HEALTH UNIT (Paete, Laguna)');
     }
 
     // Collect edited DOM values into structured JSON
@@ -1988,6 +2610,219 @@
       function getChk(id) {
         const el = document.getElementById(id);
         return el ? !!el.checked : false;
+      }
+
+      const isMedCertSheetActive = document.getElementById('medcert-paper-sheet') && document.getElementById('medcert-paper-sheet').style.display !== 'none';
+      const isMedCertCategory = document.getElementById('review-category') && ['MEDICAL_CERTIFICATE', 'MEDCERT', 'MED_CERT', 'CERTIFICATE'].includes(document.getElementById('review-category').value);
+
+      if (isMedCertSheetActive || isMedCertCategory) {
+        return {
+          header: {
+            country: 'Republic of the Philippines',
+            province: 'Province of Laguna',
+            municipality: 'Municipality of Paete',
+            facility: getVal('view-mc-facility-name') || 'PAETE RURAL HEALTH UNIT',
+            facility_address: getVal('view-mc-facility-address') || '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna',
+            form_title: 'Medical Certificate (Sertipikong Medikal)',
+            record_type: 'MEDICAL_CERTIFICATE'
+          },
+          patient_demographics: {
+            name: getVal('view-mc-patient-name') || getVal('itr-field-name'),
+            patient_number: getVal('view-mc-patient-id'),
+            age: getNumVal('view-mc-age') || getNumVal('itr-field-age'),
+            gender: getVal('view-mc-sex'),
+            address: getVal('view-mc-address') || getVal('itr-field-address'),
+            contact_number: getVal('view-mc-contact') || getVal('itr-field-cpno')
+          },
+          clinical_findings: {
+            examination_date: getVal('view-mc-exam-date'),
+            diagnosis: getVal('view-mc-diagnosis'),
+            symptoms: getVal('view-mc-symptoms')
+          },
+          medical_opinion: {
+            fitness_status: getVal('view-mc-fitness-status'),
+            sick_leave_days: getNumVal('view-mc-sick-leave-days'),
+            resume_date: getVal('view-mc-resume-date'),
+            restrictions: getVal('view-mc-restrictions'),
+            remarks: getVal('view-mc-remarks')
+          },
+          physician_details: {
+            physician_name: getVal('view-mc-physician-name'),
+            prc_license_number: getVal('view-mc-prc-license'),
+            ptr_number: getVal('view-mc-ptr-number'),
+            facility_name: getVal('view-mc-facility-name') || 'PAETE RURAL HEALTH UNIT',
+            facility_address: getVal('view-mc-facility-address'),
+            facility_contact: getVal('view-mc-facility-contact')
+          }
+        };
+      }
+
+      const isImmunizeSheetActive = document.getElementById('immunization-paper-sheet') && document.getElementById('immunization-paper-sheet').style.display !== 'none';
+      const isImmunizeCategory = document.getElementById('review-category') && ['IMMUNIZATION_RECORD', 'IMMUNIZATION', 'VACCINATION'].includes(document.getElementById('review-category').value);
+
+      if (isImmunizeSheetActive || isImmunizeCategory) {
+        const vacName = getVal('view-imm-vaccine-name');
+        const brand = getVal('view-imm-vaccine-brand');
+        const lotNo = getVal('view-imm-lot-number');
+        const expDate = getVal('view-imm-exp-date');
+        const adminDate = getVal('view-imm-admin-date');
+        const adminTime = getVal('view-imm-admin-time');
+        const doseNo = getVal('view-imm-dose-number');
+        const site = getVal('view-imm-admin-site');
+        const route = getVal('view-imm-admin-route');
+        const dosage = getVal('view-imm-admin-dosage');
+        const nextDue = getVal('view-imm-next-due-date');
+        const remarks = getVal('view-imm-remarks');
+        const vaccinator = getVal('view-imm-provider-name');
+        const license = getVal('view-imm-provider-license');
+        const facility = getVal('view-imm-facility-name') || 'PAETE RURAL HEALTH UNIT';
+
+        return {
+          header: {
+            country: 'Republic of the Philippines',
+            province: 'Province of Laguna',
+            municipality: 'Municipality of Paete',
+            facility: 'PAETE RURAL HEALTH UNIT',
+            facility_address: '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna',
+            form_title: 'Immunization & Vaccine Administration Record',
+            record_type: 'IMMUNIZATION_RECORD'
+          },
+          patient_demographics: {
+            name: getVal('view-imm-patient-name') || getVal('itr-field-name'),
+            patient_number: getVal('view-imm-patient-id'),
+            age: getNumVal('view-imm-age') || getNumVal('itr-field-age'),
+            gender: getVal('view-imm-sex'),
+            birthday: getVal('view-imm-birthday') || getVal('itr-field-birthday'),
+            contact_number: getVal('view-imm-cpno') || getVal('itr-field-cpno'),
+            address: getVal('view-imm-address') || getVal('itr-field-address')
+          },
+          vaccine_information: {
+            vaccine_name: vacName,
+            brand_and_manufacturer: brand,
+            lot_batch_number: lotNo,
+            expiration_date: expDate
+          },
+          administration_details: {
+            date_administered: adminDate,
+            time_administered: adminTime,
+            dose_number: doseNo,
+            injection_site: site,
+            route_of_administration: route,
+            dosage_volume: dosage,
+            next_due_date: nextDue,
+            remarks_adverse_reactions: remarks
+          },
+          provider_information: {
+            vaccinator_name: vaccinator,
+            prc_license_number: license,
+            facility_name: facility
+          },
+          immunization_entries: [
+            {
+              vaccine: vacName,
+              dose: doseNo,
+              date: adminDate,
+              lot_no: lotNo,
+              site: site,
+              route: route,
+              vaccinator: vaccinator,
+              license: license,
+              facility: facility
+            }
+          ]
+        };
+      }
+
+      const isConsultSheetActive = document.getElementById('consultation-paper-sheet') && document.getElementById('consultation-paper-sheet').style.display !== 'none';
+      const isConsultCategory = document.getElementById('review-category') && document.getElementById('review-category').value === 'CONSULTATION_RECORD';
+
+      if (isConsultSheetActive || isConsultCategory) {
+        const visitDate = getVal('view-cs-visit-date');
+        const chiefComplaint = getVal('view-cs-chief-complaint');
+        const hpi = getVal('view-cs-hpi');
+        const peFindings = getVal('view-cs-pe-findings');
+        const labResults = getVal('view-cs-lab-results');
+        const diagnosis = getVal('view-cs-diagnosis');
+        const rxMeds = getVal('view-cs-rx-meds');
+        const treatmentPlan = getVal('view-cs-treatment-plan');
+        const followUpDate = getVal('view-cs-followup-date');
+        const followUpNotes = getVal('view-cs-followup-notes');
+        const attendingDoc = getVal('view-cs-attending-doctor');
+
+        const consultRowFromSheet = {
+          date: visitDate,
+          subjective_findings: [chiefComplaint ? `Chief Complaint: ${chiefComplaint}` : '', hpi ? `HPI: ${hpi}` : ''].filter(Boolean).join('\n'),
+          objective_findings: {
+            notes: [peFindings ? `PE: ${peFindings}` : '', labResults ? `Labs: ${labResults}` : ''].filter(Boolean).join('\n'),
+            blood_pressure: getVal('view-cs-vs-bp'),
+            heart_rate: getNumVal('view-cs-vs-hr'),
+            respiratory_rate: getNumVal('view-cs-vs-rr'),
+            temperature: getNumVal('view-cs-vs-temp'),
+            weight_kg: getNumVal('view-cs-vs-wt'),
+            height_cm: getNumVal('view-cs-vs-ht'),
+            spo2: getNumVal('view-cs-vs-spo2')
+          },
+          assessment_diagnosis: diagnosis ? diagnosis.split(',').map(s => s.trim()).filter(Boolean) : [],
+          plan_treatment: [rxMeds ? `Rx: ${rxMeds}` : '', treatmentPlan ? `Plan: ${treatmentPlan}` : '', followUpDate ? `Follow-up: ${followUpDate} ${followUpNotes}` : ''].filter(Boolean),
+          provider: attendingDoc
+        };
+
+        return {
+          header: {
+            country: 'Republic of the Philippines',
+            province: 'Province of Laguna',
+            municipality: 'Municipality of Paete',
+            facility: 'PAETE RURAL HEALTH UNIT',
+            facility_address: '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna',
+            form_title: 'Clinical Consultation Record',
+            record_type: 'CONSULTATION_RECORD'
+          },
+          patient_demographics: {
+            name: getVal('view-cs-patient-name') || getVal('itr-field-name'),
+            patient_number: getVal('view-cs-patient-id'),
+            age: getNumVal('view-cs-age') || getNumVal('itr-field-age'),
+            gender: getVal('view-cs-sex'),
+            birthday: getVal('view-cs-birthday') || getVal('itr-field-birthday'),
+            contact_number: getVal('view-cs-cpno') || getVal('itr-field-cpno'),
+            address: getVal('view-cs-address') || getVal('itr-field-address')
+          },
+          consultation_details: {
+            visit_date: visitDate,
+            visit_time: getVal('view-cs-visit-time'),
+            attending_physician: attendingDoc,
+            chief_complaint: chiefComplaint
+          },
+          medical_history: {
+            history_of_present_illness: hpi,
+            past_medical_surgical_history: getVal('view-cs-past-history'),
+            current_medications: getVal('view-cs-current-meds'),
+            allergies: getVal('view-cs-allergies'),
+            family_history: getVal('view-cs-family-history')
+          },
+          physical_findings_assessment: {
+            vital_signs: {
+              blood_pressure: getVal('view-cs-vs-bp'),
+              heart_rate: getNumVal('view-cs-vs-hr'),
+              pulse_rate: getNumVal('view-cs-vs-hr'),
+              respiratory_rate: getNumVal('view-cs-vs-rr'),
+              temperature: getNumVal('view-cs-vs-temp'),
+              weight_kg: getNumVal('view-cs-vs-wt'),
+              height_cm: getNumVal('view-cs-vs-ht'),
+              spo2: getNumVal('view-cs-vs-spo2')
+            },
+            physical_examination: peFindings,
+            laboratory_diagnostic_results: labResults
+          },
+          diagnosis_and_management: {
+            diagnosis: diagnosis,
+            prescriptions_medications: rxMeds,
+            treatment_plan_and_advice: treatmentPlan,
+            follow_up_date: followUpDate,
+            follow_up_instructions: followUpNotes,
+            attending_physician: attendingDoc
+          },
+          consultation_records: [consultRowFromSheet]
+        };
       }
 
       const hasSmkCheck = getChk('itr-smk-current') || getChk('itr-smk-passive') || getChk('itr-smk-never') || getChk('itr-smk-gt1yr') || getChk('itr-smk-lt1yr');
@@ -2151,6 +2986,171 @@
 
       function chk(val) { return val === true ? '[x]' : '[ ]'; }
       function opt(status, target) { return status === target ? '[x]' : '[ ]'; }
+
+      if (data.record_type === 'MEDICAL_CERTIFICATE' || data.clinical_findings || (typeof currentRecord !== 'undefined' && currentRecord && currentRecord.record_type === 'MEDICAL_CERTIFICATE')) {
+        const cf = data.clinical_findings || data.clinical_details || {};
+        const mo = data.medical_opinion || data.recommendations || {};
+        const pd = data.physician_details || data.authentication || {};
+
+        const mLines = [];
+        mLines.push('=== REPUBLIKA NG PILIPINAS / HEALTH FACILITY ===');
+        mLines.push(h.country || 'Republic of the Philippines');
+        mLines.push(h.province || 'Province of Laguna');
+        mLines.push(h.municipality || 'Municipality of Paete');
+        mLines.push(h.facility || pd.facility_name || 'PAETE RURAL HEALTH UNIT');
+        mLines.push(h.facility_address || pd.facility_address || '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna');
+        mLines.push(pd.facility_contact || '(049) 557-0123 / paete_rhu@laguna.gov.ph');
+        mLines.push('----------------------------------------------------');
+        mLines.push('           MEDICAL CERTIFICATE (SERTIPIKONG MEDIKAL)           ');
+        mLines.push('----------------------------------------------------');
+        mLines.push('');
+
+        mLines.push('=== 1. IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===');
+        mLines.push(`Pangalan (Name): ${d.name || ''}`);
+        mLines.push(`Patient ID / No.: ${d.patient_number || d.patient_id || '-'}`);
+        mLines.push(`Edad (Age) / Kasarian (Sex): ${d.age !== undefined && d.age !== null ? d.age : ''} / ${d.gender || d.sex || ''}`);
+        mLines.push(`Tirahan (Address): ${d.address || ''}`);
+        mLines.push(`Contact No.: ${d.contact_number || d.cp_no || ''}`);
+        mLines.push('');
+
+        mLines.push('=== 2. KLINIKAL NA DETALYE (CLINICAL FINDINGS) ===');
+        mLines.push(`Petsa ng Pagsusuri (Examination Date): ${cf.examination_date || ''}`);
+        mLines.push(`Diagnosis / Medikal na Kondisyon: ${cf.diagnosis || ''}`);
+        mLines.push(`Mga Sintomas / Reklamo (Symptoms): ${cf.symptoms || ''}`);
+        mLines.push('');
+
+        mLines.push('=== 3. REKOMENDASYON NG DOKTOR (MEDICAL OPINION) ===');
+        mLines.push(`Katayuan / Fitness Status: ${mo.fitness_status || 'Fit to Work'}`);
+        if (mo.sick_leave_days) mLines.push(`Bilang ng Araw ng Pahinga (Sick Leave): ${mo.sick_leave_days} araw (days)`);
+        if (mo.resume_date) mLines.push(`Petsa ng Pagbalik (Resume Date): ${mo.resume_date}`);
+        if (mo.restrictions) mLines.push(`Mga Restriksyon sa Gawain (Restrictions): ${mo.restrictions}`);
+        if (mo.remarks) mLines.push(`Iba pang Tagubilin / Paalala (Remarks): ${mo.remarks}`);
+        mLines.push('');
+
+        mLines.push('=== 4. PAGPAPATUNAY NG LISENSYADONG DOKTOR (AUTHENTICATION) ===');
+        mLines.push(`Attending Physician: ${pd.physician_name || 'Dr. Maria Santos, MD'}`);
+        mLines.push(`PRC License No.: ${pd.prc_license_number || ''}`);
+        mLines.push(`PTR Number: ${pd.ptr_number || ''}`);
+        mLines.push(`Issued At: ${pd.facility_name || 'PAETE RURAL HEALTH UNIT (Paete, Laguna)'}`);
+
+        return mLines.join('\n');
+      }
+
+      if (data.record_type === 'IMMUNIZATION_RECORD' || data.vaccine_information || (typeof currentRecord !== 'undefined' && currentRecord && (currentRecord.record_type === 'IMMUNIZATION_RECORD' || currentRecord.record_type === 'IMMUNIZATION' || currentRecord.record_type === 'VACCINATION'))) {
+        const vi = data.vaccine_information || {};
+        const ad = data.administration_details || {};
+        const pi = data.provider_information || {};
+        const immList = data.immunization_entries || data.immunizations || [];
+        const firstImm = (Array.isArray(immList) && immList[0]) || {};
+
+        const iLines = [];
+        iLines.push('=== HEALTH FACILITY HEADER ===');
+        iLines.push(h.country || 'Republic of the Philippines');
+        iLines.push(h.province || 'Province of Laguna');
+        iLines.push(h.municipality || 'Municipality of Paete');
+        iLines.push(h.facility || 'PAETE RURAL HEALTH UNIT');
+        iLines.push(h.facility_address || '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna');
+        iLines.push(h.form_title || 'Immunization & Vaccine Administration Record');
+        iLines.push('');
+
+        iLines.push('=== IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===');
+        iLines.push(`NAME: ${d.name || ''}`);
+        iLines.push(`PATIENT ID: ${d.patient_number || d.patient_id || ''}`);
+        iLines.push(`AGE / SEX: ${d.age !== undefined && d.age !== null ? d.age : ''} / ${d.gender || d.sex || ''}`);
+        iLines.push(`BIRTHDAY: ${d.birthday || ''}`);
+        iLines.push(`ADDRESS: ${d.address || ''}`);
+        iLines.push(`CP NO: ${d.contact_number || d.cp_no || ''}`);
+        iLines.push('');
+
+        iLines.push('=== DETALYE NG BAKUNA (VACCINE INFORMATION) ===');
+        iLines.push(`Vaccine Name: ${vi.vaccine_name || firstImm.vaccine || ''}`);
+        iLines.push(`Brand & Manufacturer: ${vi.brand_and_manufacturer || firstImm.brand || ''}`);
+        iLines.push(`Lot / Batch Number: ${vi.lot_batch_number || firstImm.lot_no || firstImm.batch_no || ''}`);
+        iLines.push(`Expiration Date: ${vi.expiration_date || ''}`);
+        iLines.push('');
+
+        iLines.push('=== DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) ===');
+        iLines.push(`Date Administered: ${ad.date_administered || firstImm.date || ''}`);
+        iLines.push(`Time Administered: ${ad.time_administered || ''}`);
+        iLines.push(`Dose Number: ${ad.dose_number || firstImm.dose || ''}`);
+        iLines.push(`Injection Site: ${ad.injection_site || firstImm.site || ''}`);
+        iLines.push(`Route of Administration: ${ad.route_of_administration || firstImm.route || ''}`);
+        iLines.push(`Dosage Volume: ${ad.dosage_volume || firstImm.dosage || ''}`);
+        iLines.push(`Next Due Date: ${ad.next_due_date || ''}`);
+        iLines.push(`Adverse Reactions / Remarks: ${ad.remarks_adverse_reactions || ''}`);
+        iLines.push('');
+
+        iLines.push('=== IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) ===');
+        iLines.push(`Vaccinator Name / Role: ${pi.vaccinator_name || firstImm.vaccinator || ''}`);
+        iLines.push(`PRC License Number: ${pi.prc_license_number || firstImm.license || ''}`);
+        iLines.push(`Health Facility: ${pi.facility_name || firstImm.facility || 'PAETE RURAL HEALTH UNIT (Paete, Laguna)'}`);
+
+        return iLines.join('\n');
+      }
+
+      if (data.record_type === 'CONSULTATION_RECORD' || data.consultation_details || (typeof currentRecord !== 'undefined' && currentRecord && currentRecord.record_type === 'CONSULTATION_RECORD')) {
+        const cd = data.consultation_details || {};
+        const mh = data.medical_history || {};
+        const pfa = data.physical_findings_assessment || {};
+        const pfa_vs = pfa.vital_signs || vs;
+        const dm = data.diagnosis_and_management || {};
+
+        const cLines = [];
+        cLines.push('=== HEALTH FACILITY HEADER ===');
+        cLines.push(h.country || 'Republic of the Philippines');
+        cLines.push(h.province || 'Province of Laguna');
+        cLines.push(h.municipality || 'Municipality of Paete');
+        cLines.push(h.facility || 'PAETE RURAL HEALTH UNIT');
+        cLines.push(h.facility_address || '2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna');
+        cLines.push(h.form_title || 'Clinical Consultation Record');
+        cLines.push('');
+
+        cLines.push('=== PATIENT INFORMATION ===');
+        cLines.push(`NAME: ${d.name || ''}`);
+        cLines.push(`PATIENT ID: ${d.patient_number || d.patient_id || ''}`);
+        cLines.push(`AGE / SEX: ${d.age !== undefined && d.age !== null ? d.age : ''} / ${d.gender || d.sex || ''}`);
+        cLines.push(`BIRTHDAY: ${d.birthday || ''}`);
+        cLines.push(`ADDRESS: ${d.address || ''}`);
+        cLines.push(`CP NO: ${d.contact_number || d.cp_no || ''}`);
+        cLines.push('');
+
+        cLines.push('=== DETALYE NG KONSULTA (CONSULTATION DETAILS) ===');
+        cLines.push(`Date of Visit: ${cd.visit_date || ''}`);
+        cLines.push(`Time of Visit: ${cd.visit_time || ''}`);
+        cLines.push(`Attending Physician / Provider: ${cd.attending_physician || dm.attending_physician || ''}`);
+        cLines.push(`Chief Complaint: ${cd.chief_complaint || ''}`);
+        cLines.push('');
+
+        cLines.push('=== KASAYSAYAN NG MEDISINA (MEDICAL HISTORY) ===');
+        cLines.push(`History of Present Illness (HPI): ${mh.history_of_present_illness || ''}`);
+        cLines.push(`Past Medical / Surgical History: ${mh.past_medical_surgical_history || ''}`);
+        cLines.push(`Current Medications: ${mh.current_medications || ''}`);
+        cLines.push(`Allergies: ${mh.allergies || ''}`);
+        cLines.push(`Family History: ${mh.family_history || ''}`);
+        cLines.push('');
+
+        cLines.push('=== RESULTA NG PAGSUSURI (PHYSICAL FINDINGS & ASSESSMENT) ===');
+        cLines.push('Vital Signs:');
+        cLines.push(`  BP: ${pfa_vs.blood_pressure || ''} mmHg`);
+        cLines.push(`  HR/PR: ${pfa_vs.heart_rate !== undefined && pfa_vs.heart_rate !== null ? pfa_vs.heart_rate : (pfa_vs.pulse_rate || '')} bpm`);
+        cLines.push(`  RR: ${pfa_vs.respiratory_rate !== undefined && pfa_vs.respiratory_rate !== null ? pfa_vs.respiratory_rate : ''} cpm`);
+        cLines.push(`  Temperature: ${pfa_vs.temperature !== undefined && pfa_vs.temperature !== null ? pfa_vs.temperature : ''} °C`);
+        cLines.push(`  Weight: ${pfa_vs.weight_kg !== undefined && pfa_vs.weight_kg !== null ? pfa_vs.weight_kg : ''} kg`);
+        cLines.push(`  Height: ${pfa_vs.height_cm !== undefined && pfa_vs.height_cm !== null ? pfa_vs.height_cm : ''} cm`);
+        cLines.push(`  SpO2: ${pfa_vs.spo2 !== undefined && pfa_vs.spo2 !== null ? pfa_vs.spo2 : ''} %`);
+        cLines.push(`Physical Examination: ${pfa.physical_examination || ''}`);
+        cLines.push(`Laboratory / Diagnostics: ${pfa.laboratory_diagnostic_results || ''}`);
+        cLines.push('');
+
+        cLines.push('=== PLANO AT REKOMENDASYON (DIAGNOSIS & MANAGEMENT PLAN) ===');
+        cLines.push(`Assessment / Diagnosis: ${dm.diagnosis || ''}`);
+        cLines.push(`Prescription / Medications Given: ${dm.prescriptions_medications || ''}`);
+        cLines.push(`Treatment Plan & Advice: ${dm.treatment_plan_and_advice || ''}`);
+        cLines.push(`Follow-up Check-up Date: ${dm.follow_up_date || ''}`);
+        cLines.push(`Follow-up Instructions: ${dm.follow_up_instructions || ''}`);
+
+        return cLines.join('\n');
+      }
 
       const is_page_2 = !!(data.philhealth_membership || data.past_medical_history || data.immunizations || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2);
 

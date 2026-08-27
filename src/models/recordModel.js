@@ -167,10 +167,13 @@ const RecordModel = {
         if (error || !data) {
           return localRec;
         }
+        const mergedJson = (data && data.structured_json && Object.keys(data.structured_json).length > 0)
+          ? data.structured_json
+          : (localRec && localRec.structured_json ? localRec.structured_json : (data ? data.structured_json : null));
         return {
           ...localRec,
           ...data,
-          structured_json: (localRec && localRec.structured_json) ? localRec.structured_json : data.structured_json
+          structured_json: mergedJson
         };
       } catch (err) {
         return localRec;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,7 @@
       background-position: right 8px center;
       background-size: 16px;
     }
-    
+
     .table-actions {
       display: flex;
       align-items: center;
@@ -29,6 +30,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="app-container">
@@ -40,7 +42,8 @@
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
           <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/>
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z" />
           </svg>
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
@@ -57,13 +60,18 @@
       <ul class="sidebar-nav" id="layout-nav-links">
         <li>
           <a href="/dashboard/admin" class="nav-link">
-            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
+            <svg viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z" />
+            </svg>
             Admin Overview
           </a>
         </li>
         <li>
           <a href="/dashboard/admin/users" class="nav-link active">
-            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+            </svg>
             User Accounts
           </a>
         </li>
@@ -72,7 +80,8 @@
       <div class="sidebar-footer">
         <button class="logout-btn" id="logout-btn">
           <svg viewBox="0 0 24 24">
-            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+            <path
+              d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z" />
           </svg>
           Sign Out
         </button>
@@ -85,7 +94,7 @@
       <header class="mobile-header">
         <button class="menu-toggle" id="menu-toggle">
           <svg viewBox="0 0 24 24">
-            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
           </svg>
         </button>
         <span class="sidebar-brand-name">Keep Up</span>
@@ -101,7 +110,7 @@
           </div>
           <button class="btn btn-primary" id="open-modal-btn">
             <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
             Add New User
           </button>
@@ -111,7 +120,10 @@
         <div class="filter-bar">
           <div class="search-input-wrapper">
             <input type="text" class="search-input" id="search-users" placeholder="Search by name or email...">
-            <svg class="search-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/></svg>
+            <svg class="search-icon" viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+            </svg>
           </div>
         </div>
 
@@ -146,7 +158,10 @@
       <div class="modal-header">
         <h3 class="card-title">Create User Account</h3>
         <button class="modal-close" id="close-modal-btn">
-          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+          </svg>
         </button>
       </div>
 
@@ -154,17 +169,20 @@
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label" for="full_name">Full Name</label>
-            <input class="form-input" style="padding-left: 14px;" type="text" id="full_name" placeholder="e.g., Jane Doe" required>
+            <input class="form-input" style="padding-left: 14px;" type="text" id="full_name"
+              placeholder="e.g., Jane Doe" required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="email">Email Address</label>
-            <input class="form-input" style="padding-left: 14px;" type="email" id="email" placeholder="e.g., jane@keepup.com" required>
+            <input class="form-input" style="padding-left: 14px;" type="email" id="email"
+              placeholder="e.g., jane@keepup.com" required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="password">Initial Password</label>
-            <input class="form-input" style="padding-left: 14px;" type="password" id="password" placeholder="Min. 6 characters" required>
+            <input class="form-input" style="padding-left: 14px;" type="password" id="password"
+              placeholder="Min. 6 characters" required>
           </div>
 
           <div class="form-group">
@@ -291,7 +309,7 @@
     // Render table rows
     function renderUsersTable(usersList) {
       const tableBody = document.getElementById('users-table-body');
-      
+
       if (usersList.length === 0) {
         tableBody.innerHTML = `
           <tr>
@@ -306,7 +324,7 @@
       tableBody.innerHTML = usersList.map(user => {
         const isSelf = user.id === currentUser.id;
         const isActive = user.status === 'ACTIVE';
-        
+
         return `
           <tr data-id="${user.id}">
             <td style="font-weight: 600;">${escapeHtml(user.full_name)} ${isSelf ? '<span style="color: var(--text-muted); font-size: 11px;">(You)</span>' : ''}</td>
@@ -350,8 +368,8 @@
         renderUsersTable(allUsers);
         return;
       }
-      const filtered = allUsers.filter(u => 
-        u.full_name.toLowerCase().includes(query) || 
+      const filtered = allUsers.filter(u =>
+        u.full_name.toLowerCase().includes(query) ||
         u.email.toLowerCase().includes(query)
       );
       renderUsersTable(filtered);
@@ -378,16 +396,16 @@
     async function handleStatusToggle(userId, isChecked) {
       const newStatus = isChecked ? 'ACTIVE' : 'INACTIVE';
       const badge = document.getElementById(`badge-${userId}`);
-      
+
       try {
         const res = await API.updateUser(userId, { status: newStatus });
         if (res && res.success) {
           showToast(`Account status updated to ${newStatus} for ${res.user.full_name}`, 'success');
-          
+
           // Update cached copy
           const idx = allUsers.findIndex(u => u.id === userId);
           if (idx !== -1) allUsers[idx].status = newStatus;
-          
+
           // Update Badge UI immediately
           if (badge) {
             badge.className = `badge ${isChecked ? 'badge-active' : 'badge-inactive'}`;
@@ -405,11 +423,12 @@
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
   </script>
 </body>
+
 </html>

@@ -66,6 +66,22 @@ const API = {
     }
   },
 
+  async postJson(url, bodyData, options = {}) {
+    return this.fetchJson(url, {
+      ...options,
+      method: 'POST',
+      body: JSON.stringify(bodyData)
+    });
+  },
+
+  async putJson(url, bodyData, options = {}) {
+    return this.fetchJson(url, {
+      ...options,
+      method: 'PUT',
+      body: JSON.stringify(bodyData)
+    });
+  },
+
   async login(email, password) {
     return this.fetchJson('/api/auth/login', {
       method: 'POST',
@@ -146,7 +162,57 @@ const API = {
   }
 };
 
-async function loadUserProfile() {
+let currentUserProfileCache = null;
+
+function applyUserProfileToDOM(user) {
+  if (!user) return;
+  const userNameElement = document.getElementById('layout-user-name');
+  const userInitialsElement = document.getElementById('layout-user-initials');
+  const userRoleElement = document.getElementById('layout-user-role');
+  const welcomeNameElement = document.getElementById('welcome-user-name');
+
+  if (userNameElement) userNameElement.textContent = user.full_name;
+  if (userRoleElement) {
+    userRoleElement.textContent = formatRole(user.role);
+    userRoleElement.className = `user-role-badge ${getRoleClass(user.role)}`;
+  }
+  if (welcomeNameElement) welcomeNameElement.textContent = user.full_name;
+
+  if (userInitialsElement) {
+    const initials = user.full_name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+    userInitialsElement.textContent = initials || 'US';
+  }
+
+  // Mobile initials if present on page
+  const mobileInitials = document.getElementById('mobile-user-initials');
+  if (mobileInitials && user.full_name) {
+    mobileInitials.textContent = user.full_name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  }
+
+  // Automatically inject consistent sidebar navigation links for user role if empty, else update active indicator
+  const navContainer = document.getElementById('layout-nav-links');
+  if (navContainer && navContainer.children.length === 0 && user && user.role) {
+    injectSidebarLinks(user.role);
+  } else if (navContainer && user && user.role) {
+    updateSidebarActiveLink(window.location.pathname);
+  }
+}
+
+async function loadUserProfile(forceRefresh = false) {
+  if (currentUserProfileCache && !forceRefresh) {
+    applyUserProfileToDOM(currentUserProfileCache);
+    return currentUserProfileCache;
+  }
   try {
     await ensureCsrfToken();
     const data = await API.getProfile();
@@ -156,33 +222,8 @@ async function loadUserProfile() {
     }
 
     const user = data.user;
-    const userNameElement = document.getElementById('layout-user-name');
-    const userInitialsElement = document.getElementById('layout-user-initials');
-    const userRoleElement = document.getElementById('layout-user-role');
-    const welcomeNameElement = document.getElementById('welcome-user-name');
-
-    if (userNameElement) userNameElement.textContent = user.full_name;
-    if (userRoleElement) {
-      userRoleElement.textContent = formatRole(user.role);
-      userRoleElement.className = `user-role-badge ${getRoleClass(user.role)}`;
-    }
-    if (welcomeNameElement) welcomeNameElement.textContent = user.full_name;
-
-    if (userInitialsElement) {
-      const initials = user.full_name
-        .split(' ')
-        .map(n => n[0])
-        .join('')
-        .substring(0, 2)
-        .toUpperCase();
-      userInitialsElement.textContent = initials || 'US';
-    }
-
-    // Automatically inject consistent sidebar navigation links for user role
-    if (user && user.role) {
-      injectSidebarLinks(user.role);
-    }
-
+    currentUserProfileCache = user;
+    applyUserProfileToDOM(user);
     return user;
   } catch (error) {
     console.error('Failed to load user profile:', error);
@@ -210,25 +251,77 @@ function getRoleClass(role) {
   }
 }
 
+function updateSidebarActiveLink(targetPath) {
+  const currentPath = (targetPath || window.location.pathname).toLowerCase();
+  const navContainer = document.getElementById('layout-nav-links');
+  if (!navContainer) return;
+
+  const links = Array.from(navContainer.querySelectorAll('a.nav-link'));
+  if (links.length === 0) return;
+
+  let bestMatch = null;
+
+  links.forEach(a => {
+    const href = (a.getAttribute('href') || '').toLowerCase();
+    if (!href) return;
+    if (href === currentPath) {
+      bestMatch = a;
+    } else if (href !== '/dashboard' && href !== '/dashboard/admin' && currentPath.startsWith(href + '/')) {
+      if (!bestMatch || href.length > (bestMatch.getAttribute('href') || '').length) {
+        bestMatch = a;
+      }
+    }
+  });
+
+  links.forEach(a => {
+    const isActive = (a === bestMatch);
+    if (isActive) {
+      a.classList.add('active');
+    } else {
+      a.classList.remove('active');
+    }
+    const badge = a.querySelector('span[style*="border-radius"]');
+    if (badge) {
+      badge.style.background = isActive ? '#fee2e2' : '#f1f5f9';
+      badge.style.color = isActive ? '#dc2626' : '#64748b';
+    }
+  });
+}
+
 // Global Centralized Sidebar Injection
 function injectSidebarLinks(role) {
   const navContainer = document.getElementById('layout-nav-links');
   if (!navContainer) return;
 
-  const currentPath = window.location.pathname;
+  const currentPath = window.location.pathname.toLowerCase();
 
   let links = [];
 
   if (role === 'RHU_ADMINISTRATOR') {
     links = [
       { href: '/dashboard/admin', label: 'Admin Overview', icon: '<path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/>' },
-      { href: '/dashboard/admin/users', label: 'User Accounts', icon: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>' }
+      { href: '/dashboard/admin/users', label: 'User Accounts', icon: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>' },
+      { section: 'Document Binders' },
+      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>' },
+      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>' },
+      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>' },
+      { section: 'System & Reports' },
+      { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>' },
+      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>' },
+      { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' }
     ];
   } else if (role === 'RECORDS_STAFF') {
     links = [
       { href: '/dashboard/records', label: 'Dashboard Overview', icon: '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>' },
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' },
+      { section: 'Document Binders' },
+      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>', badge: 'ITR' },
+      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>', badge: 'Consult' },
+      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>', badge: 'Vax' },
+      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>', badge: 'MedCert' },
+      { section: 'Management & Tools' },
+      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>' },
       { href: '/dashboard/duplicates', label: 'Duplicate Warnings', icon: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>' },
       { href: '/dashboard/archives', label: 'Archives Directory', icon: '<path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5l-4 4-4-4 1.41-1.41L11 13.67V10h2v3.67l1.59-1.58L16 13.5z"/>' },
       { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' }
@@ -237,45 +330,364 @@ function injectSidebarLinks(role) {
     links = [
       { href: '/dashboard/healthcare', label: 'Healthcare Overview', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>' },
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' }
+      { section: 'Document Binders' },
+      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>' },
+      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>' },
+      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>' },
+      { section: 'Search' },
+      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>' }
     ];
   } else if (role === 'ADMINISTRATIVE_STAFF') {
     links = [
       { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' }
+      { section: 'Document Binders' },
+      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>' },
+      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>' },
+      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>' },
+      { section: 'Search' },
+      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>' }
     ];
   } else {
     links = [
       { href: '/dashboard/reports', label: 'Reports Dashboard', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5 5 7.01 7.01 5 9.5 5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>' }
+      { section: 'Document Binders' },
+      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>' },
+      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>' },
+      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>' },
+      { section: 'Search' },
+      { href: '/dashboard/search', label: 'Unified Search', icon: '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>' }
     ];
   }
 
-  const exactMatch = links.find(item => item.href === currentPath);
+  const exactMatch = links.find(item => item.href && item.href.toLowerCase() === currentPath);
 
   navContainer.innerHTML = links.map(item => {
+    if (item.section) {
+      return `
+        <li class="sidebar-section-header" style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 14px 4px; list-style: none;">
+          ${item.section}
+        </li>
+      `;
+    }
+
     let isActive = false;
     if (exactMatch) {
       isActive = (item === exactMatch);
-    } else if (item.href !== '/dashboard' && item.href !== '/dashboard/admin' && currentPath.startsWith(item.href + '/')) {
-      isActive = true;
+    } else if (item.href) {
+      const itemHref = item.href.toLowerCase();
+      if (itemHref !== '/dashboard' && itemHref !== '/dashboard/admin' && currentPath.startsWith(itemHref + '/')) {
+        isActive = true;
+      }
     }
 
     const activeClass = isActive ? 'active' : '';
+    const badgeHtml = item.badge ? `<span style="margin-left: auto; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 12px; background: ${isActive ? '#fee2e2' : '#f1f5f9'}; color: ${isActive ? '#dc2626' : '#64748b'};">${item.badge}</span>` : '';
+
     return `
       <li>
         <a href="${item.href}" class="nav-link ${activeClass}">
           <svg viewBox="0 0 24 24">${item.icon}</svg>
-          ${item.label}
+          <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.label}</span>
+          ${badgeHtml}
         </a>
       </li>
     `;
   }).join('');
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SPA Dynamic Router & View Swapper (Seamless Persistent Layout)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Ensure dynamically injected scripts attaching DOMContentLoaded run immediately if document is already ready
+const _nativeAddEventListener = document.addEventListener.bind(document);
+document.addEventListener = function(type, listener, options) {
+  if (type === 'DOMContentLoaded' && (document.readyState === 'complete' || document.readyState === 'interactive')) {
+    setTimeout(() => {
+      try {
+        listener(new Event('DOMContentLoaded'));
+      } catch (err) {
+        console.error('Error executing dynamic DOMContentLoaded listener:', err);
+      }
+    }, 1);
+    return;
+  }
+  return _nativeAddEventListener(type, listener, options);
+};
+
+const SpaRouter = {
+  isNavigating: false,
+
+  init() {
+    this.createProgressBar();
+    this.setupLinkInterception();
+    this.setupHistoryListener();
+    this.setupGlobalHandlers();
+  },
+
+  createProgressBar() {
+    if (!document.getElementById('spa-progress-bar')) {
+      const bar = document.createElement('div');
+      bar.id = 'spa-progress-bar';
+      document.body.appendChild(bar);
+    }
+  },
+
+  setProgressBar(percent) {
+    const bar = document.getElementById('spa-progress-bar');
+    if (!bar) return;
+    if (percent === 0) {
+      bar.style.width = '0%';
+      bar.classList.remove('active');
+    } else {
+      bar.classList.add('active');
+      bar.style.width = `${percent}%`;
+    }
+  },
+
+  async navigate(url, pushState = true) {
+    if (this.isNavigating) return;
+    
+    // Normalize target URL
+    const targetUrl = new URL(url, window.location.origin);
+    const targetPath = targetUrl.pathname;
+    const currentPath = window.location.pathname;
+
+    // If identical full URL, scroll to top
+    if (targetUrl.href === window.location.href) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Do not intercept external, api, or auth endpoints
+    if (targetUrl.origin !== window.location.origin || targetPath.startsWith('/api/') || targetPath === '/login' || targetPath === '/api/auth/logout') {
+      window.location.href = url;
+      return;
+    }
+
+    try {
+      this.isNavigating = true;
+      this.setProgressBar(25);
+
+      const response = await fetch(targetUrl.href, {
+        headers: { 'X-Requested-With': 'SPA-Router' }
+      });
+
+      // Handle redirect to login or error
+      if (response.redirected && response.url.includes('/login')) {
+        window.location.href = response.url;
+        return;
+      }
+
+      if (!response.ok) {
+        window.location.href = targetUrl.href;
+        return;
+      }
+
+      this.setProgressBar(60);
+      const htmlText = await response.text();
+      const parser = new DOMParser();
+      const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+      const newMain = newDoc.querySelector('.main-content');
+      const currentMain = document.querySelector('.main-content');
+
+      if (!newMain || !currentMain) {
+        window.location.href = targetUrl.href;
+        return;
+      }
+
+      // 1. Update Document Title
+      if (newDoc.title) {
+        document.title = newDoc.title;
+      }
+
+      // 2. Update page-specific stylesheets & <style> tags
+      document.querySelectorAll('[data-spa-dynamic="true"]').forEach(el => el.remove());
+      
+      // Page <style> elements from <head>
+      newDoc.querySelectorAll('head > style').forEach(styleEl => {
+        const clonedStyle = document.createElement('style');
+        clonedStyle.setAttribute('data-spa-dynamic', 'true');
+        clonedStyle.textContent = styleEl.textContent;
+        document.head.appendChild(clonedStyle);
+      });
+
+      // Page <link rel="stylesheet"> elements that aren't global
+      newDoc.querySelectorAll('head > link[rel="stylesheet"]').forEach(linkEl => {
+        const href = linkEl.getAttribute('href');
+        if (href && !href.includes('/css/style.css')) {
+          const existing = document.querySelector(`link[href="${href}"]`);
+          if (!existing) {
+            const clonedLink = document.createElement('link');
+            clonedLink.rel = 'stylesheet';
+            clonedLink.href = href;
+            clonedLink.setAttribute('data-spa-dynamic', 'true');
+            document.head.appendChild(clonedLink);
+          }
+        }
+      });
+
+      // 3. Swap main content
+      currentMain.innerHTML = newMain.innerHTML;
+      currentMain.className = newMain.className;
+      currentMain.classList.remove('spa-view-fade-in');
+      void currentMain.offsetWidth; // Trigger reflow for smooth animation
+      currentMain.classList.add('spa-view-fade-in');
+
+      // 4. Swap page-level modals located outside .main-content
+      document.querySelectorAll('[data-spa-modal="true"]').forEach(el => el.remove());
+      document.querySelectorAll('.app-container > .modal-overlay, .app-container > .modal-backdrop, body > .modal-overlay, body > .modal-backdrop').forEach(el => {
+        if (!currentMain.contains(el)) el.remove();
+      });
+
+      const targetAppContainer = document.querySelector('.app-container') || document.body;
+      newDoc.querySelectorAll('.modal-overlay, .modal-backdrop').forEach(modal => {
+        if (!newMain.contains(modal)) {
+          const clonedModal = modal.cloneNode(true);
+          clonedModal.setAttribute('data-spa-modal', 'true');
+          targetAppContainer.appendChild(clonedModal);
+        }
+      });
+
+      // 5. Update browser history
+      if (pushState) {
+        window.history.pushState({ spa: true, url: targetUrl.href }, document.title, targetUrl.href);
+      }
+
+      // 6. Update sidebar active indicator smoothly
+      updateSidebarActiveLink(targetPath);
+
+      // 7. Close mobile sidebar if open
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebar-overlay');
+      if (sidebar) sidebar.classList.remove('active');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+
+      // 8. Scroll view to top
+      window.scrollTo(0, 0);
+
+      this.setProgressBar(85);
+
+      // 9. Execute new scripts
+      await this.executeScripts(newDoc);
+
+      this.setProgressBar(100);
+      setTimeout(() => this.setProgressBar(0), 300);
+
+    } catch (error) {
+      console.error('SPA Navigation Error:', error);
+      window.location.href = url;
+    } finally {
+      this.isNavigating = false;
+    }
+  },
+
+  async executeScripts(newDoc) {
+    const scripts = Array.from(newDoc.querySelectorAll('script'));
+
+    for (const s of scripts) {
+      const src = s.getAttribute('src');
+      if (src) {
+        // Skip global scripts already loaded
+        if (src.includes('/js/api.js') || src.includes('/js/toast.js')) {
+          continue;
+        }
+        // Load external script if not already in document
+        if (!document.querySelector(`script[src="${src}"]`)) {
+          await new Promise((resolve) => {
+            const scriptTag = document.createElement('script');
+            scriptTag.src = src;
+            scriptTag.onload = resolve;
+            scriptTag.onerror = resolve;
+            document.head.appendChild(scriptTag);
+          });
+        }
+      } else if (s.textContent.trim()) {
+        try {
+          const rawCode = s.textContent;
+          // Find all declared top-level functions to expose them on window for inline HTML onclick handlers
+          const funcNames = new Set();
+          const funcRegex = /(?:^|\n)\s*(?:async\s+)?function\s+([a-zA-Z0-9_$]+)\s*\(/g;
+          let match;
+          while ((match = funcRegex.exec(rawCode)) !== null) {
+            funcNames.add(match[1]);
+          }
+
+          let exportsCode = '';
+          funcNames.forEach(fn => {
+            exportsCode += `\ntry { if (typeof ${fn} !== 'undefined') window['${fn}'] = ${fn}; } catch(e) {}\n`;
+          });
+
+          // Wrap in an async IIFE so let/const declarations are cleanly scoped and never conflict with global scope
+          const wrappedCode = `(async function() {\n${rawCode}\n${exportsCode}\n})();`;
+          (0, eval)(wrappedCode);
+        } catch (err) {
+          console.error('Error executing inline script:', err);
+        }
+      }
+    }
+  },
+
+  setupLinkInterception() {
+    document.addEventListener('click', (e) => {
+      // 1. Check anchor tag
+      const anchor = e.target.closest('a');
+      if (anchor) {
+        const href = anchor.getAttribute('href');
+        if (href && (href.startsWith('/dashboard') || href.startsWith('/records') || href.startsWith('/patients') || href.startsWith('/search') || href.startsWith('/archives') || href.startsWith('/duplicates') || href.startsWith('/reports'))) {
+          if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && anchor.target !== '_blank' && !anchor.hasAttribute('download') && !anchor.hasAttribute('data-no-spa')) {
+            e.preventDefault();
+            this.navigate(anchor.href, true);
+            return;
+          }
+        }
+      }
+
+      // 2. Check cards or elements with data-href or role-link
+      const card = e.target.closest('[data-spa-href], [data-href]');
+      if (card) {
+        const href = card.getAttribute('data-spa-href') || card.getAttribute('data-href');
+        if (href && (href.startsWith('/dashboard') || href.startsWith('/records') || href.startsWith('/patients'))) {
+          e.preventDefault();
+          this.navigate(href, true);
+        }
+      }
+    });
+  },
+
+  setupHistoryListener() {
+    window.addEventListener('popstate', () => {
+      this.navigate(window.location.href, false);
+    });
+  },
+
+  setupGlobalHandlers() {
+    // Global Logout button handler (ensures no duplicate confirmation dialogs)
+    document.addEventListener('click', async (e) => {
+      const logoutBtn = e.target.closest('#logout-btn');
+      if (logoutBtn) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
+          await API.logout();
+        }
+      }
+    });
+  }
+};
+
+window.navigateTo = function(url) {
+  return SpaRouter.navigate(url);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  SpaRouter.init();
+
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
   const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -298,4 +710,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 });
+
 

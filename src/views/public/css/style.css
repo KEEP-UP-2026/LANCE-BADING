@@ -377,7 +377,10 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   min-height: 100vh;
   width: 100%;
+  max-width: 100vw;
   background: #F5F7FA;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Sidebar (Desktop) */
@@ -588,11 +591,15 @@ h1, h2, h3, h4, h5, h6 {
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  max-width: calc(100% - var(--sidebar-width));
+  min-width: 0;
   padding: 24px 32px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #F5F7FA;
+  box-sizing: border-box;
 }
 
 /* Mobile Header */
@@ -1277,3 +1284,40 @@ input:checked + .slider:before {
     padding: 30px 20px;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   + SPA NAVIGATION & VIEW TRANSITIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+#spa-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #C62828 0%, #ef4444 50%, #b71c1c 100%);
+  z-index: 99999;
+  width: 0%;
+  opacity: 0;
+  box-shadow: 0 0 12px rgba(198, 40, 40, 0.7);
+  transition: width 0.25s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+
+#spa-progress-bar.active {
+  opacity: 1;
+}
+
+@keyframes spaFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spa-view-fade-in {
+  animation: spaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

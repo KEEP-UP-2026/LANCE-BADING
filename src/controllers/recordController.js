@@ -629,6 +629,232 @@ const RecordController = {
     }
   },
 
+  // Create manual patient record (e.g. Manual ITR, Consultation, Immunization, or Medical Certificate)
+  async createManualRecord(req, res) {
+    try {
+      const { patient_id, record_type, structured_json, file_name } = req.body;
+
+      let patient = null;
+      if (patient_id) {
+        // Check if existing patient exists
+        patient = await PatientModel.findById(patient_id);
+        if (!patient) {
+          return res.status(404).json({ success: false, message: 'Selected patient not found.' });
+        }
+      } else {
+        // Optional patient linking: for walk-in patients or newly arrived visitors without an existing profile
+        const demo = (structured_json && (structured_json.patient_demographics || structured_json.demographics)) || {};
+        const pName = (demo.name || demo.full_name || req.body.patient_name || 'Walk-in Patient').trim();
+        const parts = pName.split(' ');
+        const firstName = parts[0] || 'Walk-in';
+        const lastName = parts.slice(1).join(' ') || 'Patient';
+
+        const allPatients = await PatientModel.findAllActive();
+        const existingPatient = allPatients.find(p => {
+          const fn = `${p.first_name || ''} ${p.last_name || ''}`.trim().toLowerCase();
+          return fn === pName.toLowerCase() || (p.full_name && p.full_name.toLowerCase() === pName.toLowerCase());
+        });
+
+        if (existingPatient) {
+          patient = existingPatient;
+        } else {
+          const yr = new Date().getFullYear();
+          const random4 = Math.floor(1000 + Math.random() * 9000);
+          const generatedPatientNumber = `0001-${yr}-${random4}`;
+          const ageNum = demo.age ? parseInt(demo.age, 10) : 25;
+          const birthYear = yr - ageNum;
+          const birthDate = demo.birth_date || `${birthYear}-01-01`;
+          const genderRaw = String(demo.gender || demo.sex || 'OTHER').toUpperCase();
+          const sex = genderRaw.startsWith('F') ? 'FEMALE' : (genderRaw.startsWith('M') ? 'MALE' : 'OTHER');
+
+          patient = await PatientModel.create({
+            patient_number: generatedPatientNumber,
+            first_name: firstName,
+            last_name: lastName,
+            middle_name: '',
+            birth_date: birthDate,
+            sex: sex,
+            age: ageNum,
+            gender: sex,
+            address: demo.address || 'Paete, Laguna',
+            contact_number: demo.contact_number || '',
+            created_by: req.user ? req.user.id : null
+          });
+        }
+      }
+
+      const finalRecordType = record_type || 'PATIENT_INFORMATION_SHEET';
+      const recordId = crypto.randomUUID();
+      const prefix = finalRecordType === 'MEDICAL_CERTIFICATE' ? 'MedCert' : (finalRecordType === 'IMMUNIZATION_RECORD' ? 'Immunization' : (finalRecordType === 'CONSULTATION_RECORD' ? 'Consultation' : 'Manual_ITR'));
+      const sanitizedName = file_name && file_name.trim()
+        ? sanitizeFilename(file_name)
+        : `${prefix}_${patient.patient_number || patient.id}_${Date.now()}.pdf`;
+
+      // Build searchable text from structured_json for unified search
+      let extractedText = '';
+      if (structured_json && typeof structured_json === 'object') {
+        const textParts = [];
+
+        // Demographics
+        const demo = structured_json.patient_demographics || structured_json.demographics || {};
+        Object.entries(demo).forEach(([k, v]) => {
+          if (v) textParts.push(`${k.replace(/_/g, ' ')}: ${v}`);
+        });
+
+        // Vital Signs
+        const vitals = structured_json.vital_signs || {};
+        Object.entries(vitals).forEach(([k, v]) => {
+          if (typeof v === 'object' && v !== null) {
+            Object.entries(v).forEach(([vk, vv]) => { if (vv) textParts.push(`${vk}: ${vv}`); });
+          } else if (v) {
+            textParts.push(`${k.replace(/_/g, ' ')}: ${v}`);
+          }
+        });
+
+        // Smoking & Lifestyle
+        const smk = structured_json.smoking_cessation_profile || structured_json.lifestyle || {};
+        Object.entries(smk).forEach(([k, v]) => {
+          if (v) textParts.push(`${k.replace(/_/g, ' ')}: ${v}`);
+        });
+
+        // Family History
+        const fh = structured_json.family_history || {};
+        const fhPos = Object.entries(fh).filter(([_, v]) => v === true).map(([k]) => k.replace(/_/g, ' '));
+        if (fhPos.length > 0) textParts.push(`Family History: ${fhPos.join(', ')}`);
+
+        // Clinical Consultation Specific Fields
+        const consultDetails = structured_json.consultation_details || {};
+        if (consultDetails.visit_date) textParts.push(`Visit Date: ${consultDetails.visit_date}`);
+        if (consultDetails.chief_complaint) textParts.push(`Chief Complaint: ${consultDetails.chief_complaint}`);
+        if (consultDetails.attending_physician) textParts.push(`Attending Physician: ${consultDetails.attending_physician}`);
+
+        const medHistory = structured_json.medical_history || {};
+        if (medHistory.history_of_present_illness) textParts.push(`HPI: ${medHistory.history_of_present_illness}`);
+        if (medHistory.past_medical_surgical_history) textParts.push(`Past Medical History: ${medHistory.past_medical_surgical_history}`);
+        if (medHistory.current_medications) textParts.push(`Current Medications: ${medHistory.current_medications}`);
+        if (medHistory.allergies) textParts.push(`Allergies: ${medHistory.allergies}`);
+        if (medHistory.family_history) textParts.push(`Family History: ${medHistory.family_history}`);
+
+        const physAssess = structured_json.physical_findings_assessment || {};
+        if (physAssess.vital_signs) {
+          const vsText = Object.entries(physAssess.vital_signs).filter(([_, v]) => v !== null && v !== '').map(([k, v]) => `${k.replace(/_/g, ' ')}: ${v}`).join(', ');
+          if (vsText) textParts.push(`Vital Signs: ${vsText}`);
+        }
+        if (physAssess.physical_examination) textParts.push(`Physical Exam: ${physAssess.physical_examination}`);
+        if (physAssess.laboratory_diagnostic_results) textParts.push(`Lab Results: ${physAssess.laboratory_diagnostic_results}`);
+
+        const diagMgmt = structured_json.diagnosis_and_management || {};
+        if (diagMgmt.diagnosis) textParts.push(`Diagnosis: ${diagMgmt.diagnosis}`);
+        if (diagMgmt.prescriptions_medications) textParts.push(`Prescriptions: ${diagMgmt.prescriptions_medications}`);
+        if (diagMgmt.treatment_plan_and_advice) textParts.push(`Treatment Plan: ${diagMgmt.treatment_plan_and_advice}`);
+        if (diagMgmt.follow_up_date) textParts.push(`Follow-up Date: ${diagMgmt.follow_up_date}`);
+        if (diagMgmt.follow_up_instructions) textParts.push(`Follow-up Instructions: ${diagMgmt.follow_up_instructions}`);
+
+        // Vaccine & Immunization Specific Fields
+        const vacInfo = structured_json.vaccine_information || {};
+        if (vacInfo.vaccine_name) textParts.push(`Vaccine: ${vacInfo.vaccine_name}`);
+        if (vacInfo.brand_and_manufacturer) textParts.push(`Brand / Manufacturer: ${vacInfo.brand_and_manufacturer}`);
+        if (vacInfo.lot_batch_number) textParts.push(`Lot / Batch: ${vacInfo.lot_batch_number}`);
+        if (vacInfo.expiration_date) textParts.push(`Vaccine Exp: ${vacInfo.expiration_date}`);
+
+        const adminDetails = structured_json.administration_details || {};
+        if (adminDetails.date_administered) textParts.push(`Date Administered: ${adminDetails.date_administered}`);
+        if (adminDetails.dose_number) textParts.push(`Dose: ${adminDetails.dose_number}`);
+        if (adminDetails.injection_site) textParts.push(`Site: ${adminDetails.injection_site}`);
+        if (adminDetails.route_of_administration) textParts.push(`Route: ${adminDetails.route_of_administration}`);
+        if (adminDetails.dosage_volume) textParts.push(`Dosage: ${adminDetails.dosage_volume}`);
+        if (adminDetails.next_due_date) textParts.push(`Next Due Date: ${adminDetails.next_due_date}`);
+        if (adminDetails.remarks_adverse_reactions) textParts.push(`Remarks: ${adminDetails.remarks_adverse_reactions}`);
+
+        const provInfo = structured_json.provider_information || {};
+        if (provInfo.vaccinator_name) textParts.push(`Vaccinator: ${provInfo.vaccinator_name}`);
+        if (provInfo.prc_license_number) textParts.push(`PRC License: ${provInfo.prc_license_number}`);
+        if (provInfo.facility_name) textParts.push(`Facility: ${provInfo.facility_name}`);
+
+        // Medical Certificate Specific Fields
+        const medCertFindings = structured_json.clinical_findings || structured_json.clinical_details || {};
+        if (medCertFindings.examination_date) textParts.push(`Exam Date: ${medCertFindings.examination_date}`);
+        if (medCertFindings.diagnosis) textParts.push(`Diagnosis: ${medCertFindings.diagnosis}`);
+        if (medCertFindings.symptoms) textParts.push(`Symptoms / Complaints: ${medCertFindings.symptoms}`);
+
+        const medCertOpinion = structured_json.medical_opinion || structured_json.recommendations || {};
+        if (medCertOpinion.fitness_status) textParts.push(`Fitness Status: ${medCertOpinion.fitness_status}`);
+        if (medCertOpinion.sick_leave_days) textParts.push(`Sick Leave: ${medCertOpinion.sick_leave_days} days`);
+        if (medCertOpinion.resume_date) textParts.push(`Resume Date: ${medCertOpinion.resume_date}`);
+        if (medCertOpinion.restrictions) textParts.push(`Restrictions: ${medCertOpinion.restrictions}`);
+        if (medCertOpinion.remarks) textParts.push(`Remarks: ${medCertOpinion.remarks}`);
+
+        const medCertAuth = structured_json.physician_details || structured_json.authentication || {};
+        if (medCertAuth.physician_name) textParts.push(`Physician: ${medCertAuth.physician_name}`);
+        if (medCertAuth.prc_license_number) textParts.push(`PRC License: ${medCertAuth.prc_license_number}`);
+        if (medCertAuth.ptr_number) textParts.push(`PTR Number: ${medCertAuth.ptr_number}`);
+        if (medCertAuth.facility_name) textParts.push(`Clinic / Facility: ${medCertAuth.facility_name}`);
+        if (medCertAuth.facility_address) textParts.push(`Facility Address: ${medCertAuth.facility_address}`);
+        if (medCertAuth.facility_contact) textParts.push(`Facility Contact: ${medCertAuth.facility_contact}`);
+
+        // Consultations Table
+        const consultList = structured_json.consultation_records || structured_json.consultations || [];
+        if (Array.isArray(consultList)) {
+          consultList.forEach((c, idx) => {
+            const date = c.date || '';
+            const subj = c.subjective_findings || c.chief_complaint || '';
+            const obj = typeof c.objective_findings === 'object' && c.objective_findings !== null
+              ? (c.objective_findings.notes || c.objective_findings.blood_pressure || JSON.stringify(c.objective_findings))
+              : (c.objective_findings || '');
+            const diag = Array.isArray(c.assessment_diagnosis)
+              ? c.assessment_diagnosis.join(', ')
+              : (c.diagnosis || '');
+            const plan = Array.isArray(c.plan_treatment)
+              ? c.plan_treatment.join(', ')
+              : (c.treatment || '');
+            const prov = c.provider || '';
+            textParts.push(`Consultation ${idx + 1} (${date}): Subj: ${subj} | Obj: ${obj} | Diag: ${diag} | Plan: ${plan} | Provider: ${prov}`);
+          });
+        }
+
+        extractedText = textParts.join('\n');
+      }
+
+      const fileUrl = `/api/records/download/${recordId}`;
+
+      const newRecord = await RecordModel.create({
+        id: recordId,
+        patient_id: patient.id,
+        record_type: finalRecordType,
+        file_name: sanitizedName,
+        file_url: fileUrl,
+        file_path: '',
+        file_type: 'application/pdf',
+        extracted_text: extractedText,
+        layout_blocks: null,
+        structured_json: structured_json || {},
+        classification_result: finalRecordType,
+        uploaded_by: req.user.id
+      });
+
+      await AuditMiddleware.logActivity(
+        req.user.id,
+        req.user.email,
+        'MANUAL_RECORD_CREATED',
+        `Manually created ${finalRecordType} document: ${sanitizedName} for patient ${patient.full_name || (patient.first_name + ' ' + patient.last_name)} (ID: ${patient.id})`,
+        req
+      );
+
+      return res.status(201).json({
+        success: true,
+        message: 'Individual Treatment Record created and filed successfully.',
+        record: newRecord
+      });
+
+    } catch (error) {
+      console.error('Create manual record error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while creating manual record.'
+      });
+    }
+  },
+
   // Cancel temporary upload session
   async cancelUpload(req, res) {
     try {
@@ -700,6 +926,165 @@ const RecordController = {
       return res.status(500).json({
         success: false,
         message: 'An internal server error occurred while fetching recent records.'
+      });
+    }
+  },
+
+  // List records filtered by category binder with search, pagination, and summary statistics
+  async listRecordsByCategory(req, res) {
+    try {
+      const PatientModel = require('../models/patientModel');
+      const { category, search, date_from, date_to, sort = 'newest', page = 1, limit = 15 } = req.query;
+
+      const normalizeCategoryKey = (cat) => {
+        if (!cat) return 'ALL';
+        const c = String(cat).toUpperCase().trim();
+        if (['PATIENT_INFORMATION_SHEET', 'INDIVIDUAL_TREATMENT_RECORD', 'ITR', 'TREATMENT'].includes(c)) return 'PATIENT_INFORMATION_SHEET';
+        if (['CONSULTATION_RECORD', 'CONSULTATION', 'CONSULTATIONS'].includes(c)) return 'CONSULTATION_RECORD';
+        if (['IMMUNIZATION_RECORD', 'IMMUNIZATION', 'IMMUNIZATIONS', 'VACCINE', 'VACCINATION', 'ANTI_RABIES_RECORD'].includes(c)) return 'IMMUNIZATION_RECORD';
+        if (['MEDICAL_CERTIFICATE', 'MEDCERT', 'MED_CERT', 'MEDICAL_CERT', 'CERTIFICATE'].includes(c)) return 'MEDICAL_CERTIFICATE';
+        return c;
+      };
+
+      const getCategoryLabel = (type) => {
+        const norm = normalizeCategoryKey(type);
+        switch (norm) {
+          case 'PATIENT_INFORMATION_SHEET': return 'Individual Treatment Record';
+          case 'CONSULTATION_RECORD': return 'Consultation Record';
+          case 'IMMUNIZATION_RECORD': return 'Immunization Record';
+          case 'MEDICAL_CERTIFICATE': return 'Medical Certificate';
+          case 'MATERNAL_CARE_RECORD': return 'Maternal Care Record';
+          default: return type ? type.replace(/_/g, ' ') : 'General Record';
+        }
+      };
+
+      const targetCategory = normalizeCategoryKey(category);
+      const allRecords = await RecordModel.findAllActive();
+      const patients = await PatientModel.findAllActive();
+      const patientMap = new Map(patients.map(p => [p.id, p]));
+
+      // Enrich active records with patient details
+      const enrichedRecords = [];
+      for (const rec of allRecords) {
+        const patient = patientMap.get(rec.patient_id);
+        if (!patient) continue; // Skip orphaned records
+
+        const recCategoryKey = normalizeCategoryKey(rec.record_type);
+        const matchesCat = (targetCategory === 'ALL' || recCategoryKey === targetCategory);
+
+        if (matchesCat) {
+          // Clean snippet of extracted text
+          let snippet = '';
+          if (rec.extracted_text) {
+            snippet = rec.extracted_text
+              .replace(/===\s*[^=]+\s*===/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .substring(0, 180);
+            if (rec.extracted_text.length > 180) snippet += '...';
+          }
+
+          const patientFullName = `${patient.first_name} ${patient.middle_name ? patient.middle_name + ' ' : ''}${patient.last_name}`.trim();
+
+          enrichedRecords.push({
+            id: rec.id,
+            patient_id: patient.id,
+            patient_name: patientFullName,
+            patient_number: patient.patient_number,
+            patient_birth_date: patient.birth_date,
+            patient_sex: patient.sex,
+            patient_address: patient.address || patient.barangay || 'Paete, Laguna',
+            patient_photo_url: patient.photo_url || null,
+            file_name: rec.file_name,
+            file_url: rec.file_url || `/api/records/download/${rec.id}`,
+            file_type: rec.file_type,
+            record_type: rec.record_type,
+            record_type_normalized: recCategoryKey,
+            record_type_label: getCategoryLabel(rec.record_type),
+            classification_result: rec.classification_result,
+            extracted_text_preview: snippet,
+            structured_json: rec.structured_json || null,
+            created_at: rec.created_at,
+            updated_at: rec.updated_at
+          });
+        }
+      }
+
+      // Compute category summary metrics before textual search filters
+      const totalCategoryCount = enrichedRecords.length;
+      const uniquePatients = new Set(enrichedRecords.map(r => r.patient_id));
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+      const recent30DaysCount = enrichedRecords.filter(r => new Date(r.created_at) >= thirtyDaysAgo).length;
+
+      // Apply search filters
+      let filtered = enrichedRecords;
+      if (search && search.trim() !== '') {
+        const q = search.toLowerCase().trim();
+        filtered = filtered.filter(r => {
+          const nameMatch = (r.patient_name || '').toLowerCase().includes(q);
+          const numMatch = (r.patient_number || '').toLowerCase().includes(q);
+          const fileMatch = (r.file_name || '').toLowerCase().includes(q);
+          const textMatch = (r.extracted_text_preview || '').toLowerCase().includes(q);
+          return nameMatch || numMatch || fileMatch || textMatch;
+        });
+      }
+
+      // Apply date filters
+      if (date_from) {
+        const fromDate = new Date(date_from);
+        filtered = filtered.filter(r => new Date(r.created_at) >= fromDate);
+      }
+      if (date_to) {
+        const toDate = new Date(date_to);
+        toDate.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(r => new Date(r.created_at) <= toDate);
+      }
+
+      // Apply sorting
+      if (sort === 'oldest') {
+        filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      } else if (sort === 'patient_name') {
+        filtered.sort((a, b) => (a.patient_name || '').localeCompare(b.patient_name || ''));
+      } else if (sort === 'filename') {
+        filtered.sort((a, b) => (a.file_name || '').localeCompare(b.file_name || ''));
+      } else {
+        // default: newest first
+        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
+      // Pagination
+      const parsedPage = Math.max(1, parseInt(page, 10) || 1);
+      const parsedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 15));
+      const totalFiltered = filtered.length;
+      const totalPages = Math.ceil(totalFiltered / parsedLimit) || 1;
+      const offset = (parsedPage - 1) * parsedLimit;
+      const paginatedRecords = filtered.slice(offset, offset + parsedLimit);
+
+      return res.status(200).json({
+        success: true,
+        category: targetCategory,
+        category_label: getCategoryLabel(targetCategory),
+        stats: {
+          total_records: totalCategoryCount,
+          total_patients: uniquePatients.size,
+          recent_30_days: recent30DaysCount,
+          filtered_count: totalFiltered
+        },
+        pagination: {
+          page: parsedPage,
+          limit: parsedLimit,
+          total_records: totalFiltered,
+          total_pages: totalPages
+        },
+        records: paginatedRecords
+      });
+
+    } catch (error) {
+      console.error('List records by category error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'An internal server error occurred while fetching category documents.'
       });
     }
   },

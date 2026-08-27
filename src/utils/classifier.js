@@ -163,6 +163,29 @@ const CATEGORY_KEYWORDS = {
     { word: "iron supplement", weight: 2.5 },
     { word: "prenatal vitamins", weight: 3 },
     { word: "cervical", weight: 2 }
+  ],
+  MEDICAL_CERTIFICATE: [
+    { word: "medical certificate", weight: 5 },
+    { word: "med cert", weight: 4.5 },
+    { word: "medcert", weight: 4 },
+    { word: "sertipikong medikal", weight: 4.5 },
+    { word: "sertipiko", weight: 3 },
+    { word: "certificate of health", weight: 4.5 },
+    { word: "fit to work", weight: 4 },
+    { word: "fit to school", weight: 4 },
+    { word: "fit to study", weight: 4 },
+    { word: "fit to resume", weight: 4 },
+    { word: "sick leave", weight: 4 },
+    { word: "rest for", weight: 3.5 },
+    { word: "days of rest", weight: 3.5 },
+    { word: "activity restriction", weight: 3.5 },
+    { word: "prc license no", weight: 3.5 },
+    { word: "ptr no", weight: 3.5 },
+    { word: "ptr number", weight: 3.5 },
+    { word: "attending physician", weight: 3 },
+    { word: "physician's signature", weight: 3.5 },
+    { word: "this is to certify", weight: 4.5 },
+    { word: "to whom it may concern", weight: 3.5 }
   ]
 };
 

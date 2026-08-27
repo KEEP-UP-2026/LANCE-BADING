@@ -23,7 +23,10 @@ async function getCookieForUser(baseUrl, email, password, withCsrf = false) {
   }
 
   const headers = { 'Content-Type': 'application/json' };
-  if (withCsrf) headers[TEST_CSRF_HEADER] = csrfToken;
+  if (withCsrf) {
+    headers[TEST_CSRF_HEADER] = csrfToken;
+    headers['Cookie'] = csrfCookie;
+  }
 
   const res = await fetch(`${baseUrl}/api/auth/login`, {
     method: 'POST',
