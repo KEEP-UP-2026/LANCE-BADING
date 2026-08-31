@@ -29,9 +29,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -71,13 +69,13 @@
 
       <div class="welcome-banner">
         <h2 class="welcome-title">Welcome back, <span id="welcome-user-name">Admin</span>!</h2>
-        <p class="welcome-desc">RHU Administrator Portal - Keep Up File Management System. Review system status, auditing, and manage authorized personnel accounts.</p>
+        <p class="welcome-desc">RHU Administrator Portal &bull; System Governance & Security. User account management, role & permission assignments, account activation/deactivation, audit log review, and system activity monitoring.</p>
       </div>
 
       <div class="stats-grid">
-        <div class="stats-card glass-panel">
+        <div class="stats-card glass-panel" style="cursor: pointer;" onclick="navigateTo('/dashboard/admin/users')">
           <div class="stats-info">
-            <span class="stats-label">Total Users</span>
+            <span class="stats-label">Total User Accounts</span>
             <span class="stats-value" id="stat-total-users">-</span>
           </div>
           <div class="stats-icon-wrapper">
@@ -86,7 +84,7 @@
         </div>
         <div class="stats-card glass-panel">
           <div class="stats-info">
-            <span class="stats-label">Active Users</span>
+            <span class="stats-label">Active Accounts</span>
             <span class="stats-value" style="color: var(--color-success);" id="stat-active-users">-</span>
           </div>
           <div class="stats-icon-wrapper" style="color: var(--color-success);">
@@ -95,20 +93,20 @@
         </div>
         <div class="stats-card glass-panel">
           <div class="stats-info">
-            <span class="stats-label">Inactive Users</span>
+            <span class="stats-label">Deactivated / Inactive</span>
             <span class="stats-value" style="color: var(--color-danger);" id="stat-inactive-users">-</span>
           </div>
           <div class="stats-icon-wrapper" style="color: var(--color-danger);">
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
         </div>
-        <div class="stats-card glass-panel" style="cursor: pointer;" onclick="navigateTo('/dashboard/duplicates')">
+        <div class="stats-card glass-panel" style="cursor: pointer;" onclick="navigateTo('/dashboard/admin/audit')">
           <div class="stats-info">
-            <span class="stats-label" style="color: #fda4af;">Duplicate warnings</span>
-            <span class="stats-value" style="color: var(--color-danger);" id="stat-warnings">0</span>
+            <span class="stats-label" style="color: #93c5fd;">System Audit Events</span>
+            <span class="stats-value" style="color: #60a5fa;" id="stat-total-audits">-</span>
           </div>
-          <div class="stats-icon-wrapper" style="color: var(--color-danger); background: rgba(239, 68, 68, 0.1);">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          <div class="stats-icon-wrapper" style="color: #60a5fa; background: rgba(59, 130, 246, 0.1);">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
           </div>
         </div>
       </div>
@@ -116,11 +114,15 @@
       <div class="stats-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 0;">
         <!-- Left: Recent logs -->
         <div class="content-card glass-panel" style="margin-bottom: 0;">
-          <div class="card-title-section">
+          <div class="card-title-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div>
-              <h3 class="card-title">Recent Security & Audit Logs</h3>
-              <p class="card-subtitle">Local system log events for record updates and security state.</p>
+              <h3 class="card-title">Audit Log Review & Security Trails</h3>
+              <p class="card-subtitle">Live system access logs, authentication events, and administrative activities.</p>
             </div>
+            <a href="/dashboard/admin/audit" class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              View Full Audit Logs
+            </a>
           </div>
 
           <div class="audit-list" id="admin-audit-logs">
@@ -130,23 +132,35 @@
           </div>
         </div>
 
-        <!-- Right: Unlocked Objective 3 Data Integrity Metrics -->
+        <!-- Right: Role & Permission Management Overview -->
         <div class="content-card glass-panel" style="margin-bottom: 0;">
-          <h3 class="card-title" style="margin-bottom: 4px;">Data Integrity Metrics</h3>
-          <p class="card-subtitle" style="margin-bottom: 20px;">Filing health statistics and duplicate warnings indicators.</p>
+          <h3 class="card-title" style="margin-bottom: 4px;">Role & Permission Management</h3>
+          <p class="card-subtitle" style="margin-bottom: 16px;">Authorized staff accounts by assigned system role.</p>
 
-          <div>
-            <h4 class="category-title" style="margin-bottom: 8px; font-size: 13px;">Digitized Attachments Filing</h4>
-            <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
-              <span>Total active scanned files in binders</span>
-              <strong id="progress-files-count" style="color: var(--color-primary); font-size: 18px;">0</strong>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+              <span>Administrative Staff</span>
+              <strong id="role-count-admin-staff" style="color: #60a5fa; font-size: 15px;">0</strong>
             </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+              <span>Records Staff</span>
+              <strong id="role-count-records" style="color: #34d399; font-size: 15px;">0</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+              <span>Healthcare Personnel</span>
+              <strong id="role-count-healthcare" style="color: #a78bfa; font-size: 15px;">0</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+              <span>RHU Administrators</span>
+              <strong id="role-count-admin" style="color: #f43f5e; font-size: 15px;">0</strong>
+            </div>
+          </div>
 
-            <h4 class="category-title" style="margin-bottom: 8px; font-size: 13px;">Duplicate Profile Warnings</h4>
-            <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
-              <span>Pending demographic conflict reviews</span>
-              <strong id="progress-warnings-count" style="color: var(--color-danger); font-size: 18px;">0 pending</strong>
-            </div>
+          <div style="margin-top: 18px;">
+            <a href="/dashboard/admin/users" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none; justify-content: center; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px;">
+              <svg style="width: 16px; height: 16px; fill: currentColor;" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+              Manage Users & Permissions
+            </a>
           </div>
         </div>
       </div>
@@ -175,11 +189,11 @@
       // 2. Inject Dynamic Sidebar Navigation
       injectSidebarLinks(user.role);
 
-      // 3. Fetch system stats
+      // 3. Fetch system users, role distributions, and audit logs
       try {
         const data = await API.getUsers();
         if (data && data.success) {
-          const users = data.users;
+          const users = data.users || [];
           document.getElementById('stat-total-users').textContent = users.length;
           
           const active = users.filter(u => u.status === 'ACTIVE').length;
@@ -187,28 +201,29 @@
           
           const inactive = users.filter(u => u.status === 'INACTIVE').length;
           document.getElementById('stat-inactive-users').textContent = inactive;
+
+          // Role Breakdown
+          const adminStaffCount = users.filter(u => u.role === 'ADMINISTRATIVE_STAFF').length;
+          const recordsCount = users.filter(u => u.role === 'RECORDS_STAFF').length;
+          const healthcareCount = users.filter(u => u.role === 'HEALTHCARE_PERSONNEL').length;
+          const adminCount = users.filter(u => u.role === 'RHU_ADMINISTRATOR').length;
+
+          document.getElementById('role-count-admin-staff').textContent = adminStaffCount;
+          document.getElementById('role-count-records').textContent = recordsCount;
+          document.getElementById('role-count-healthcare').textContent = healthcareCount;
+          document.getElementById('role-count-admin').textContent = adminCount;
         }
 
-        // Fetch duplicate warnings count
-        const duplicateRes = await API.fetchJson('/api/duplicates');
-        const pendingFlags = duplicateRes.success ? (duplicateRes.flags || []) : [];
-        document.getElementById('stat-warnings').textContent = pendingFlags.length;
-        document.getElementById('progress-warnings-count').textContent = `${pendingFlags.length} pending`;
-
-        const statsRes = await API.fetchJson('/api/reports/stats?report_type=stats');
-        const totalFiles = statsRes && statsRes.success
-          ? (statsRes.stats.binders.total_active || 0)
-          : 0;
-        document.getElementById('progress-files-count').textContent = totalFiles;
-
+        // Fetch audit logs
         const auditRes = await API.fetchJson('/api/reports/audit-logs');
         if (auditRes && auditRes.success) {
           const logs = auditRes.logs || [];
+          document.getElementById('stat-total-audits').textContent = logs.length;
           const logsContainer = document.getElementById('admin-audit-logs');
           if (logs.length === 0) {
             logsContainer.innerHTML = `
               <div style="text-align: center; color: var(--text-muted); padding: 20px 0;">
-                No system activity logs found.
+                No system activity logs recorded.
               </div>
             `;
           } else {
@@ -241,13 +256,6 @@
       } catch (error) {
         showToast('Error loading statistical metrics.', 'error');
       }
-
-      // 4. Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
-      });
     });
 
 

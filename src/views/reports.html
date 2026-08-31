@@ -3,12 +3,370 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reports Dashboard - KEEP UP</title>
+  <title>Healthcare Analytics & Reports - KEEP UP</title>
   <link rel="stylesheet" href="/css/style.css">
   <!-- Load jsPDF and AutoTable locally for client-side PDF export -->
   <script src="/js/jspdf.umd.min.js"></script>
   <script src="/js/jspdf.plugin.autotable.min.js"></script>
+  <!-- Load Chart.js for data analytics diagrams and charts -->
+  <script src="/js/chart.umd.min.js"></script>
   <style>
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+    .analytics-card {
+      background: #FFFFFF;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .analytics-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .analytics-card-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .analytics-card-val {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1e293b;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .analytics-card-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 6px;
+    }
+    .comparison-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-top: 10px;
+      width: fit-content;
+    }
+    .comparison-pill.positive {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+    .comparison-pill.negative {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    .comparison-pill.neutral {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 22px;
+      margin-bottom: 25px;
+    }
+    @media (max-width: 1100px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .chart-box {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 18px;
+      padding: 22px 24px;
+      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .chart-box:hover {
+      box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+      transform: translateY(-2px);
+    }
+    .chart-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, #4F46E5 0%, #06B6D4 50%, #10B981 100%);
+      opacity: 0.95;
+    }
+    .chart-box.chart-box-accent-rose::before {
+      background: linear-gradient(90deg, #E11D48 0%, #F59E0B 50%, #10B981 100%);
+    }
+    .chart-box.chart-box-accent-violet::before {
+      background: linear-gradient(90deg, #7C3AED 0%, #2563EB 50%, #06B6D4 100%);
+    }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #F1F5F9;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .chart-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .chart-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #0F172A;
+      margin: 0;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-subtitle {
+      font-size: 11.5px;
+      color: #64748B;
+      font-weight: 500;
+      margin: 0;
+    }
+    .chart-badge-pill {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chart-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 0 currentColor;
+      animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .donut-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(175px, 0.85fr);
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+      height: 300px;
+    }
+    @media (max-width: 680px) {
+      .donut-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .donut-wrapper {
+        height: 240px;
+      }
+      .donut-mini-legends {
+        border-left: none !important;
+        border-top: 1.5px dashed #E2E8F0;
+        padding-left: 0 !important;
+        padding-top: 14px;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+    }
+    .donut-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .donut-center-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      text-align: center;
+      background: radial-gradient(circle, #FFFFFF 55%, #F8FAFC 100%);
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      border: 2.5px solid #FFFFFF;
+      z-index: 2;
+    }
+    .donut-center-count {
+      font-size: 24px;
+      font-weight: 900;
+      color: #0F172A;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .donut-center-label {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #64748B;
+      margin-top: 3px;
+    }
+    .donut-mini-legends {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-left: 16px;
+      border-left: 1.5px solid #F1F5F9;
+      min-width: 0;
+      z-index: 3;
+    }
+    .donut-mini-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: #F8FAFC;
+      padding: 7px 11px;
+      border-radius: 9px;
+      border: 1px solid #E2E8F0;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    }
+    .donut-mini-item:hover {
+      background: #F1F5F9;
+      border-color: #CBD5E1;
+      transform: translateX(2px);
+    }
+    .donut-mini-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .donut-mini-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .donut-mini-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0F172A;
+      padding-left: 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+    .donut-mini-val .donut-pct-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+    }
+    .trend-legend-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .trend-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      cursor: default;
+    }
+    .trend-pill.pill-indigo {
+      background: #EEF2FF;
+      color: #4F46E5;
+      border-color: #C7D2FE;
+    }
+    .trend-pill.pill-emerald {
+      background: #ECFDF5;
+      color: #059669;
+      border-color: #A7F3D0;
+    }
+    .trend-pill.pill-rose {
+      background: #FFF1F2;
+      color: #E11D48;
+      border-color: #FECDD3;
+    }
+    .mon-fri-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .mon-fri-table th {
+      background: #f8fafc;
+      padding: 12px 16px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+      text-align: left;
+    }
+    .mon-fri-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+    }
+    .mon-fri-table tr:hover td {
+      background: #fdf2f2;
+    }
+    .mon-fri-table tr.total-row td {
+      background: #fff1f2 !important;
+      font-weight: 800;
+      color: #991b1b;
+      border-top: 2px solid #fecdd3;
+      border-bottom: 2px solid #fecdd3;
+    }
     .filter-panel {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -35,6 +393,66 @@
       margin-bottom: 25px;
       border-bottom: 2px solid #e2e8f0;
       padding-bottom: 15px;
+    }
+    .kebab-menu-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1.5px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .kebab-menu-btn:hover {
+      background: #F1F5F9;
+      border-color: #94A3B8;
+      color: #0F172A;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .dropdown-menu-custom {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+      min-width: 255px;
+      padding: 7px;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      animation: dropdownFadeIn 0.18s ease-out;
+    }
+    @keyframes dropdownFadeIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .dropdown-item-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .dropdown-item-btn:hover {
+      background: #F8FAFC;
+      color: #0F172A;
+      transform: translateX(2px);
     }
     .tab-btn {
       padding: 10px 22px;
@@ -133,9 +551,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -174,52 +590,59 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <div class="welcome-banner">
-        <h2 class="welcome-title">Healthcare Reports Dashboard</h2>
-        <p class="welcome-desc">Compile clinical charts, monitor active database growth, evaluate duplicates registries, and export summaries.</p>
-      </div>
-
-      <!-- Date / Patient Filter Panel -->
-      <div class="content-card glass-panel" style="margin-bottom: 25px;">
-        <h4 class="result-section-title" style="margin-top: 0; margin-bottom: 12px; font-size: 12px;">Report Filter Criteria</h4>
-        <div class="filter-panel">
-          <div class="filter-group">
-            <label class="filter-label" for="filter-start-date">Start Date</label>
-            <input type="date" id="filter-start-date" class="form-input">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label" for="filter-end-date">End Date</label>
-            <input type="date" id="filter-end-date" class="form-input">
-          </div>
-          <div class="filter-group">
-            <label class="filter-label" for="filter-patient-name">Patient Name / No.</label>
-            <input type="text" id="filter-patient-name" class="form-input" placeholder="e.g. John Doe, PAT-1002">
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button id="apply-filters-btn" class="btn btn-primary" style="flex: 1; padding: 12px;">Apply</button>
-            <button id="reset-filters-btn" class="btn btn-secondary" style="padding: 12px;">Reset</button>
-          </div>
-        </div>
-      </div>
-
       <!-- Action Panel & Reports Tabs -->
       <div class="content-card glass-panel" style="flex: 1; min-height: 450px; margin-bottom: 0;">
         <div class="card-title-section" style="margin-bottom: 20px;">
           <div>
-            <h3 class="card-title" id="active-report-title">Dashboard Summary Overview</h3>
-            <p class="card-subtitle" id="active-report-subtitle">Aggregated system metadata showing total patients, filing registries, and duplicates warnings.</p>
+            <h3 class="card-title" id="active-report-title">Weekly Data Analytics</h3>
+            <p class="card-subtitle" id="active-report-subtitle">Weekly Monday–Friday clinical records, consultation and medical certificate totals, and patient growth comparisons.</p>
           </div>
           
-          <!-- Exports Group (Hidden for Records View-Only Users) -->
-          <div class="action-icons-group" id="export-actions-group">
-            <button id="export-csv-btn" class="btn btn-secondary" style="font-size: 12px; padding: 8px 14px; gap: 6px; display: inline-flex; align-items: center;">
-              <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
-              Export CSV
+          <!-- Exports Group in 3 dots dropdown (Top Right of Card) -->
+          <div class="dropdown-wrapper" id="export-actions-group" style="position: relative;">
+            <button id="reports-kebab-menu-btn" class="kebab-menu-btn" title="Export &amp; Analytics Options" onclick="toggleReportsDropdown(event)" type="button">
+              <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
             </button>
-            <button id="export-pdf-btn" class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; gap: 6px; display: inline-flex; align-items: center; background: linear-gradient(135deg, var(--color-primary), #4f46e5); border: none;">
-              <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
-              Export PDF
-            </button>
+
+            <div id="reports-export-dropdown" class="dropdown-menu-custom" style="display: none;">
+              <div style="padding: 6px 12px 6px; font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #F1F5F9; margin-bottom: 4px;">
+                Export Analytics Data
+              </div>
+              
+              <button id="export-csv-btn" class="dropdown-item-btn" type="button">
+                <div style="width: 28px; height: 28px; border-radius: 7px; background: #ECFDF5; color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight: 700; color: #1E293B; line-height: 1.2;">Export CSV</div>
+                  <div style="font-size: 11px; color: #64748B; font-weight: 500;">Download tabular raw dataset</div>
+                </div>
+              </button>
+              
+              <button id="export-pdf-btn" class="dropdown-item-btn" type="button">
+                <div style="width: 28px; height: 28px; border-radius: 7px; background: #FEF2F2; color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight: 700; color: #1E293B; line-height: 1.2;">Export PDF</div>
+                  <div style="font-size: 11px; color: #64748B; font-weight: 500;">Formatted current view report</div>
+                </div>
+              </button>
+              
+              <div style="height: 1px; background: #F1F5F9; margin: 4px 6px;"></div>
+              
+              <button id="export-all-pdf-btn" class="dropdown-item-btn" type="button" style="background: #F0FDF4; border: 1px solid #DCFCE7;">
+                <div style="width: 28px; height: 28px; border-radius: 7px; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg style="width: 15px; height: 15px; fill: currentColor;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                </div>
+                <div>
+                  <div style="font-weight: 800; color: #15803D; line-height: 1.2;">Export All Analytics</div>
+                  <div style="font-size: 11px; color: #16A34A; font-weight: 600;">Complete Master PDF report</div>
+                </div>
+              </button>
+            </div>
           </div>
 
           <!-- View-Only notice for Records Staff -->
@@ -231,283 +654,670 @@
 
         <!-- Navigation Tabs -->
         <div class="reports-tabs-bar">
-          <button class="tab-btn active" onclick="switchTab('overview')">Overview Dashboard</button>
-          <button class="tab-btn" onclick="switchTab('patients')">Patient Records</button>
-          <button class="tab-btn" onclick="switchTab('consultations')">Consultation</button>
-          <button class="tab-btn" onclick="switchTab('immunizations')">Immunization</button>
-          <button class="tab-btn" onclick="switchTab('maternal-care')">Maternal Care</button>
-          <button class="tab-btn" onclick="switchTab('duplicates')">Duplicates Warning</button>
-          <button class="tab-btn" onclick="switchTab('summary')">Healthcare Summary</button>
+          <button class="tab-btn active" id="tab-btn-weekly" onclick="switchTab('weekly')">Weekly Analytics</button>
+          <button class="tab-btn" id="tab-btn-monthly" onclick="switchTab('monthly')">Monthly Analytics</button>
+          <button class="tab-btn" id="tab-btn-yearly" onclick="switchTab('yearly')">Yearly Analytics</button>
         </div>
 
-        <!-- TAB 1: OVERVIEW DASHBOARD -->
-        <div id="section-overview" class="report-section active">
-          <div class="report-card-grid">
-            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
-              <div class="stats-info">
-                <span class="stats-label">Active Patients</span>
-                <span class="stats-value" id="overview-active-patients">0</span>
+        <!-- TAB: WEEKLY DATA ANALYTICS (DEFAULT ACTIVE TAB) -->
+        <div id="section-weekly" class="report-section active">
+          <!-- Week Navigation Header Bar -->
+          <div class="weekly-nav-bar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 14px 20px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <button id="analytics-prev-week-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                Previous Week
+              </button>
+              
+              <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 6px 14px;">
+                <svg style="width: 16px; height: 16px; fill: #C62828;" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                <span id="analytics-week-label" style="font-size: 14px; font-weight: 800; color: #1E293B;">
+                  Loading Weekly Analytics...
+                </span>
+                <span id="analytics-current-week-tag" style="display: none; background: #E0E7FF; color: #3730A3; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">CURRENT</span>
+              </div>
+
+              <button id="analytics-next-week-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                Next Week
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+              </button>
+
+              <button id="analytics-current-week-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; border-color: #CBD5E1; background: #FFFFFF;">
+                Current Week
+              </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 12px; font-weight: 700; color: #64748B;">Select Specific Date:</span>
+              <input type="date" id="analytics-jump-date" class="form-input" style="padding: 8px 12px; font-size: 12.5px; border-radius: 8px; border: 1.5px solid #CBD5E1;">
+            </div>
+          </div>
+
+          <!-- Top Analytics KPI Grid -->
+          <div class="analytics-grid">
+            <!-- KPI 1: Patient Monitoring & Comparison Card (PROMINENT REQUEST) -->
+            <div class="analytics-card" style="border-top: 4px solid #C62828;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Patient Monitoring & Growth</span>
+                  <svg style="width: 18px; height: 18px; fill: #C62828;" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="analytics-kpi-patients">0</div>
+                <div class="analytics-card-sub">Monitored patients & encounters (Mon–Fri)</div>
+              </div>
+              <div id="analytics-patient-comparison-pill" class="comparison-pill positive">
+                <svg id="analytics-comparison-icon" style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+                <span id="analytics-patient-comparison-text">Patient increased by 12.5% compared with the previews week.</span>
               </div>
             </div>
-            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
-              <div class="stats-info">
-                <span class="stats-label">Archived Patients</span>
-                <span class="stats-value" id="overview-archived-patients">0</span>
+
+            <!-- KPI 2: Weekly Consultations Card -->
+            <div class="analytics-card" style="border-top: 4px solid #2563EB;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Total of Consultation</span>
+                  <svg style="width: 18px; height: 18px; fill: #2563EB;" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="analytics-kpi-consultations">0</div>
+                <div class="analytics-card-sub">Total consultations every week</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Daily Average: <strong id="analytics-kpi-consultations-avg">0.0</strong> / day
               </div>
             </div>
-            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
-              <div class="stats-info">
-                <span class="stats-label">Total Digitized Records</span>
-                <span class="stats-value" id="overview-total-records">0</span>
+
+            <!-- KPI 3: Weekly Medical Certificates Card -->
+            <div class="analytics-card" style="border-top: 4px solid #059669;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Medical Certificates Issued</span>
+                  <svg style="width: 18px; height: 18px; fill: #059669;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="analytics-kpi-medcerts">0</div>
+                <div class="analytics-card-sub">Kumuha ng medical certificate every week</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Daily Average: <strong id="analytics-kpi-medcerts-avg">0.0</strong> / day
               </div>
             </div>
-            <div class="stats-card glass-panel" style="background: rgba(255,255,255,0.01);">
-              <div class="stats-info">
-                <span class="stats-label">Duplicate Flags</span>
-                <span class="stats-value" id="overview-duplicate-flags" style="color: var(--color-danger);">0</span>
+
+            <!-- KPI 4: Total Records Mon-Fri -->
+            <div class="analytics-card" style="border-top: 4px solid #7C3AED;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Total Mon–Fri Records</span>
+                  <svg style="width: 18px; height: 18px; fill: #7C3AED;" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="analytics-kpi-records">0</div>
+                <div class="analytics-card-sub">All clinical binders filed this week</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Mon–Fri Record Operations
               </div>
             </div>
           </div>
 
-          <h4 class="result-section-title" style="margin-bottom: 12px; font-size: 13px;">Document Binder Distributions</h4>
-          <div class="report-card-grid">
-            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
-              <div class="stats-info">
-                <span class="stats-label">Individual Treatment Records</span>
-                <span class="stats-value" id="overview-itr">0</span>
+          <!-- DIAGRAMS & CHARTS ROW 1 -->
+          <div class="charts-grid">
+            <!-- Chart 1: Mon-Fri Daily Breakdown Bar Chart -->
+            <div class="chart-box">
+              <div class="chart-header">
+                <div class="chart-title-group">
+                  <h4 class="chart-title">
+                    <span>Monday – Friday Activity Breakdown</span>
+                  </h4>
+                  <div class="chart-subtitle">Daily comparison of Consultations, Medical Certificates & Patient Encounters</div>
+                </div>
+                <span class="chart-badge-pill" style="color: #4F46E5; background: #EEF2FF; border: 1px solid #C7D2FE;">
+                  <span class="chart-pulse-dot" style="background: #4F46E5;"></span> Mon–Fri Pulse
+                </span>
+              </div>
+              <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="chart-mon-fri-bars"></canvas>
               </div>
             </div>
-            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
-              <div class="stats-info">
-                <span class="stats-label">Consultations</span>
-                <span class="stats-value" id="overview-consultations">0</span>
-              </div>
-            </div>
-            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
-              <div class="stats-info">
-                <span class="stats-label">Immunizations</span>
-                <span class="stats-value" id="overview-immunizations">0</span>
-              </div>
-            </div>
-            <div class="stats-card glass-panel" style="background: rgba(99, 102, 241, 0.02); border-color: rgba(99, 102, 241, 0.15);">
-              <div class="stats-info">
-                <span class="stats-label">Maternal Care</span>
-                <span class="stats-value" id="overview-maternal-care">0</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- TAB 2: PATIENT RECORD SUMMARY -->
-        <div id="section-patients" class="report-section">
-          <div style="background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
-            <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #25282D;">Patient Status Metrics</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px;">
-              <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Patients</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px;" id="metric-patients-total">0</div>
+            <!-- Chart 2: Service Distribution Doughnut -->
+            <div class="chart-box chart-box-accent-rose">
+              <div class="chart-header">
+                <div class="chart-title-group">
+                  <h4 class="chart-title">
+                    <span>Weekly Services Distribution</span>
+                  </h4>
+                  <div class="chart-subtitle">Categorical split across all filed healthcare records</div>
+                </div>
+                <span class="chart-badge-pill" style="color: #059669; background: #ECFDF5; border: 1px solid #A7F3D0;">
+                  <span class="chart-pulse-dot" style="background: #10B981;"></span> Active Share
+                </span>
               </div>
-              <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Active Profiles</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--color-success);" id="metric-patients-active">0</div>
-                <div class="percentage-bar-wrapper">
-                  <div class="percentage-bar-container"><div id="bar-patients-active" class="percentage-bar-fill" style="background: var(--color-success);"></div></div>
-                  <span style="font-size: 11px; font-weight: 600;" id="label-patients-active">0%</span>
+              <div class="donut-layout">
+                <div class="donut-wrapper">
+                  <canvas id="chart-services-donut"></canvas>
+                  <div id="donut-center-weekly" class="donut-center-badge">
+                    <span class="donut-center-count" id="donut-weekly-total-num">0</span>
+                    <span class="donut-center-label">TOTAL FILINGS</span>
+                  </div>
+                </div>
+                <div class="donut-mini-legends" id="donut-weekly-mini-legends">
+                  <!-- Populated by JS -->
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- DIAGRAMS & CHARTS ROW 2: 4-WEEK TREND -->
+          <div class="chart-box chart-box-accent-violet" style="margin-bottom: 25px;">
+            <div class="chart-header">
+              <div class="chart-title-group">
+                <h4 class="chart-title">
+                  <span>Patient Monitoring & Volume Trajectory</span>
+                </h4>
+                <div class="chart-subtitle">Week-over-week multi-interval comparison comparing past 4 clinical weeks</div>
+              </div>
+              <div class="trend-legend-pills">
+                <span class="trend-pill pill-indigo">
+                  <span style="width: 8px; height: 8px; background: #4F46E5; border-radius: 50%; display: inline-block;"></span> Patients Monitored
+                </span>
+                <span class="trend-pill pill-rose">
+                  <span style="width: 8px; height: 8px; background: #E11D48; border-radius: 50%; display: inline-block;"></span> Consultations
+                </span>
+                <span class="trend-pill pill-emerald">
+                  <span style="width: 8px; height: 8px; background: #059669; border-radius: 50%; display: inline-block;"></span> Med Certificates
+                </span>
+              </div>
+            </div>
+            <div style="position: relative; height: 270px; width: 100%;">
+              <canvas id="chart-weekly-trend"></canvas>
+            </div>
+          </div>
+
+          <!-- MONDAY - FRIDAY DAILY RECORDS TABLE -->
+          <div class="content-card glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 25px; border: 1.5px solid #e2e8f0; border-radius: 14px;">
+            <div style="padding: 16px 20px; background: #F8FAFC; border-bottom: 1.5px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Archived Profiles</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--text-secondary);" id="metric-patients-archived">0</div>
-                <div class="percentage-bar-wrapper">
-                  <div class="percentage-bar-container"><div id="bar-patients-archived" class="percentage-bar-fill" style="background: var(--text-secondary);"></div></div>
-                  <span style="font-size: 11px; font-weight: 600;" id="label-patients-archived">0%</span>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #1E293B;">Monday to Friday Record Log & Daily Totals</h4>
+                <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Granular tally of consultation and medical certificates every week and every date</div>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; color: #1E293B; background: #E2E8F0; padding: 4px 10px; border-radius: 10px;">MON – FRI TALLY</span>
+            </div>
+
+            <div class="table-responsive" style="margin: 0;">
+              <table class="mon-fri-table">
+                <thead>
+                  <tr>
+                    <th>Day of Week</th>
+                    <th>Exact Date</th>
+                    <th style="color: #2563EB;">Total Consultations</th>
+                    <th style="color: #059669;">Medical Certificates</th>
+                    <th style="color: #C62828;">Patients Monitored</th>
+                    <th>Total Records</th>
+                    <th>Activity Level</th>
+                  </tr>
+                </thead>
+                <tbody id="table-mon-fri-body">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 25px;">Loading Mon–Fri records...</td></tr>
+                </tbody>
+                <tfoot id="table-mon-fri-foot">
+                  <!-- Injected dynamically with weekly totals -->
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- PATIENT MONITORING ACTIVITY STREAM -->
+          <div class="content-card glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 0; border: 1.5px solid #e2e8f0; border-radius: 14px;">
+            <div style="padding: 16px 20px; background: #F8FAFC; border-bottom: 1.5px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #1E293B;">Patient Monitoring Stream (This Week)</h4>
+                <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Real-time timeline of patients seen, consultations documented, and certificates issued</div>
+              </div>
+              <span id="patient-stream-count-badge" style="font-size: 11px; font-weight: 700; color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 3px 10px; border-radius: 12px;">0 Records</span>
+            </div>
+            <div class="table-responsive" style="margin: 0; max-height: 380px; overflow-y: auto;">
+              <table class="data-table" style="margin: 0;">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Patient Number</th>
+                    <th>Patient Full Name</th>
+                    <th>Record Type</th>
+                    <th>Document File</th>
+                  </tr>
+                </thead>
+                <tbody id="table-patient-stream-body">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 25px;">Loading patient stream...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: MONTHLY DATA ANALYTICS -->
+        <div id="section-monthly" class="report-section">
+          <!-- Month Navigation Header Bar -->
+          <div class="weekly-nav-bar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 14px 20px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <button id="monthly-prev-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                Previous Month
+              </button>
+              
+              <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 6px 14px;">
+                <svg style="width: 16px; height: 16px; fill: #2563EB;" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                <span id="monthly-label" style="font-size: 14px; font-weight: 800; color: #1E293B;">
+                  Loading Monthly Analytics...
+                </span>
+                <span id="monthly-current-tag" style="display: none; background: #E0E7FF; color: #3730A3; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">CURRENT</span>
+              </div>
+
+              <button id="monthly-next-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                Next Month
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+              </button>
+
+              <button id="monthly-current-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; border-color: #CBD5E1; background: #FFFFFF;">
+                Current Month
+              </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 12px; font-weight: 700; color: #64748B;">Select Month:</span>
+              <input type="month" id="monthly-jump-input" class="form-input" style="padding: 8px 12px; font-size: 12.5px; border-radius: 8px; border: 1.5px solid #CBD5E1;">
+            </div>
+          </div>
+
+          <!-- Top Monthly KPI Grid -->
+          <div class="analytics-grid">
+            <div class="analytics-card" style="border-top: 4px solid #C62828;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Monthly Patient Reach</span>
+                  <svg style="width: 18px; height: 18px; fill: #C62828;" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="monthly-kpi-patients">0</div>
+                <div class="analytics-card-sub">Unique patients encountered this month</div>
+              </div>
+              <div id="monthly-patient-comparison-pill" class="comparison-pill positive">
+                <svg id="monthly-comparison-icon" style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+                <span id="monthly-patient-comparison-text">Loading comparison...</span>
+              </div>
+            </div>
+
+            <div class="analytics-card" style="border-top: 4px solid #2563EB;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Monthly Consultations</span>
+                  <svg style="width: 18px; height: 18px; fill: #2563EB;" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="monthly-kpi-consultations">0</div>
+                <div class="analytics-card-sub">Total consultations documented</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Weekly Avg: <strong id="monthly-kpi-consultations-avg">0.0</strong> / week
+              </div>
+            </div>
+
+            <div class="analytics-card" style="border-top: 4px solid #059669;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Medical Certificates Issued</span>
+                  <svg style="width: 18px; height: 18px; fill: #059669;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="monthly-kpi-medcerts">0</div>
+                <div class="analytics-card-sub">Certificates issued this month</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Weekly Avg: <strong id="monthly-kpi-medcerts-avg">0.0</strong> / week
+              </div>
+            </div>
+
+            <div class="analytics-card" style="border-top: 4px solid #7C3AED;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Total Monthly Records</span>
+                  <svg style="width: 18px; height: 18px; fill: #7C3AED;" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="monthly-kpi-records">0</div>
+                <div class="analytics-card-sub">All clinical binders filed this month</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Monthly Operations Total
+              </div>
+            </div>
+          </div>
+
+          <!-- DIAGRAMS & CHARTS ROW 1 -->
+          <div class="charts-grid">
+            <div class="chart-box">
+              <div class="chart-header">
+                <div class="chart-title-group">
+                  <h4 class="chart-title">
+                    <span>Week-by-Week Activity Breakdown</span>
+                  </h4>
+                  <div class="chart-subtitle">Consultations, Medical Certificates & Patient Encounters by calendar week</div>
+                </div>
+                <span class="chart-badge-pill" style="color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE;">
+                  <span class="chart-pulse-dot" style="background: #2563EB;"></span> Monthly Weeks
+                </span>
+              </div>
+              <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="chart-monthly-weeks-bars"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-box chart-box-accent-rose">
+              <div class="chart-header">
+                <div class="chart-title-group">
+                  <h4 class="chart-title">
+                    <span>Monthly Services Distribution</span>
+                  </h4>
+                  <div class="chart-subtitle">Categorical split across all filed records this month</div>
+                </div>
+                <span class="chart-badge-pill" style="color: #059669; background: #ECFDF5; border: 1px solid #A7F3D0;">
+                  <span class="chart-pulse-dot" style="background: #10B981;"></span> Month Split
+                </span>
+              </div>
+              <div class="donut-layout">
+                <div class="donut-wrapper">
+                  <canvas id="chart-monthly-services-donut"></canvas>
+                  <div id="donut-center-monthly" class="donut-center-badge">
+                    <span class="donut-center-count" id="donut-monthly-total-num">0</span>
+                    <span class="donut-center-label">MONTHLY TOTAL</span>
+                  </div>
+                </div>
+                <div class="donut-mini-legends" id="donut-monthly-mini-legends">
+                  <!-- Populated by JS -->
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Patient No.</th>
-                  <th>Full Name</th>
-                  <th>Birth Date</th>
-                  <th>Sex</th>
-                  <th>Status</th>
-                  <th>Registration Date</th>
-                </tr>
-              </thead>
-              <tbody id="table-patients-body">
-                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No patients matching filters found.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TAB 3: CONSULTATIONS REPORT -->
-        <div id="section-consultations" class="report-section">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: #334155;">Consultations count: <strong id="consultations-count-badge" style="color: #C62828;">0</strong></h4>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Filing Date</th>
-                  <th>Patient Number</th>
-                  <th>Patient Name</th>
-                  <th>Document File Name</th>
-                </tr>
-              </thead>
-              <tbody id="table-consultations-body">
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No consultation records matching filters found.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TAB 4: IMMUNIZATIONS REPORT -->
-        <div id="section-immunizations" class="report-section">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: #334155;">Immunizations count: <strong id="immunizations-count-badge" style="color: #C62828;">0</strong></h4>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Filing Date</th>
-                  <th>Patient Number</th>
-                  <th>Patient Name</th>
-                  <th>Document File Name</th>
-                </tr>
-              </thead>
-              <tbody id="table-immunizations-body">
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No immunization records matching filters found.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TAB 5: ANTI-RABIES REPORT -->
-        <div id="section-anti-rabies" class="report-section">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: #334155;">Anti-Rabies count: <strong id="anti-rabies-count-badge" style="color: #C62828;">0</strong></h4>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Filing Date</th>
-                  <th>Patient Number</th>
-                  <th>Patient Name</th>
-                  <th>Document File Name</th>
-                </tr>
-              </thead>
-              <tbody id="table-anti-rabies-body">
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No anti-rabies records matching filters found.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TAB 6: MATERNAL CARE REPORT -->
-        <div id="section-maternal-care" class="report-section">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h4 style="margin: 0; font-size: 13px; color: #334155;">Maternal Care count: <strong id="maternal-care-count-badge" style="color: #C62828;">0</strong></h4>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Filing Date</th>
-                  <th>Patient Number</th>
-                  <th>Patient Name</th>
-                  <th>Document File Name</th>
-                </tr>
-              </thead>
-              <tbody id="table-maternal-care-body">
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No maternal care records matching filters found.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TAB 7: DUPLICATE RECORD REPORT -->
-        <div id="section-duplicates" class="report-section">
-          <div style="background: #F5F7FA; border: 1px solid #e2e8f0; border-radius: var(--border-radius-sm); padding: 18px; margin-bottom: 20px;">
-            <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #25282D;">Duplicate Demographic Conflict States</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 15px;">
-              <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Detected</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px;" id="metric-dup-total">0</div>
+          <!-- DIAGRAMS ROW 2: 6-MONTH TREND -->
+          <div class="chart-box chart-box-accent-violet" style="margin-bottom: 25px;">
+            <div class="chart-header">
+              <div class="chart-title-group">
+                <h4 class="chart-title">
+                  <span>Patient Monitoring & Volume Trajectory (6-Month Trend)</span>
+                </h4>
+                <div class="chart-subtitle">Month-over-month growth trajectory comparing the past 6 clinical months</div>
               </div>
-              <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Pending Review</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--color-danger);" id="metric-dup-pending">0</div>
+              <div class="trend-legend-pills">
+                <span class="trend-pill pill-indigo">
+                  <span style="width: 8px; height: 8px; background: #4F46E5; border-radius: 50%; display: inline-block;"></span> Patients Monitored
+                </span>
+                <span class="trend-pill pill-rose">
+                  <span style="width: 8px; height: 8px; background: #E11D48; border-radius: 50%; display: inline-block;"></span> Consultations
+                </span>
+                <span class="trend-pill pill-emerald">
+                  <span style="width: 8px; height: 8px; background: #059669; border-radius: 50%; display: inline-block;"></span> Med Certificates
+                </span>
               </div>
-              <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Reviewed</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--color-success);" id="metric-dup-reviewed">0</div>
-              </div>
-              <div>
-                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Ignored</span>
-                <div style="font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--text-secondary);" id="metric-dup-ignored">0</div>
-              </div>
+            </div>
+            <div style="position: relative; height: 270px; width: 100%;">
+              <canvas id="chart-monthly-trend"></canvas>
             </div>
           </div>
 
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Detected At</th>
-                  <th>Patient A (Number)</th>
-                  <th>Patient B (Number)</th>
-                  <th>Conflict Reason</th>
-                  <th>Match %</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="table-duplicates-body">
-                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No duplicate flags matching filters found.</td></tr>
-              </tbody>
-            </table>
+          <!-- MONTH CALENDAR BREAKDOWN TABLE -->
+          <div class="content-card glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 25px; border: 1.5px solid #e2e8f0; border-radius: 14px;">
+            <div style="padding: 16px 20px; background: #F8FAFC; border-bottom: 1.5px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #1E293B;">Weekly Calendar Records Log</h4>
+                <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Aggregated counts across calendar weeks in this month</div>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; color: #1E293B; background: #E2E8F0; padding: 4px 10px; border-radius: 10px;">MONTHLY WEEKS</span>
+            </div>
+
+            <div class="table-responsive" style="margin: 0;">
+              <table class="mon-fri-table">
+                <thead>
+                  <tr>
+                    <th>Week Interval</th>
+                    <th>Date Span</th>
+                    <th style="color: #2563EB;">Consultations</th>
+                    <th style="color: #059669;">Medical Certificates</th>
+                    <th style="color: #C62828;">Patients Monitored</th>
+                    <th>Total Records</th>
+                    <th>Monthly Share</th>
+                  </tr>
+                </thead>
+                <tbody id="table-monthly-weeks-body">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 25px;">Loading monthly records...</td></tr>
+                </tbody>
+                <tfoot id="table-monthly-weeks-foot"></tfoot>
+              </table>
+            </div>
           </div>
-        </div>
 
-        <!-- TAB 8: HEALTHCARE SUMMARY REPORT -->
-        <div id="section-summary" class="report-section">
-          <div class="summary-metrics-container">
-            <!-- Patient Stats Summary Card -->
-            <div class="summary-block-card">
-              <div class="summary-block-title">Demographics Summary</div>
-              <div class="summary-metric-item"><span>Total Registered Patients</span><strong id="sum-pat-total">0</strong></div>
-              <div class="summary-metric-item"><span>Active Patient Profiles</span><strong id="sum-pat-active" style="color: var(--color-success);">0</strong></div>
-              <div class="summary-metric-item"><span>Archived Profiles</span><strong id="sum-pat-archived">0</strong></div>
+          <!-- PATIENT ACTIVITY STREAM FOR MONTH -->
+          <div class="content-card glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 0; border: 1.5px solid #e2e8f0; border-radius: 14px;">
+            <div style="padding: 16px 20px; background: #F8FAFC; border-bottom: 1.5px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #1E293B;">Patient Monitoring Stream (This Month)</h4>
+                <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Timeline of patient encounters and services filed this month</div>
+              </div>
+              <span id="monthly-stream-badge" style="font-size: 11px; font-weight: 700; color: #2563EB; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 3px 10px; border-radius: 12px;">0 Records</span>
             </div>
-
-            <!-- Health Binders Card -->
-            <div class="summary-block-card">
-              <div class="summary-block-title">Document Filing Summary</div>
-              <div class="summary-metric-item"><span>Consultation Records</span><strong id="sum-rec-consultation">0</strong></div>
-              <div class="summary-metric-item"><span>Childhood Immunizations</span><strong id="sum-rec-immunization">0</strong></div>
-              <div class="summary-metric-item"><span>Anti-Rabies Vaccinations</span><strong id="sum-rec-antirabies">0</strong></div>
-              <div class="summary-metric-item"><span>Maternal Care Records</span><strong id="sum-rec-maternal">0</strong></div>
-              <div class="summary-metric-item"><span>Total Active Scan Logs</span><strong id="sum-rec-total" style="color: var(--color-info);">0</strong></div>
-            </div>
-
-            <!-- Duplicate States Card -->
-            <div class="summary-block-card">
-              <div class="summary-block-title">Demographic Duplicates Summary</div>
-              <div class="summary-metric-item"><span>Pending Warnings Review</span><strong id="sum-dup-pending" style="color: var(--color-danger);">0</strong></div>
-              <div class="summary-metric-item"><span>Reviewed Conflicts</span><strong id="sum-dup-reviewed" style="color: var(--color-success);">0</strong></div>
-              <div class="summary-metric-item"><span>Ignored Warnings</span><strong id="sum-dup-ignored">0</strong></div>
+            <div class="table-responsive" style="margin: 0; max-height: 380px; overflow-y: auto;">
+              <table class="data-table" style="margin: 0;">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Patient Number</th>
+                    <th>Patient Full Name</th>
+                    <th>Record Type</th>
+                    <th>Document File</th>
+                  </tr>
+                </thead>
+                <tbody id="table-monthly-patient-stream-body">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 25px;">Loading patient stream...</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
-      </div>
+        <!-- TAB: YEARLY DATA ANALYTICS -->
+        <div id="section-yearly" class="report-section">
+          <!-- Year Navigation Header Bar -->
+          <div class="weekly-nav-bar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 14px 20px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <button id="yearly-prev-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                Previous Year
+              </button>
+              
+              <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 10px; padding: 6px 14px;">
+                <svg style="width: 16px; height: 16px; fill: #7C3AED;" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                <span id="yearly-label" style="font-size: 14px; font-weight: 800; color: #1E293B;">
+                  Loading Yearly Analytics...
+                </span>
+                <span id="yearly-current-tag" style="display: none; background: #E0E7FF; color: #3730A3; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">CURRENT</span>
+              </div>
+
+              <button id="yearly-next-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                Next Year
+                <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+              </button>
+
+              <button id="yearly-current-btn" class="btn btn-secondary" style="padding: 9px 15px; font-size: 12.5px; font-weight: 700; border-color: #CBD5E1; background: #FFFFFF;">
+                Current Year
+              </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 12px; font-weight: 700; color: #64748B;">Select Year:</span>
+              <select id="yearly-jump-select" class="form-input" style="padding: 8px 12px; font-size: 12.5px; border-radius: 8px; border: 1.5px solid #CBD5E1;">
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Top Yearly KPI Grid -->
+          <div class="analytics-grid">
+            <div class="analytics-card" style="border-top: 4px solid #C62828;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Annual Patient Reach</span>
+                  <svg style="width: 18px; height: 18px; fill: #C62828;" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="yearly-kpi-patients">0</div>
+                <div class="analytics-card-sub">Unique patients encountered throughout the year</div>
+              </div>
+              <div id="yearly-patient-comparison-pill" class="comparison-pill positive">
+                <svg id="yearly-comparison-icon" style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+                <span id="yearly-patient-comparison-text">Loading comparison...</span>
+              </div>
+            </div>
+
+            <div class="analytics-card" style="border-top: 4px solid #2563EB;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Annual Consultations</span>
+                  <svg style="width: 18px; height: 18px; fill: #2563EB;" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="yearly-kpi-consultations">0</div>
+                <div class="analytics-card-sub">Total consultations documented this year</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Monthly Avg: <strong id="yearly-kpi-consultations-avg">0.0</strong> / mo
+              </div>
+            </div>
+
+            <div class="analytics-card" style="border-top: 4px solid #059669;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Annual Medical Certificates</span>
+                  <svg style="width: 18px; height: 18px; fill: #059669;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="yearly-kpi-medcerts">0</div>
+                <div class="analytics-card-sub">Medical certificates issued this year</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Monthly Avg: <strong id="yearly-kpi-medcerts-avg">0.0</strong> / mo
+              </div>
+            </div>
+
+            <div class="analytics-card" style="border-top: 4px solid #7C3AED;">
+              <div>
+                <div class="analytics-card-title">
+                  <span>Total Annual Records</span>
+                  <svg style="width: 18px; height: 18px; fill: #7C3AED;" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                </div>
+                <div class="analytics-card-val" id="yearly-kpi-records">0</div>
+                <div class="analytics-card-sub">Total active binders digitized this year</div>
+              </div>
+              <div style="font-size: 11.5px; color: #475569; margin-top: 10px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; width: fit-content;">
+                Annual System Operations
+              </div>
+            </div>
+          </div>
+
+          <!-- DIAGRAMS & CHARTS ROW 1 -->
+          <div class="charts-grid">
+            <div class="chart-box">
+              <div class="chart-header">
+                <div class="chart-title-group">
+                  <h4 class="chart-title">
+                    <span>12-Month Activity Breakdown (Jan – Dec)</span>
+                  </h4>
+                  <div class="chart-subtitle">Consultations, Medical Certificates & Patient Encounters per month</div>
+                </div>
+                <span class="chart-badge-pill" style="color: #7C3AED; background: #F5F3FF; border: 1px solid #DDD6FE;">
+                  <span class="chart-pulse-dot" style="background: #7C3AED;"></span> 12 Months
+                </span>
+              </div>
+              <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="chart-yearly-months-bars"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-box chart-box-accent-rose">
+              <div class="chart-header">
+                <div class="chart-title-group">
+                  <h4 class="chart-title">
+                    <span>Annual Services Distribution</span>
+                  </h4>
+                  <div class="chart-subtitle">Service distribution across all 12 months</div>
+                </div>
+                <span class="chart-badge-pill" style="color: #059669; background: #ECFDF5; border: 1px solid #A7F3D0;">
+                  <span class="chart-pulse-dot" style="background: #10B981;"></span> Annual Split
+                </span>
+              </div>
+              <div class="donut-layout">
+                <div class="donut-wrapper">
+                  <canvas id="chart-yearly-services-donut"></canvas>
+                  <div id="donut-center-yearly" class="donut-center-badge">
+                    <span class="donut-center-count" id="donut-yearly-total-num">0</span>
+                    <span class="donut-center-label">ANNUAL TOTAL</span>
+                  </div>
+                </div>
+                <div class="donut-mini-legends" id="donut-yearly-mini-legends">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIAGRAMS ROW 2: MULTI-YEAR TREND -->
+          <div class="chart-box chart-box-accent-violet" style="margin-bottom: 25px;">
+            <div class="chart-header">
+              <div class="chart-title-group">
+                <h4 class="chart-title">
+                  <span>Multi-Year Growth Trajectory (3-Year History)</span>
+                </h4>
+                <div class="chart-subtitle">Year-over-year multi-interval trajectory comparing recent years</div>
+              </div>
+              <div class="trend-legend-pills">
+                <span class="trend-pill pill-indigo">
+                  <span style="width: 8px; height: 8px; background: #4F46E5; border-radius: 50%; display: inline-block;"></span> Patients Monitored
+                </span>
+                <span class="trend-pill pill-rose">
+                  <span style="width: 8px; height: 8px; background: #E11D48; border-radius: 50%; display: inline-block;"></span> Consultations
+                </span>
+                <span class="trend-pill pill-emerald">
+                  <span style="width: 8px; height: 8px; background: #059669; border-radius: 50%; display: inline-block;"></span> Med Certificates
+                </span>
+              </div>
+            </div>
+            <div style="position: relative; height: 270px; width: 100%;">
+              <canvas id="chart-yearly-trend"></canvas>
+            </div>
+          </div>
+
+          <!-- 12-MONTH RECORD LOG TABLE -->
+          <div class="content-card glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 0; border: 1.5px solid #e2e8f0; border-radius: 14px;">
+            <div style="padding: 16px 20px; background: #F8FAFC; border-bottom: 1.5px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: #1E293B;">12-Month Record Log & Monthly Totals</h4>
+                <div style="font-size: 11.5px; color: #64748B; margin-top: 2px;">Comprehensive annual tally of all clinical services and encounters</div>
+              </div>
+              <span style="font-size: 11px; font-weight: 700; color: #1E293B; background: #E2E8F0; padding: 4px 10px; border-radius: 10px;">JAN – DEC TALLY</span>
+            </div>
+
+            <div class="table-responsive" style="margin: 0;">
+              <table class="mon-fri-table">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th style="color: #2563EB;">Total Consultations</th>
+                    <th style="color: #059669;">Medical Certificates</th>
+                    <th style="color: #C62828;">Patients Monitored</th>
+                    <th>Total Records</th>
+                    <th>Annual Share</th>
+                  </tr>
+                </thead>
+                <tbody id="table-yearly-months-body">
+                  <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 25px;">Loading annual records...</td></tr>
+                </tbody>
+                <tfoot id="table-yearly-months-foot"></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
     </main>
   </div>
 
@@ -515,18 +1325,39 @@
   <script src="/js/api.js"></script>
   <script>
     let currentUser = null;
-    let currentTab = 'overview';
+    let currentTab = 'weekly';
     let currentReportData = null; // Store query result for CSV/PDF exports
+    let weeklyAnalyticsData = null;
+    let currentWeekStart = '';
+    let prevWeekStart = '';
+    let nextWeekStart = '';
+
+    let monthlyAnalyticsData = null;
+    let currentMonthKey = '';
+    let prevMonthKey = '';
+    let nextMonthKey = '';
+
+    let yearlyAnalyticsData = null;
+    let currentYearVal = new Date().getFullYear();
+    let prevYearVal = currentYearVal - 1;
+    let nextYearVal = currentYearVal + 1;
+
+    let chartMonFri = null;
+    let chartDonut = null;
+    let chartTrend = null;
+
+    let chartMonthlyWeeks = null;
+    let chartMonthlyDonut = null;
+    let chartMonthlyTrend = null;
+
+    let chartYearlyMonths = null;
+    let chartYearlyDonut = null;
+    let chartYearlyTrend = null;
 
     const tabData = {
-      overview: { title: 'Dashboard Summary Overview', desc: 'Aggregated system metadata showing total patients, filing registries, and duplicates warnings.' },
-      patients: { title: 'Patient Record Summary Report', desc: 'Summary of active vs archived patient profiles with registration timelines.' },
-      consultations: { title: 'Consultation Summary Report', desc: 'Historical stream of consultation notes, diagnostic checkups, and doctor findings.' },
-      immunizations: { title: 'Childhood Immunization Report', desc: 'Filing logs of vaccination cards, shots records, and immunization trackers.' },
-      'anti-rabies': { title: 'Anti-Rabies Vaccination Report', desc: 'Registries of animal bite treatment notes, dog bites records, and vaccination schedules.' },
-      'maternal-care': { title: 'Maternal Care Records Report', desc: 'Pregnancy trackers, pre-natal cards, and obstetrics checkup documentation.' },
-      duplicates: { title: 'Demographic Duplicates Report', desc: 'Warnings and pending reviews on overlapping patient folders.' },
-      summary: { title: 'Healthcare Summary Report', desc: 'Combined statistics of all clinical registries, patient data, and duplicates warnings.' }
+      weekly: { title: 'Weekly Data Analytics', desc: 'Weekly Monday–Friday clinical records, consultation and medical certificate totals, and patient growth comparisons.' },
+      monthly: { title: 'Monthly Data Analytics', desc: 'Monthly clinical service distributions, week-by-week trends, and month-over-month patient volume comparisons.' },
+      yearly: { title: 'Yearly Healthcare Analytics', desc: 'Annual clinical summaries, month-by-month activity distributions, and year-over-year growth trajectories.' }
     };
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -534,7 +1365,7 @@
       if (!currentUser) return;
 
       // Restrict access on frontend
-      const allowedRoles = ['RHU_ADMINISTRATOR', 'ADMINISTRATIVE_STAFF', 'RECORDS_STAFF'];
+      const allowedRoles = ['ADMINISTRATIVE_STAFF', 'RECORDS_STAFF'];
       if (!allowedRoles.includes(currentUser.role)) {
         window.location.href = '/login';
         return;
@@ -549,236 +1380,1364 @@
       // Inject Navigation Links
       injectSidebarLinks(currentUser.role);
 
-      // Load static counts on dashboard load
-      await refreshOverviewCounters();
-      
-      // Load current filtered reports data
-      await refreshReportData();
+      // Load primary weekly analytics
+      await loadWeeklyAnalytics('');
 
-      // Listeners for Filters
-      document.getElementById('apply-filters-btn').addEventListener('click', async () => {
-        await refreshReportData();
-      });
+      // Week Navigation Button Listeners
+      const prevBtn = document.getElementById('analytics-prev-week-btn');
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          if (prevWeekStart) loadWeeklyAnalytics(prevWeekStart);
+        });
+      }
 
-      document.getElementById('reset-filters-btn').addEventListener('click', async () => {
-        document.getElementById('filter-start-date').value = '';
-        document.getElementById('filter-end-date').value = '';
-        document.getElementById('filter-patient-name').value = '';
-        await refreshReportData();
-      });
+      const nextBtn = document.getElementById('analytics-next-week-btn');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          if (nextWeekStart) loadWeeklyAnalytics(nextWeekStart);
+        });
+      }
+
+      const currentWeekBtn = document.getElementById('analytics-current-week-btn');
+      if (currentWeekBtn) {
+        currentWeekBtn.addEventListener('click', () => {
+          loadWeeklyAnalytics('');
+        });
+      }
+
+      const jumpDateInput = document.getElementById('analytics-jump-date');
+      if (jumpDateInput) {
+        jumpDateInput.addEventListener('change', (e) => {
+          if (e.target.value) {
+            loadWeeklyAnalytics(e.target.value);
+          }
+        });
+      }
+
+      // Monthly Navigation Listeners
+      const mPrevBtn = document.getElementById('monthly-prev-btn');
+      if (mPrevBtn) {
+        mPrevBtn.addEventListener('click', () => {
+          if (prevMonthKey) loadMonthlyAnalytics(prevMonthKey);
+        });
+      }
+
+      const mNextBtn = document.getElementById('monthly-next-btn');
+      if (mNextBtn) {
+        mNextBtn.addEventListener('click', () => {
+          if (nextMonthKey) loadMonthlyAnalytics(nextMonthKey);
+        });
+      }
+
+      const mCurrentBtn = document.getElementById('monthly-current-btn');
+      if (mCurrentBtn) {
+        mCurrentBtn.addEventListener('click', () => {
+          loadMonthlyAnalytics('');
+        });
+      }
+
+      const mJumpInput = document.getElementById('monthly-jump-input');
+      if (mJumpInput) {
+        mJumpInput.addEventListener('change', (e) => {
+          if (e.target.value) {
+            loadMonthlyAnalytics(e.target.value);
+          }
+        });
+      }
+
+      // Yearly Navigation Listeners
+      const yPrevBtn = document.getElementById('yearly-prev-btn');
+      if (yPrevBtn) {
+        yPrevBtn.addEventListener('click', () => {
+          if (prevYearVal) loadYearlyAnalytics(prevYearVal);
+        });
+      }
+
+      const yNextBtn = document.getElementById('yearly-next-btn');
+      if (yNextBtn) {
+        yNextBtn.addEventListener('click', () => {
+          if (nextYearVal) loadYearlyAnalytics(nextYearVal);
+        });
+      }
+
+      const yCurrentBtn = document.getElementById('yearly-current-btn');
+      if (yCurrentBtn) {
+        yCurrentBtn.addEventListener('click', () => {
+          loadYearlyAnalytics(new Date().getFullYear());
+        });
+      }
+
+      const yJumpSelect = document.getElementById('yearly-jump-select');
+      if (yJumpSelect) {
+        yJumpSelect.addEventListener('change', (e) => {
+          if (e.target.value) {
+            loadYearlyAnalytics(e.target.value);
+          }
+        });
+      }
 
       // Export Buttons Listeners
-      document.getElementById('export-csv-btn').addEventListener('click', () => {
-        if (!currentReportData) return;
-        exportCSV();
-      });
+      const csvBtn = document.getElementById('export-csv-btn');
+      if (csvBtn) {
+        csvBtn.addEventListener('click', () => {
+          closeReportsDropdown();
+          exportCSV();
+        });
+      }
 
-      document.getElementById('export-pdf-btn').addEventListener('click', () => {
-        if (!currentReportData) return;
-        exportPDF();
-      });
+      const pdfBtn = document.getElementById('export-pdf-btn');
+      if (pdfBtn) {
+        pdfBtn.addEventListener('click', () => {
+          closeReportsDropdown();
+          exportPDF();
+        });
+      }
 
-      // Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
+      const allPdfBtn = document.getElementById('export-all-pdf-btn');
+      if (allPdfBtn) {
+        allPdfBtn.addEventListener('click', () => {
+          closeReportsDropdown();
+          exportMasterPDF();
+        });
+      }
+
+      // Close dropdown when clicking anywhere outside
+      document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('reports-export-dropdown');
+        const btn = document.getElementById('reports-kebab-menu-btn');
+        if (dropdown && dropdown.style.display === 'block') {
+          if (!dropdown.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            dropdown.style.display = 'none';
+          }
         }
       });
     });
 
-    // Refresh Overview stats count cards
-    async function refreshOverviewCounters() {
+    // Toggle 3-dots Dropdown Menu
+    window.toggleReportsDropdown = function(e) {
+      if (e) e.stopPropagation();
+      const dropdown = document.getElementById('reports-export-dropdown');
+      if (dropdown) {
+        const isShown = dropdown.style.display === 'block';
+        dropdown.style.display = isShown ? 'none' : 'block';
+      }
+    };
+
+    window.closeReportsDropdown = function() {
+      const dropdown = document.getElementById('reports-export-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    };
+
+    // Load Weekly Analytics Data from API
+    async function loadWeeklyAnalytics(weekStartDate) {
       try {
-        const res = await API.fetchJson('/api/reports/stats?report_type=overview');
-        if (res && res.success) {
-          const s = res.stats || {};
-          const setTxt = (id, val) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = (val !== undefined && val !== null) ? val : 0;
-          };
-
-          setTxt('overview-active-patients', s.patients?.active);
-          setTxt('overview-archived-patients', s.patients?.archived);
-          setTxt('overview-total-records', s.binders?.total_active);
-          setTxt('overview-duplicate-flags', s.duplicates?.total);
-
-          setTxt('overview-itr', s.binders?.patient_information_sheet || s.binders?.itr || 0);
-          setTxt('overview-consultations', s.binders?.consultation || s.binders?.consultation_record || 0);
-          setTxt('overview-immunizations', s.binders?.immunization || s.binders?.immunization_record || 0);
-          setTxt('overview-maternal-care', s.binders?.maternal_care || s.binders?.maternal_care_record || 0);
+        const url = `/api/reports/analytics/weekly?week_start=${encodeURIComponent(weekStartDate || '')}`;
+        const res = await API.fetchJson(url);
+        if (res && res.success && res.analytics) {
+          weeklyAnalyticsData = res.analytics;
+          renderWeeklyAnalytics();
+        } else {
+          showToast('Unable to load weekly analytics.', 'error');
         }
       } catch (err) {
-        console.error('Failed to load overview statistics', err);
+        console.error('Failed to load weekly analytics:', err);
+        showToast('Error loading weekly analytics.', 'error');
       }
     }
 
-    // Refresh active tables data
-    async function refreshReportData() {
-      try {
-        const start = document.getElementById('filter-start-date').value;
-        const end = document.getElementById('filter-end-date').value;
-        const patient = document.getElementById('filter-patient-name').value;
+    // Render Weekly Analytics UI, KPIs, Table, and Diagrams
+    function renderWeeklyAnalytics() {
+      if (!weeklyAnalyticsData) return;
 
-        // Determine category mapping from tab
-        let categoryQuery = 'ALL';
-        if (currentTab === 'consultations') categoryQuery = 'CONSULTATION_RECORD';
-        if (currentTab === 'immunizations') categoryQuery = 'IMMUNIZATION_RECORD';
-        if (currentTab === 'anti-rabies') categoryQuery = 'ANTI_RABIES_RECORD';
-        if (currentTab === 'maternal-care') categoryQuery = 'MATERNAL_CARE_RECORD';
+      const a = weeklyAnalyticsData;
+      const w = a.week;
+      const kpi = a.kpi;
+      const comp = a.comparison;
 
-        const queryUrl = `/api/reports/data?start_date=${start}&end_date=${end}&patient_name=${encodeURIComponent(patient)}&category=${categoryQuery}&report_type=${encodeURIComponent(currentTab)}`;
-        const res = await API.fetchJson(queryUrl);
+      currentWeekStart = w.start_date;
+      prevWeekStart = w.prev_week_start;
+      nextWeekStart = w.next_week_start;
 
-        if (res && res.success) {
-          currentReportData = res.report;
-          renderActiveTabViews();
+      // Update Week Navigator Header
+      const weekLabelEl = document.getElementById('analytics-week-label');
+      if (weekLabelEl) weekLabelEl.textContent = `Week of ${w.label} (Mon – Fri)`;
+
+      const tagEl = document.getElementById('analytics-current-week-tag');
+      if (tagEl) {
+        tagEl.style.display = w.is_current_week ? 'inline-block' : 'none';
+      }
+
+      const jumpInput = document.getElementById('analytics-jump-date');
+      if (jumpInput) {
+        jumpInput.value = w.start_date;
+      }
+
+      // Update Top KPIs
+      const setEl = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val !== undefined && val !== null ? val : 0;
+      };
+
+      setEl('analytics-kpi-patients', kpi.total_patients_monitored);
+      setEl('analytics-kpi-consultations', kpi.total_consultations);
+      setEl('analytics-kpi-consultations-avg', kpi.daily_avg_consultations);
+      setEl('analytics-kpi-medcerts', kpi.total_medical_certificates);
+      setEl('analytics-kpi-medcerts-avg', kpi.daily_avg_medical_certificates);
+      setEl('analytics-kpi-records', kpi.total_records);
+
+      // Update Patient Comparison Pill
+      const compPill = document.getElementById('analytics-patient-comparison-pill');
+      const compText = document.getElementById('analytics-patient-comparison-text');
+      const compIcon = document.getElementById('analytics-comparison-icon');
+
+      if (compPill && compText) {
+        compText.textContent = comp.patient_comparison_text || 'Patient increased by 12.5% compared with the previews week.';
+        
+        let pillClass = 'comparison-pill neutral';
+        let iconPath = '<path d="M7 14l5-5 5 5z"/>';
+
+        if (comp.patient_change_direction === 'up') {
+          pillClass = 'comparison-pill positive';
+          iconPath = '<path d="M7 14l5-5 5 5z"/>';
+        } else if (comp.patient_change_direction === 'down') {
+          pillClass = 'comparison-pill negative';
+          iconPath = '<path d="M7 10l5 5 5-5z"/>';
         }
-      } catch (err) {
-        showToast('Error compilation report details.', 'error');
+
+        compPill.className = pillClass;
+        if (compIcon) compIcon.innerHTML = iconPath;
+      }
+
+      // Render Charts & Diagrams
+      renderAnalyticsCharts(a);
+
+      // Render Monday to Friday Table
+      renderMonFriTable(a.mon_to_fri_days, kpi);
+
+      // Render Patient Monitoring Stream
+      renderPatientStream(a.patient_monitoring_stream);
+    }
+
+    // Chart.js High-End Visual Helpers
+    function makeBarGradient(ctx, topColor, bottomColor, height = 300) {
+      const barGrad = ctx.createLinearGradient(0, 0, 0, height);
+      barGrad.addColorStop(0, topColor);
+      barGrad.addColorStop(1, bottomColor);
+      return barGrad;
+    }
+
+    function makeAreaGradient(ctx, r, g, b, height = 270) {
+      const areaGrad = ctx.createLinearGradient(0, 0, 0, height);
+      areaGrad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.32)`);
+      areaGrad.addColorStop(0.65, `rgba(${r}, ${g}, ${b}, 0.06)`);
+      areaGrad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.00)`);
+      return areaGrad;
+    }
+
+    const modernChartTooltip = {
+      backgroundColor: 'rgba(15, 23, 42, 0.94)',
+      titleColor: '#F8FAFC',
+      bodyColor: '#E2E8F0',
+      titleFont: { size: 12.5, weight: '700', family: 'system-ui, sans-serif' },
+      bodyFont: { size: 12, weight: '500', family: 'system-ui, sans-serif' },
+      padding: { top: 10, bottom: 10, left: 14, right: 14 },
+      cornerRadius: 10,
+      boxPadding: 6,
+      usePointStyle: true,
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      borderWidth: 1
+    };
+
+    function renderDonutMiniLegends(containerId, labels, values, colors) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const total = values.reduce((s, v) => s + v, 0);
+      container.innerHTML = labels.map((l, idx) => {
+        const val = values[idx] || 0;
+        const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+        return `
+          <div class="donut-mini-item" title="${escapeHtml(l)}: ${val} records (${pct}%)">
+            <div class="donut-mini-header">
+              <span class="donut-mini-dot" style="background: ${colors[idx]};"></span>
+              <span>${escapeHtml(l)}</span>
+            </div>
+            <div class="donut-mini-val">
+              <span>${val}</span>
+              <span class="donut-pct-sub">(${pct}%)</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Chart.js Diagrams
+    function renderAnalyticsCharts(analytics) {
+      if (typeof Chart === 'undefined') {
+        console.warn('Chart.js is not loaded yet');
+        return;
+      }
+
+      const days = analytics.mon_to_fri_days || [];
+      const kpi = analytics.kpi || {};
+      const trend = analytics.historical_trend || [];
+
+      // 1. Mon - Fri Daily Bar Chart
+      const barCanvas = document.getElementById('chart-mon-fri-bars');
+      if (barCanvas) {
+        if (chartMonFri) chartMonFri.destroy();
+        const ctx = barCanvas.getContext('2d');
+
+        const labels = days.map(d => d.display_label);
+        const consultData = days.map(d => d.consultations);
+        const medCertData = days.map(d => d.medical_certificates);
+        const patientData = days.map(d => d.patient_monitoring);
+
+        chartMonFri = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Consultations',
+                data: consultData,
+                backgroundColor: makeBarGradient(ctx, '#4F46E5', '#06B6D4'),
+                hoverBackgroundColor: '#4338CA',
+                borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              },
+              {
+                label: 'Medical Certificates',
+                data: medCertData,
+                backgroundColor: makeBarGradient(ctx, '#059669', '#34D399'),
+                hoverBackgroundColor: '#047857',
+                borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              },
+              {
+                label: 'Patients Monitored',
+                data: patientData,
+                backgroundColor: makeBarGradient(ctx, '#E11D48', '#FB7185'),
+                hoverBackgroundColor: '#BE123C',
+                borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 850,
+              easing: 'easeOutQuart'
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: { family: 'inherit', size: 12, weight: 700 },
+                  boxWidth: 12,
+                  boxHeight: 12,
+                  borderRadius: 4,
+                  useBorderRadius: true,
+                  padding: 16
+                }
+              },
+              tooltip: modernChartTooltip
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'inherit', size: 11, weight: 600 }, color: '#64748B' },
+                grid: { color: '#F1F5F9', borderDash: [3, 3] }
+              },
+              x: {
+                ticks: { font: { family: 'inherit', size: 11, weight: 700 }, color: '#334155' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Service Distribution Donut Chart
+      const donutCanvas = document.getElementById('chart-services-donut');
+      if (donutCanvas) {
+        if (chartDonut) chartDonut.destroy();
+        const ctx = donutCanvas.getContext('2d');
+
+        const b = kpi.breakdown || {};
+        const donutLabels = ['Consultation', 'Medical Certificate', 'Immunization', 'Maternal Care'];
+        const donutColors = ['#4F46E5', '#10B981', '#F59E0B', '#EC4899'];
+        const donutValues = [
+          b.consultations || 0,
+          b.medical_certificates || 0,
+          b.immunizations || 0,
+          b.maternal_care || 0
+        ];
+
+        const totalVal = donutValues.reduce((s, v) => s + v, 0);
+        const finalValues = totalVal > 0 ? donutValues : [1, 0, 0, 0];
+
+        // Update Center HUD Number
+        const countEl = document.getElementById('donut-weekly-total-num');
+        if (countEl) countEl.textContent = totalVal;
+
+        // Render Mini-Legends Beside Doughnut
+        renderDonutMiniLegends('donut-weekly-mini-legends', donutLabels, donutValues, donutColors);
+
+        chartDonut = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: donutLabels,
+            datasets: [{
+              data: finalValues,
+              backgroundColor: donutColors,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              borderRadius: 8,
+              spacing: 5,
+              hoverOffset: 12
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            animation: {
+              animateRotate: true,
+              animateScale: true,
+              duration: 900
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                ...modernChartTooltip,
+                callbacks: {
+                  label: function(ctx) {
+                    const label = ctx.label || '';
+                    const val = totalVal > 0 ? ctx.raw : 0;
+                    return ` ${label}: ${val} (${totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 3. Multi-Week Trend Line Chart
+      const trendCanvas = document.getElementById('chart-weekly-trend');
+      if (trendCanvas) {
+        if (chartTrend) chartTrend.destroy();
+        const ctx = trendCanvas.getContext('2d');
+
+        const trendLabels = trend.map(t => t.week_label);
+        const trendPatients = trend.map(t => t.patients_monitored);
+        const trendConsults = trend.map(t => t.consultations);
+        const trendMeds = trend.map(t => t.medical_certificates);
+
+        chartTrend = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: trendLabels,
+            datasets: [
+              {
+                label: 'Patients Monitored',
+                data: trendPatients,
+                borderColor: '#4F46E5',
+                backgroundColor: makeAreaGradient(ctx, 79, 70, 229),
+                borderWidth: 2.8,
+                fill: true,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#4F46E5',
+                pointBorderWidth: 3,
+                pointRadius: 4.5,
+                pointHoverRadius: 7.5,
+                pointHoverBorderWidth: 3.5
+              },
+              {
+                label: 'Consultations',
+                data: trendConsults,
+                borderColor: '#E11D48',
+                borderWidth: 2.2,
+                borderDash: [5, 4],
+                fill: false,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#E11D48',
+                pointBorderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 7
+              },
+              {
+                label: 'Medical Certificates',
+                data: trendMeds,
+                borderColor: '#059669',
+                borderWidth: 2.2,
+                fill: false,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#059669',
+                pointBorderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 7
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: 'easeOutQuart' },
+            plugins: {
+              legend: { display: false },
+              tooltip: modernChartTooltip
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'inherit', size: 11, weight: 600 }, color: '#64748B' },
+                grid: { color: '#F1F5F9', borderDash: [3, 3] }
+              },
+              x: {
+                ticks: { font: { family: 'inherit', size: 11, weight: 700 }, color: '#334155' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
       }
     }
 
-    // Render active tab view tables
-    function renderActiveTabViews() {
-      if (!currentReportData) return;
+    // Render Monday - Friday Daily Records Table
+    function renderMonFriTable(days, kpi) {
+      const tbody = document.getElementById('table-mon-fri-body');
+      const tfoot = document.getElementById('table-mon-fri-foot');
+      if (!tbody) return;
 
-      const rep = currentReportData;
+      if (!days || days.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 25px;">No record data found for this week.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+      }
 
-      // 1. Patient Record Summary
-      const pat = rep.patientSummary;
-      document.getElementById('metric-patients-total').textContent = pat.total;
-      document.getElementById('metric-patients-active').textContent = pat.active;
-      document.getElementById('metric-patients-archived').textContent = pat.archived;
-      
-      document.getElementById('label-patients-active').textContent = `${pat.active_percentage}%`;
-      document.getElementById('bar-patients-active').style.width = `${pat.active_percentage}%`;
-      
-      document.getElementById('label-patients-archived').textContent = `${pat.archived_percentage}%`;
-      document.getElementById('bar-patients-archived').style.width = `${pat.archived_percentage}%`;
+      const totalWeekRecords = kpi.total_records || 1;
 
-      const patBody = document.getElementById('table-patients-body');
-      if (pat.list.length === 0) {
-        patBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No patients found matching the criteria.</td></tr>`;
-      } else {
-        patBody.innerHTML = pat.list.map(p => `
+      tbody.innerHTML = days.map(d => {
+        const dayPct = totalWeekRecords > 0 ? Math.round((d.total_records / totalWeekRecords) * 100) : 0;
+        return `
           <tr>
-            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(p.patient_number)}</td>
-            <td style="font-weight:600;">${escapeHtml(p.name)}</td>
-            <td>${formatDate(p.birth_date)}</td>
-            <td><span class="badge">${escapeHtml(p.sex)}</span></td>
-            <td><span class="badge ${p.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">${p.status}</span></td>
-            <td>${formatDate(p.created_at)}</td>
+            <td style="font-weight: 800; color: #1E293B;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: #C62828; border-radius: 50%; margin-right: 6px;"></span>
+              ${escapeHtml(d.day_name)}
+            </td>
+            <td style="font-weight: 600; color: #475569;">${escapeHtml(d.date_formatted)}</td>
+            <td style="font-weight: 800; font-size: 14px; color: #2563EB;">
+              ${d.consultations}
+            </td>
+            <td style="font-weight: 800; font-size: 14px; color: #059669;">
+              ${d.medical_certificates}
+            </td>
+            <td style="font-weight: 800; font-size: 14px; color: #C62828;">
+              ${d.patient_monitoring}
+            </td>
+            <td style="font-weight: 800; color: #1E293B; font-size: 14px;">${d.total_records}</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="flex: 1; height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden; min-width: 60px;">
+                  <div style="width: ${dayPct}%; height: 100%; background: #C62828; border-radius: 3px;"></div>
+                </div>
+                <span style="font-size: 11px; font-weight: 700; color: #64748B;">${dayPct}%</span>
+              </div>
+            </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr class="total-row">
+            <td>WEEK TOTAL (MON – FRI)</td>
+            <td>5 Business Days</td>
+            <td style="font-size: 15px; color: #2563EB;">${kpi.total_consultations || 0}</td>
+            <td style="font-size: 15px; color: #059669;">${kpi.total_medical_certificates || 0}</td>
+            <td style="font-size: 15px; color: #C62828;">${kpi.total_patients_monitored || 0}</td>
+            <td style="font-size: 16px; color: #991B1B;">${kpi.total_records || 0}</td>
+            <td><span style="background: #991B1B; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 10px;">100% SUMMARY</span></td>
+          </tr>
+        `;
+      }
+    }
+
+    // Render Patient Monitoring Stream Table
+    function renderPatientStream(stream) {
+      const tbody = document.getElementById('table-patient-stream-body');
+      const badge = document.getElementById('patient-stream-count-badge');
+      if (!tbody) return;
+
+      if (!stream || stream.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 25px;">No patient records or visits logged during this Monday to Friday week.</td></tr>`;
+        if (badge) badge.textContent = '0 Records';
+        return;
       }
 
-      // 2. Consultation Table
-      document.getElementById('consultations-count-badge').textContent = rep.consultations.length;
-      const conBody = document.getElementById('table-consultations-body');
-      if (rep.consultations.length === 0) {
-        conBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No consultation records found.</td></tr>`;
-      } else {
-        conBody.innerHTML = rep.consultations.map(c => `
+      if (badge) badge.textContent = `${stream.length} Records`;
+
+      tbody.innerHTML = stream.map(s => {
+        let badgeColor = '#2563EB';
+        let badgeBg = '#EFF6FF';
+        if (s.record_type && s.record_type.includes('CERTIFICATE')) {
+          badgeColor = '#059669';
+          badgeBg = '#ECFDF5';
+        } else if (s.record_type && s.record_type.includes('CONSULTATION')) {
+          badgeColor = '#2563EB';
+          badgeBg = '#EFF6FF';
+        } else if (s.record_type && s.record_type.includes('IMMUNIZATION')) {
+          badgeColor = '#D97706';
+          badgeBg = '#FFFBEB';
+        }
+
+        return `
           <tr>
-            <td>${formatDate(c.created_at)}</td>
-            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
-            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
-            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+            <td>${formatDate(s.created_at)}</td>
+            <td style="font-weight: 700; color: var(--color-primary);">${escapeHtml(s.patient_number)}</td>
+            <td style="font-weight: 600; color: #1E293B;">${escapeHtml(s.patient_name)}</td>
+            <td>
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid ${badgeColor}33;">
+                ${escapeHtml(s.record_category_display)}
+              </span>
+            </td>
+            <td>
+              ${s.record_id ? `<a href="/dashboard/records/view/${s.record_id}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(s.file_name || 'View Record')}</a>` : (s.file_name ? `<span style="color: #64748B;">${escapeHtml(s.file_name)}</span>` : '—')}
+            </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+    }
+
+    // Load Monthly Analytics Data from API
+    async function loadMonthlyAnalytics(monthParam) {
+      try {
+        const url = `/api/reports/analytics/monthly?month=${encodeURIComponent(monthParam || '')}`;
+        const res = await API.fetchJson(url);
+        if (res && res.success && res.analytics) {
+          monthlyAnalyticsData = res.analytics;
+          renderMonthlyAnalytics();
+        } else {
+          showToast('Unable to load monthly analytics.', 'error');
+        }
+      } catch (err) {
+        console.error('Failed to load monthly analytics:', err);
+        showToast('Error loading monthly analytics.', 'error');
+      }
+    }
+
+    // Render Monthly Analytics UI, KPIs, Tables, Charts
+    function renderMonthlyAnalytics() {
+      if (!monthlyAnalyticsData) return;
+
+      const a = monthlyAnalyticsData;
+      const m = a.month;
+      const kpi = a.kpi;
+      const comp = a.comparison;
+
+      currentMonthKey = m.month_key;
+      prevMonthKey = m.prev_month;
+      nextMonthKey = m.next_month;
+
+      const labelEl = document.getElementById('monthly-label');
+      if (labelEl) labelEl.textContent = `Month of ${m.label}`;
+
+      const tagEl = document.getElementById('monthly-current-tag');
+      if (tagEl) tagEl.style.display = m.is_current_month ? 'inline-block' : 'none';
+
+      const jumpEl = document.getElementById('monthly-jump-input');
+      if (jumpEl) jumpEl.value = m.month_key;
+
+      const setEl = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val !== undefined && val !== null ? val : 0;
+      };
+
+      setEl('monthly-kpi-patients', kpi.total_patients_monitored);
+      setEl('monthly-kpi-consultations', kpi.total_consultations);
+      setEl('monthly-kpi-consultations-avg', kpi.weekly_avg_consultations);
+      setEl('monthly-kpi-medcerts', kpi.total_medical_certificates);
+      setEl('monthly-kpi-medcerts-avg', kpi.weekly_avg_medical_certificates);
+      setEl('monthly-kpi-records', kpi.total_records);
+
+      const pill = document.getElementById('monthly-patient-comparison-pill');
+      const text = document.getElementById('monthly-patient-comparison-text');
+      const icon = document.getElementById('monthly-comparison-icon');
+
+      if (pill && text) {
+        text.textContent = comp.patient_comparison_text || 'Month-over-month patient volume steady.';
+        let pClass = 'comparison-pill neutral';
+        let iPath = '<path d="M7 14l5-5 5 5z"/>';
+        if (comp.patient_change_direction === 'up') {
+          pClass = 'comparison-pill positive';
+          iPath = '<path d="M7 14l5-5 5 5z"/>';
+        } else if (comp.patient_change_direction === 'down') {
+          pClass = 'comparison-pill negative';
+          iPath = '<path d="M7 10l5 5 5-5z"/>';
+        }
+        pill.className = pClass;
+        if (icon) icon.innerHTML = iPath;
       }
 
-      // 3. Immunization Table
-      document.getElementById('immunizations-count-badge').textContent = rep.immunizations.length;
-      const immBody = document.getElementById('table-immunizations-body');
-      if (rep.immunizations.length === 0) {
-        immBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No immunization records found.</td></tr>`;
-      } else {
-        immBody.innerHTML = rep.immunizations.map(c => `
+      renderMonthlyCharts(a);
+      renderMonthlyWeeksTable(a.weeks_breakdown, kpi);
+      renderMonthlyPatientStream(a.patient_monitoring_stream);
+    }
+
+    function renderMonthlyCharts(analytics) {
+      if (typeof Chart === 'undefined') return;
+
+      const weeks = analytics.weeks_breakdown || [];
+      const kpi = analytics.kpi || {};
+      const trend = analytics.historical_trend || [];
+
+      // 1. Weeks Breakdown Bar Chart
+      const barCanvas = document.getElementById('chart-monthly-weeks-bars');
+      if (barCanvas) {
+        if (chartMonthlyWeeks) chartMonthlyWeeks.destroy();
+        const ctx = barCanvas.getContext('2d');
+
+        chartMonthlyWeeks = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: weeks.map(w => w.week_label),
+            datasets: [
+              {
+                label: 'Consultations',
+                data: weeks.map(w => w.consultations),
+                backgroundColor: makeBarGradient(ctx, '#4F46E5', '#06B6D4'),
+                hoverBackgroundColor: '#4338CA',
+                borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              },
+              {
+                label: 'Medical Certificates',
+                data: weeks.map(w => w.medical_certificates),
+                backgroundColor: makeBarGradient(ctx, '#059669', '#34D399'),
+                hoverBackgroundColor: '#047857',
+                borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              },
+              {
+                label: 'Patients Monitored',
+                data: weeks.map(w => w.patient_monitoring),
+                backgroundColor: makeBarGradient(ctx, '#E11D48', '#FB7185'),
+                hoverBackgroundColor: '#BE123C',
+                borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 850, easing: 'easeOutQuart' },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: { font: { family: 'inherit', size: 12, weight: 700 }, boxWidth: 12, boxHeight: 12, borderRadius: 4, useBorderRadius: true, padding: 16 }
+              },
+              tooltip: modernChartTooltip
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'inherit', size: 11, weight: 600 }, color: '#64748B' },
+                grid: { color: '#F1F5F9', borderDash: [3, 3] }
+              },
+              x: {
+                ticks: { font: { family: 'inherit', size: 11, weight: 700 }, color: '#334155' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Monthly Service Distribution Doughnut
+      const donutCanvas = document.getElementById('chart-monthly-services-donut');
+      if (donutCanvas) {
+        if (chartMonthlyDonut) chartMonthlyDonut.destroy();
+        const ctx = donutCanvas.getContext('2d');
+
+        const b = kpi.breakdown || {};
+        const donutLabels = ['Consultation', 'Medical Certificate', 'Immunization', 'Maternal Care'];
+        const donutColors = ['#4F46E5', '#10B981', '#F59E0B', '#EC4899'];
+        const donutValues = [
+          b.consultations || 0,
+          b.medical_certificates || 0,
+          b.immunizations || 0,
+          b.maternal_care || 0
+        ];
+        const totalVal = donutValues.reduce((s, v) => s + v, 0);
+        const finalValues = totalVal > 0 ? donutValues : [1, 0, 0, 0];
+
+        // Update Center HUD Number
+        const countEl = document.getElementById('donut-monthly-total-num');
+        if (countEl) countEl.textContent = totalVal;
+
+        // Render Mini-Legends Beside Doughnut
+        renderDonutMiniLegends('donut-monthly-mini-legends', donutLabels, donutValues, donutColors);
+
+        chartMonthlyDonut = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: donutLabels,
+            datasets: [{
+              data: finalValues,
+              backgroundColor: donutColors,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              borderRadius: 8,
+              spacing: 5,
+              hoverOffset: 12
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            animation: { animateRotate: true, animateScale: true, duration: 900 },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                ...modernChartTooltip,
+                callbacks: {
+                  label: (ctx) => {
+                    const val = totalVal > 0 ? ctx.raw : 0;
+                    return ` ${ctx.label}: ${val} (${totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 3. 6-Month Trajectory Line Chart
+      const trendCanvas = document.getElementById('chart-monthly-trend');
+      if (trendCanvas) {
+        if (chartMonthlyTrend) chartMonthlyTrend.destroy();
+        const ctx = trendCanvas.getContext('2d');
+
+        chartMonthlyTrend = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: trend.map(t => t.month_label),
+            datasets: [
+              {
+                label: 'Patients Monitored',
+                data: trend.map(t => t.patients_monitored),
+                borderColor: '#4F46E5',
+                backgroundColor: makeAreaGradient(ctx, 79, 70, 229),
+                borderWidth: 2.8,
+                fill: true,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#4F46E5',
+                pointBorderWidth: 3,
+                pointRadius: 4.5,
+                pointHoverRadius: 7.5,
+                pointHoverBorderWidth: 3.5
+              },
+              {
+                label: 'Consultations',
+                data: trend.map(t => t.consultations),
+                borderColor: '#E11D48',
+                borderWidth: 2.2,
+                borderDash: [5, 4],
+                fill: false,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#E11D48',
+                pointBorderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 7
+              },
+              {
+                label: 'Medical Certificates',
+                data: trend.map(t => t.medical_certificates),
+                borderColor: '#059669',
+                borderWidth: 2.2,
+                fill: false,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#059669',
+                pointBorderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 7
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: 'easeOutQuart' },
+            plugins: { legend: { display: false }, tooltip: modernChartTooltip },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'inherit', size: 11, weight: 600 }, color: '#64748B' },
+                grid: { color: '#F1F5F9', borderDash: [3, 3] }
+              },
+              x: {
+                ticks: { font: { family: 'inherit', size: 11, weight: 700 }, color: '#334155' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function renderMonthlyWeeksTable(weeks, kpi) {
+      const tbody = document.getElementById('table-monthly-weeks-body');
+      const tfoot = document.getElementById('table-monthly-weeks-foot');
+      if (!tbody) return;
+
+      if (!weeks || weeks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 25px;">No weekly data found for this month.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+      }
+
+      const totalMonthlyRecords = kpi.total_records || 1;
+
+      tbody.innerHTML = weeks.map(w => {
+        const sharePct = totalMonthlyRecords > 0 ? Math.round((w.total_records / totalMonthlyRecords) * 100) : 0;
+        return `
           <tr>
-            <td>${formatDate(c.created_at)}</td>
-            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
-            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
-            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+            <td style="font-weight: 800; color: #1E293B;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: #2563EB; border-radius: 50%; margin-right: 6px;"></span>
+              ${escapeHtml(w.week_label)}
+            </td>
+            <td style="font-weight: 600; color: #475569;">${escapeHtml(w.date_range)}</td>
+            <td style="font-weight: 800; font-size: 14px; color: #2563EB;">${w.consultations}</td>
+            <td style="font-weight: 800; font-size: 14px; color: #059669;">${w.medical_certificates}</td>
+            <td style="font-weight: 800; font-size: 14px; color: #C62828;">${w.patient_monitoring}</td>
+            <td style="font-weight: 800; color: #1E293B; font-size: 14px;">${w.total_records}</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="flex: 1; height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden; min-width: 60px;">
+                  <div style="width: ${sharePct}%; height: 100%; background: #2563EB; border-radius: 3px;"></div>
+                </div>
+                <span style="font-size: 11px; font-weight: 700; color: #64748B;">${sharePct}%</span>
+              </div>
+            </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr class="total-row">
+            <td>MONTH TOTAL</td>
+            <td>Calendar Month</td>
+            <td style="font-size: 15px; color: #2563EB;">${kpi.total_consultations || 0}</td>
+            <td style="font-size: 15px; color: #059669;">${kpi.total_medical_certificates || 0}</td>
+            <td style="font-size: 15px; color: #C62828;">${kpi.total_patients_monitored || 0}</td>
+            <td style="font-size: 16px; color: #991B1B;">${kpi.total_records || 0}</td>
+            <td><span style="background: #2563EB; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 10px;">100% SUMMARY</span></td>
+          </tr>
+        `;
+      }
+    }
+
+    function renderMonthlyPatientStream(stream) {
+      const tbody = document.getElementById('table-monthly-patient-stream-body');
+      const badge = document.getElementById('monthly-stream-badge');
+      if (!tbody) return;
+
+      if (!stream || stream.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 25px;">No patient records or visits logged this month.</td></tr>`;
+        if (badge) badge.textContent = '0 Records';
+        return;
       }
 
-      // 4. Anti-Rabies Table
-      document.getElementById('anti-rabies-count-badge').textContent = rep.antiRabies.length;
-      const rabBody = document.getElementById('table-anti-rabies-body');
-      if (rep.antiRabies.length === 0) {
-        rabBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No anti-rabies records found.</td></tr>`;
-      } else {
-        rabBody.innerHTML = rep.antiRabies.map(c => `
+      if (badge) badge.textContent = `${stream.length} Records`;
+
+      tbody.innerHTML = stream.map(s => {
+        let badgeColor = '#2563EB';
+        let badgeBg = '#EFF6FF';
+        if (s.record_type && s.record_type.includes('CERTIFICATE')) {
+          badgeColor = '#059669';
+          badgeBg = '#ECFDF5';
+        } else if (s.record_type && s.record_type.includes('IMMUNIZATION')) {
+          badgeColor = '#D97706';
+          badgeBg = '#FFFBEB';
+        }
+
+        return `
           <tr>
-            <td>${formatDate(c.created_at)}</td>
-            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
-            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
-            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+            <td>${formatDate(s.created_at)}</td>
+            <td style="font-weight: 700; color: var(--color-primary);">${escapeHtml(s.patient_number)}</td>
+            <td style="font-weight: 600; color: #1E293B;">${escapeHtml(s.patient_name)}</td>
+            <td>
+              <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid ${badgeColor}33;">
+                ${escapeHtml(s.record_category_display)}
+              </span>
+            </td>
+            <td>
+              ${s.record_id ? `<a href="/dashboard/records/view/${s.record_id}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(s.file_name || 'View Record')}</a>` : (s.file_name ? `<span style="color: #64748B;">${escapeHtml(s.file_name)}</span>` : '—')}
+            </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+    }
+
+    // Load Yearly Analytics Data from API
+    async function loadYearlyAnalytics(yearParam) {
+      try {
+        const url = `/api/reports/analytics/yearly?year=${encodeURIComponent(yearParam || '')}`;
+        const res = await API.fetchJson(url);
+        if (res && res.success && res.analytics) {
+          yearlyAnalyticsData = res.analytics;
+          renderYearlyAnalytics();
+        } else {
+          showToast('Unable to load yearly analytics.', 'error');
+        }
+      } catch (err) {
+        console.error('Failed to load yearly analytics:', err);
+        showToast('Error loading yearly analytics.', 'error');
+      }
+    }
+
+    // Render Yearly Analytics UI, KPIs, Table, Charts
+    function renderYearlyAnalytics() {
+      if (!yearlyAnalyticsData) return;
+
+      const a = yearlyAnalyticsData;
+      const y = a.year;
+      const kpi = a.kpi;
+      const comp = a.comparison;
+
+      currentYearVal = y.year;
+      prevYearVal = y.prev_year;
+      nextYearVal = y.next_year;
+
+      const labelEl = document.getElementById('yearly-label');
+      if (labelEl) labelEl.textContent = `${y.label} (Annual Analytics)`;
+
+      const tagEl = document.getElementById('yearly-current-tag');
+      if (tagEl) tagEl.style.display = y.is_current_year ? 'inline-block' : 'none';
+
+      const selectEl = document.getElementById('yearly-jump-select');
+      if (selectEl) selectEl.value = String(y.year);
+
+      const setEl = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val !== undefined && val !== null ? val : 0;
+      };
+
+      setEl('yearly-kpi-patients', kpi.total_patients_monitored);
+      setEl('yearly-kpi-consultations', kpi.total_consultations);
+      setEl('yearly-kpi-consultations-avg', kpi.monthly_avg_consultations);
+      setEl('yearly-kpi-medcerts', kpi.total_medical_certificates);
+      setEl('yearly-kpi-medcerts-avg', kpi.monthly_avg_medical_certificates);
+      setEl('yearly-kpi-records', kpi.total_records);
+
+      const pill = document.getElementById('yearly-patient-comparison-pill');
+      const text = document.getElementById('yearly-patient-comparison-text');
+      const icon = document.getElementById('yearly-comparison-icon');
+
+      if (pill && text) {
+        text.textContent = comp.patient_comparison_text || 'Annual patient volume steady.';
+        let pClass = 'comparison-pill neutral';
+        let iPath = '<path d="M7 14l5-5 5 5z"/>';
+        if (comp.patient_change_direction === 'up') {
+          pClass = 'comparison-pill positive';
+          iPath = '<path d="M7 14l5-5 5 5z"/>';
+        } else if (comp.patient_change_direction === 'down') {
+          pClass = 'comparison-pill negative';
+          iPath = '<path d="M7 10l5 5 5-5z"/>';
+        }
+        pill.className = pClass;
+        if (icon) icon.innerHTML = iPath;
       }
 
-      // 5. Maternal Care Table
-      document.getElementById('maternal-care-count-badge').textContent = rep.maternalCares.length;
-      const matBody = document.getElementById('table-maternal-care-body');
-      if (rep.maternalCares.length === 0) {
-        matBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No maternal care records found.</td></tr>`;
-      } else {
-        matBody.innerHTML = rep.maternalCares.map(c => `
+      renderYearlyCharts(a);
+      renderYearlyMonthsTable(a.months_breakdown, kpi);
+    }
+
+    function renderYearlyCharts(analytics) {
+      if (typeof Chart === 'undefined') return;
+
+      const months = analytics.months_breakdown || [];
+      const kpi = analytics.kpi || {};
+      const trend = analytics.historical_trend || [];
+
+      // 1. 12-Month Bar Chart
+      const barCanvas = document.getElementById('chart-yearly-months-bars');
+      if (barCanvas) {
+        if (chartYearlyMonths) chartYearlyMonths.destroy();
+        const ctx = barCanvas.getContext('2d');
+
+        chartYearlyMonths = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: months.map(m => m.short_month),
+            datasets: [
+              {
+                label: 'Consultations',
+                data: months.map(m => m.consultations),
+                backgroundColor: makeBarGradient(ctx, '#7C3AED', '#2563EB'),
+                hoverBackgroundColor: '#6D28D9',
+                borderRadius: { topLeft: 7, topRight: 7, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              },
+              {
+                label: 'Medical Certificates',
+                data: months.map(m => m.medical_certificates),
+                backgroundColor: makeBarGradient(ctx, '#059669', '#34D399'),
+                hoverBackgroundColor: '#047857',
+                borderRadius: { topLeft: 7, topRight: 7, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              },
+              {
+                label: 'Patients Monitored',
+                data: months.map(m => m.patient_monitoring),
+                backgroundColor: makeBarGradient(ctx, '#E11D48', '#FB7185'),
+                hoverBackgroundColor: '#BE123C',
+                borderRadius: { topLeft: 7, topRight: 7, bottomLeft: 2, bottomRight: 2 },
+                borderSkipped: false,
+                barPercentage: 0.68,
+                categoryPercentage: 0.8
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 850, easing: 'easeOutQuart' },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: { font: { family: 'inherit', size: 12, weight: 700 }, boxWidth: 12, boxHeight: 12, borderRadius: 4, useBorderRadius: true, padding: 16 }
+              },
+              tooltip: modernChartTooltip
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'inherit', size: 11, weight: 600 }, color: '#64748B' },
+                grid: { color: '#F1F5F9', borderDash: [3, 3] }
+              },
+              x: {
+                ticks: { font: { family: 'inherit', size: 11, weight: 700 }, color: '#334155' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Annual Service Donut
+      const donutCanvas = document.getElementById('chart-yearly-services-donut');
+      if (donutCanvas) {
+        if (chartYearlyDonut) chartYearlyDonut.destroy();
+        const ctx = donutCanvas.getContext('2d');
+
+        const b = kpi.breakdown || {};
+        const donutLabels = ['Consultation', 'Medical Certificate', 'Immunization', 'Maternal Care'];
+        const donutColors = ['#7C3AED', '#10B981', '#F59E0B', '#EC4899'];
+        const donutValues = [
+          b.consultations || 0,
+          b.medical_certificates || 0,
+          b.immunizations || 0,
+          b.maternal_care || 0
+        ];
+        const totalVal = donutValues.reduce((s, v) => s + v, 0);
+        const finalValues = totalVal > 0 ? donutValues : [1, 0, 0, 0];
+
+        // Update Center HUD Number
+        const countEl = document.getElementById('donut-yearly-total-num');
+        if (countEl) countEl.textContent = totalVal;
+
+        // Render Mini-Legends Beside Doughnut
+        renderDonutMiniLegends('donut-yearly-mini-legends', donutLabels, donutValues, donutColors);
+
+        chartYearlyDonut = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: donutLabels,
+            datasets: [{
+              data: finalValues,
+              backgroundColor: donutColors,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              borderRadius: 8,
+              spacing: 5,
+              hoverOffset: 12
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            animation: { animateRotate: true, animateScale: true, duration: 900 },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                ...modernChartTooltip,
+                callbacks: {
+                  label: (ctx) => {
+                    const val = totalVal > 0 ? ctx.raw : 0;
+                    return ` ${ctx.label}: ${val} (${totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 3. Multi-Year Trend
+      const trendCanvas = document.getElementById('chart-yearly-trend');
+      if (trendCanvas) {
+        if (chartYearlyTrend) chartYearlyTrend.destroy();
+        const ctx = trendCanvas.getContext('2d');
+
+        chartYearlyTrend = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: trend.map(t => t.year_label),
+            datasets: [
+              {
+                label: 'Patients Monitored',
+                data: trend.map(t => t.patients_monitored),
+                borderColor: '#4F46E5',
+                backgroundColor: makeAreaGradient(ctx, 79, 70, 229),
+                borderWidth: 2.8,
+                fill: true,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#4F46E5',
+                pointBorderWidth: 3,
+                pointRadius: 4.5,
+                pointHoverRadius: 7.5,
+                pointHoverBorderWidth: 3.5
+              },
+              {
+                label: 'Consultations',
+                data: trend.map(t => t.consultations),
+                borderColor: '#E11D48',
+                borderWidth: 2.2,
+                borderDash: [5, 4],
+                fill: false,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#E11D48',
+                pointBorderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 7
+              },
+              {
+                label: 'Medical Certificates',
+                data: trend.map(t => t.medical_certificates),
+                borderColor: '#059669',
+                borderWidth: 2.2,
+                fill: false,
+                tension: 0.42,
+                pointBackgroundColor: '#FFFFFF',
+                pointBorderColor: '#059669',
+                pointBorderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 7
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 900, easing: 'easeOutQuart' },
+            plugins: { legend: { display: false }, tooltip: modernChartTooltip },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { family: 'inherit', size: 11, weight: 600 }, color: '#64748B' },
+                grid: { color: '#F1F5F9', borderDash: [3, 3] }
+              },
+              x: {
+                ticks: { font: { family: 'inherit', size: 11, weight: 700 }, color: '#334155' },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function renderYearlyMonthsTable(months, kpi) {
+      const tbody = document.getElementById('table-yearly-months-body');
+      const tfoot = document.getElementById('table-yearly-months-foot');
+      if (!tbody) return;
+
+      if (!months || months.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 25px;">No monthly records found for this year.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+      }
+
+      const totalYearRecords = kpi.total_records || 1;
+
+      tbody.innerHTML = months.map(m => {
+        const sharePct = totalYearRecords > 0 ? Math.round((m.total_records / totalYearRecords) * 100) : 0;
+        return `
           <tr>
-            <td>${formatDate(c.created_at)}</td>
-            <td style="font-weight:700; color:var(--color-primary);">${escapeHtml(c.patient_number)}</td>
-            <td style="font-weight:600;">${escapeHtml(c.patient_name)}</td>
-            <td><a href="${c.file_url}" target="_blank" style="color: var(--color-primary);" class="hover-underline">${escapeHtml(c.file_name)}</a></td>
+            <td style="font-weight: 800; color: #1E293B;">
+              <span style="display: inline-block; width: 8px; height: 8px; background: #7C3AED; border-radius: 50%; margin-right: 6px;"></span>
+              ${escapeHtml(m.month_name)}
+            </td>
+            <td style="font-weight: 800; font-size: 14px; color: #2563EB;">${m.consultations}</td>
+            <td style="font-weight: 800; font-size: 14px; color: #059669;">${m.medical_certificates}</td>
+            <td style="font-weight: 800; font-size: 14px; color: #C62828;">${m.patient_monitoring}</td>
+            <td style="font-weight: 800; color: #1E293B; font-size: 14px;">${m.total_records}</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="flex: 1; height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden; min-width: 60px;">
+                  <div style="width: ${sharePct}%; height: 100%; background: #7C3AED; border-radius: 3px;"></div>
+                </div>
+                <span style="font-size: 11px; font-weight: 700; color: #64748B;">${sharePct}%</span>
+              </div>
+            </td>
           </tr>
-        `).join('');
+        `;
+      }).join('');
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr class="total-row">
+            <td>ANNUAL TOTAL</td>
+            <td style="font-size: 15px; color: #2563EB;">${kpi.total_consultations || 0}</td>
+            <td style="font-size: 15px; color: #059669;">${kpi.total_medical_certificates || 0}</td>
+            <td style="font-size: 15px; color: #C62828;">${kpi.total_patients_monitored || 0}</td>
+            <td style="font-size: 16px; color: #991B1B;">${kpi.total_records || 0}</td>
+            <td><span style="background: #7C3AED; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 10px;">100% SUMMARY</span></td>
+          </tr>
+        `;
       }
-
-      // 6. Duplicate warnings Report
-      const dup = rep.duplicateSummary;
-      document.getElementById('metric-dup-total').textContent = dup.total;
-      document.getElementById('metric-dup-pending').textContent = dup.pending;
-      document.getElementById('metric-dup-reviewed').textContent = dup.reviewed;
-      document.getElementById('metric-dup-ignored').textContent = dup.ignored;
-
-      const dupBody = document.getElementById('table-duplicates-body');
-      if (dup.list.length === 0) {
-        dupBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No duplicate warnings matching filters found.</td></tr>`;
-      } else {
-        dupBody.innerHTML = dup.list.map(f => {
-          let badgeClass = 'badge-inactive';
-          if (f.status === 'PENDING') badgeClass = 'badge-danger';
-          if (f.status === 'REVIEWED') badgeClass = 'badge-active';
-
-          return `
-            <tr>
-              <td>${formatDate(f.detected_at)}</td>
-              <td><span style="font-weight:600;">${escapeHtml(f.patient_name)}</span> <span style="font-size:11px; color:var(--text-secondary);">(${escapeHtml(f.patient_number)})</span></td>
-              <td><span style="font-weight:600;">${escapeHtml(f.duplicate_patient_name)}</span> <span style="font-size:11px; color:var(--text-secondary);">(${escapeHtml(f.duplicate_patient_number)})</span></td>
-              <td style="max-width:250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeHtml(f.reason)}">${escapeHtml(f.reason)}</td>
-              <td style="font-weight:700; color:var(--color-danger);">${f.similarity_score}%</td>
-              <td><span class="badge ${badgeClass}">${f.status}</span></td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      // 7. Combined Summary metrics
-      document.getElementById('sum-pat-total').textContent = pat.total;
-      document.getElementById('sum-pat-active').textContent = pat.active;
-      document.getElementById('sum-pat-archived').textContent = pat.archived;
-
-      document.getElementById('sum-rec-consultation').textContent = rep.consultations.length;
-      document.getElementById('sum-rec-immunization').textContent = rep.immunizations.length;
-      document.getElementById('sum-rec-antirabies').textContent = rep.antiRabies.length;
-      document.getElementById('sum-rec-maternal').textContent = rep.maternalCares.length;
-      document.getElementById('sum-rec-total').textContent = rep.allRecords.length;
-
-      document.getElementById('sum-dup-pending').textContent = dup.pending;
-      document.getElementById('sum-dup-reviewed').textContent = dup.reviewed;
-      document.getElementById('sum-dup-ignored').textContent = dup.ignored;
     }
 
     // Switch Tabs handler
@@ -789,14 +2748,16 @@
       const tabs = document.querySelectorAll('.tab-btn');
       tabs.forEach(btn => {
         btn.classList.remove('active');
-        if (btn.getAttribute('onclick').includes(tabId)) {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${tabId}'`)) {
           btn.classList.add('active');
         }
       });
 
       // Update Card Header titles
-      document.getElementById('active-report-title').textContent = tabData[tabId].title;
-      document.getElementById('active-report-subtitle').textContent = tabData[tabId].desc;
+      if (tabData[tabId]) {
+        document.getElementById('active-report-title').textContent = tabData[tabId].title;
+        document.getElementById('active-report-subtitle').textContent = tabData[tabId].desc;
+      }
 
       // Toggle Active section panel display
       const sections = document.querySelectorAll('.report-section');
@@ -807,20 +2768,58 @@
         activeSec.classList.add('active');
       }
 
-      // Hide or show filter options depending on context
-      // Re-fetch category filtered data dynamically
-      refreshReportData();
+      if (tabId === 'weekly') {
+        if (!weeklyAnalyticsData) {
+          loadWeeklyAnalytics(currentWeekStart);
+        } else {
+          setTimeout(() => {
+            if (chartMonFri) chartMonFri.resize();
+            if (chartDonut) chartDonut.resize();
+            if (chartTrend) chartTrend.resize();
+          }, 60);
+        }
+      } else if (tabId === 'monthly') {
+        if (!monthlyAnalyticsData) {
+          loadMonthlyAnalytics(currentMonthKey);
+        } else {
+          setTimeout(() => {
+            if (chartMonthlyWeeks) chartMonthlyWeeks.resize();
+            if (chartMonthlyDonut) chartMonthlyDonut.resize();
+            if (chartMonthlyTrend) chartMonthlyTrend.resize();
+          }, 60);
+        }
+      } else if (tabId === 'yearly') {
+        if (!yearlyAnalyticsData) {
+          loadYearlyAnalytics(currentYearVal);
+        } else {
+          setTimeout(() => {
+            if (chartYearlyMonths) chartYearlyMonths.resize();
+            if (chartYearlyDonut) chartYearlyDonut.resize();
+            if (chartYearlyTrend) chartYearlyTrend.resize();
+          }, 60);
+        }
+      }
     }
 
     async function recordExportAudit(exportFormat) {
-      if (!currentReportData) return;
-      const start = document.getElementById('filter-start-date').value;
-      const end = document.getElementById('filter-end-date').value;
-      let category = 'ALL';
-      if (currentTab === 'consultations') category = 'CONSULTATION_RECORD';
-      if (currentTab === 'immunizations') category = 'IMMUNIZATION_RECORD';
-      if (currentTab === 'anti-rabies') category = 'ANTI_RABIES_RECORD';
-      if (currentTab === 'maternal-care') category = 'MATERNAL_CARE_RECORD';
+      let start = '';
+      let end = '';
+      let category = 'WEEKLY_ANALYTICS';
+
+      if (currentTab === 'weekly') {
+        start = weeklyAnalyticsData?.week?.start_date || '';
+        end = weeklyAnalyticsData?.week?.end_date || '';
+        category = 'WEEKLY_ANALYTICS';
+      } else if (currentTab === 'monthly') {
+        start = monthlyAnalyticsData?.month?.month_key || '';
+        end = monthlyAnalyticsData?.month?.month_key || '';
+        category = 'MONTHLY_ANALYTICS';
+      } else if (currentTab === 'yearly') {
+        start = String(yearlyAnalyticsData?.year?.year || '');
+        end = String(yearlyAnalyticsData?.year?.year || '');
+        category = 'YEARLY_ANALYTICS';
+      }
+
       try {
         await API.logReportExport({
           export_format: exportFormat,
@@ -837,57 +2836,60 @@
     // CLIENT-SIDE EXPORTS: CSV
     async function exportCSV() {
       let csvContent = "";
-      const filename = `keepup-report-${currentTab}-${Date.now()}.csv`;
+      const filename = `keepup-analytics-${currentTab}-${Date.now()}.csv`;
 
-      csvContent += `"KEEP UP SYSTEM - HEALTHCARE REPORT"\r\n`;
-      csvContent += `"Report:","${tabData[currentTab].title}"\r\n`;
-      csvContent += `"Period:","${currentReportData.period.start} to ${currentReportData.period.end}"\r\n`;
+      csvContent += `"KEEP UP SYSTEM - HEALTHCARE ANALYTICS REPORT"\r\n`;
+      csvContent += `"Report:","${tabData[currentTab]?.title || 'Analytics'}"\r\n`;
+      
+      let periodStr = 'N/A';
+      if (currentTab === 'weekly' && weeklyAnalyticsData) periodStr = weeklyAnalyticsData.week.label;
+      if (currentTab === 'monthly' && monthlyAnalyticsData) periodStr = monthlyAnalyticsData.month.label;
+      if (currentTab === 'yearly' && yearlyAnalyticsData) periodStr = yearlyAnalyticsData.year.label;
+      
+      csvContent += `"Period:","${periodStr}"\r\n`;
       csvContent += `"Generation Date:","${new Date().toLocaleString()}"\r\n\r\n`;
 
-      if (currentTab === 'patients') {
-        csvContent += `"Patient Number","Full Name","Birth Date","Sex","Status","Registration Date"\r\n`;
-        currentReportData.patientSummary.list.forEach(p => {
-          csvContent += `"${p.patient_number}","${p.name}","${p.birth_date}","${p.sex}","${p.status}","${p.created_at}"\r\n`;
+      if (currentTab === 'weekly') {
+        if (!weeklyAnalyticsData) {
+          showToast('No weekly analytics data loaded.', 'warning');
+          return;
+        }
+        csvContent += `"WEEKLY HEALTHCARE DATA ANALYTICS (MON - FRI)"\r\n`;
+        csvContent += `"Week Period:","${weeklyAnalyticsData.week.label}"\r\n`;
+        csvContent += `"Comparison Insight:","${weeklyAnalyticsData.comparison.patient_comparison_text}"\r\n\r\n`;
+        csvContent += `"Day of Week","Exact Date","Total Consultations","Medical Certificates","Patients Monitored","Total Records"\r\n`;
+        weeklyAnalyticsData.mon_to_fri_days.forEach(d => {
+          csvContent += `"${d.day_name}","${d.date_formatted}","${d.consultations}","${d.medical_certificates}","${d.patient_monitoring}","${d.total_records}"\r\n`;
         });
-      } 
-      else if (currentTab === 'duplicates') {
-        csvContent += `"Detected At","Patient Name","Patient No.","Duplicate Patient Name","Duplicate Patient No.","Reason","Score","Status"\r\n`;
-        currentReportData.duplicateSummary.list.forEach(f => {
-          csvContent += `"${f.detected_at}","${f.patient_name}","${f.patient_number}","${f.duplicate_patient_name}","${f.duplicate_patient_number}","${f.reason}","${f.similarity_score}%","${f.status}"\r\n`;
-        });
+        csvContent += `"WEEK TOTAL","5 Business Days","${weeklyAnalyticsData.kpi.total_consultations}","${weeklyAnalyticsData.kpi.total_medical_certificates}","${weeklyAnalyticsData.kpi.total_patients_monitored}","${weeklyAnalyticsData.kpi.total_records}"\r\n`;
       }
-      else if (currentTab === 'summary') {
-        const pat = currentReportData.patientSummary;
-        const dup = currentReportData.duplicateSummary;
-        csvContent += `"DEMOGRAPHICS SUMMARY"\r\n`;
-        csvContent += `"Total Registered Patients","${pat.total}"\r\n`;
-        csvContent += `"Active Profiles","${pat.active}"\r\n`;
-        csvContent += `"Archived Profiles","${pat.archived}"\r\n\r\n`;
-
-        csvContent += `"DOCUMENT BINDERS SUMMARY"\r\n`;
-        csvContent += `"Consultation Records","${currentReportData.consultations.length}"\r\n`;
-        csvContent += `"Childhood Immunizations","${currentReportData.immunizations.length}"\r\n`;
-        csvContent += `"Anti-Rabies Vaccinations","${currentReportData.antiRabies.length}"\r\n`;
-        csvContent += `"Maternal Care Records","${currentReportData.maternalCares.length}"\r\n`;
-        csvContent += `"Total Scanned Files","${currentReportData.allRecords.length}"\r\n\r\n`;
-
-        csvContent += `"DUPLICATE PROFILE WARNINGS"\r\n`;
-        csvContent += `"Pending Review","${dup.pending}"\r\n`;
-        csvContent += `"Reviewed Conflicts","${dup.reviewed}"\r\n`;
-        csvContent += `"Ignored Warnings","${dup.ignored}"\r\n`;
-      }
-      else {
-        // Records collections: consultations, immunizations, anti-rabies, maternal care, overview
-        let list = currentReportData.allRecords;
-        if (currentTab === 'consultations') list = currentReportData.consultations;
-        if (currentTab === 'immunizations') list = currentReportData.immunizations;
-        if (currentTab === 'anti-rabies') list = currentReportData.antiRabies;
-        if (currentTab === 'maternal-care') list = currentReportData.maternalCares;
-
-        csvContent += `"Filing Date","Patient Number","Patient Name","Document File Name","Category"\r\n`;
-        list.forEach(c => {
-          csvContent += `"${c.created_at}","${c.patient_number}","${c.patient_name}","${c.file_name}","${c.record_type}"\r\n`;
+      else if (currentTab === 'monthly') {
+        if (!monthlyAnalyticsData) {
+          showToast('No monthly analytics data loaded.', 'warning');
+          return;
+        }
+        csvContent += `"MONTHLY HEALTHCARE DATA ANALYTICS"\r\n`;
+        csvContent += `"Month Period:","${monthlyAnalyticsData.month.label}"\r\n`;
+        csvContent += `"Comparison Insight:","${monthlyAnalyticsData.comparison.patient_comparison_text}"\r\n\r\n`;
+        csvContent += `"Week Interval","Date Span","Total Consultations","Medical Certificates","Patients Monitored","Total Records"\r\n`;
+        monthlyAnalyticsData.weeks_breakdown.forEach(w => {
+          csvContent += `"${w.week_label}","${w.date_range}","${w.consultations}","${w.medical_certificates}","${w.patient_monitoring}","${w.total_records}"\r\n`;
         });
+        csvContent += `"MONTH TOTAL","Full Calendar Month","${monthlyAnalyticsData.kpi.total_consultations}","${monthlyAnalyticsData.kpi.total_medical_certificates}","${monthlyAnalyticsData.kpi.total_patients_monitored}","${monthlyAnalyticsData.kpi.total_records}"\r\n`;
+      }
+      else if (currentTab === 'yearly') {
+        if (!yearlyAnalyticsData) {
+          showToast('No yearly analytics data loaded.', 'warning');
+          return;
+        }
+        csvContent += `"YEARLY HEALTHCARE DATA ANALYTICS"\r\n`;
+        csvContent += `"Year Period:","${yearlyAnalyticsData.year.label}"\r\n`;
+        csvContent += `"Comparison Insight:","${yearlyAnalyticsData.comparison.patient_comparison_text}"\r\n\r\n`;
+        csvContent += `"Month","Total Consultations","Medical Certificates","Patients Monitored","Total Records"\r\n`;
+        yearlyAnalyticsData.months_breakdown.forEach(m => {
+          csvContent += `"${m.month_name}","${m.consultations}","${m.medical_certificates}","${m.patient_monitoring}","${m.total_records}"\r\n`;
+        });
+        csvContent += `"ANNUAL TOTAL","12 Months","${yearlyAnalyticsData.kpi.total_consultations}","${yearlyAnalyticsData.kpi.total_medical_certificates}","${yearlyAnalyticsData.kpi.total_patients_monitored}","${yearlyAnalyticsData.kpi.total_records}"\r\n`;
       }
 
       // Download Trigger
@@ -910,146 +2912,732 @@
       await recordExportAudit('CSV');
     }
 
-    // CLIENT-SIDE EXPORTS: PDF (jsPDF + autoTable)
+    // Canvas Snapshot Helper for PDF Embedding
+    function getCanvasDataURL(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      try {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+        return tempCanvas.toDataURL('image/png', 1.0);
+      } catch (err) {
+        console.warn('Canvas export to PDF failed for ' + canvasId, err);
+        return null;
+      }
+    }
+
+    // PDF Running Footer Helper
+    function addPdfFooter(doc) {
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184);
+        doc.text(`RHU KEEP-UP Healthcare Analytics & Clinical Intelligence System | Page ${i} of ${totalPages}`, 14, 290);
+      }
+    }
+
+    // CLIENT-SIDE EXPORTS: FULL PDF (jsPDF + autoTable + Chart Visuals)
     async function exportPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF('p', 'mm', 'a4');
       const timestamp = new Date().toLocaleString();
-      const periodStr = `${currentReportData.period.start} to ${currentReportData.period.end}`;
 
-      // Title & Document Header
-      doc.setFont("Helvetica", "bold");
-      doc.setFontSize(18);
-      doc.setTextColor(30, 41, 59); // dark slate blue
-      doc.text("KEEP UP SYSTEM - HEALTHCARE REPORT", 14, 22);
+      if (currentTab === 'weekly') {
+        if (!weeklyAnalyticsData) {
+          showToast('No weekly analytics data loaded.', 'warning');
+          return;
+        }
+        const w = weeklyAnalyticsData.week;
+        const kpi = weeklyAnalyticsData.kpi;
+        const comp = weeklyAnalyticsData.comparison;
+        const b = kpi.breakdown || {};
 
-      doc.setFont("Helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(100, 116, 139); // muted gray
-      doc.text(`Report Subject: ${tabData[currentTab].title}`, 14, 30);
-      doc.text(`Report Period: ${periodStr}`, 14, 35);
-      doc.text(`Generation Date: ${timestamp}`, 14, 40);
-
-      // Add a line divider
-      doc.setDrawColor(226, 232, 240);
-      doc.setLineWidth(0.5);
-      doc.line(14, 45, 196, 45);
-
-      // Table Setup
-      let headers = [];
-      let body = [];
-
-      if (currentTab === 'patients') {
-        headers = [['Patient No.', 'Full Name', 'Birth Date', 'Sex', 'Status', 'Reg Date']];
-        body = currentReportData.patientSummary.list.map(p => [
-          p.patient_number,
-          p.name,
-          formatDate(p.birth_date),
-          p.sex,
-          p.status,
-          formatDate(p.created_at)
-        ]);
-      } 
-      else if (currentTab === 'duplicates') {
-        headers = [['Detected At', 'Patient A Name', 'Patient B Name', 'Reason', 'Match %', 'Status']];
-        body = currentReportData.duplicateSummary.list.map(f => [
-          formatDate(f.detected_at),
-          `${f.patient_name} (${f.patient_number})`,
-          `${f.duplicate_patient_name} (${f.duplicate_patient_number})`,
-          f.reason,
-          `${f.similarity_score}%`,
-          f.status
-        ]);
-      }
-      else if (currentTab === 'summary') {
-        const pat = currentReportData.patientSummary;
-        const dup = currentReportData.duplicateSummary;
-
-        // For summary report, render simple key-value blocks
+        // Document Title & Executive Header
         doc.setFont("Helvetica", "bold");
-        doc.setFontSize(13);
+        doc.setFontSize(17);
+        doc.setTextColor(30, 41, 59);
+        doc.text("KEEP UP SYSTEM - WEEKLY CLINICAL HEALTHCARE ANALYTICS", 14, 20);
+
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(9.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Week Range: ${w.label} (Monday to Friday Records)`, 14, 26);
+        doc.text(`Patient Trajectory Insight: ${comp.patient_comparison_text}`, 14, 31);
+        doc.text(`Report Generated: ${timestamp}`, 14, 36);
+
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(14, 40, 196, 40);
+
+        // 1. Weekly Core KPIs Table
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(198, 40, 40);
+        doc.text("1. Weekly Key Performance Indicators (Mon - Fri)", 14, 47);
+
+        doc.autoTable({
+          startY: 50,
+          theme: 'striped',
+          head: [['Weekly Metric KPI', 'Mon - Fri Tally', 'Workload Average', 'Comparison vs Previous Week']],
+          body: [
+            ['Total Consultations', `${kpi.total_consultations}`, `${kpi.daily_avg_consultations} / day`, `${comp.consultation_change_percent}% change`],
+            ['Medical Certificates Issued', `${kpi.total_medical_certificates}`, `${kpi.daily_avg_medical_certificates} / day`, `${comp.medcert_change_percent}% change`],
+            ['Patients Monitored & Encounter Reach', `${kpi.total_patients_monitored}`, 'Unique patient individuals', comp.patient_comparison_text],
+            ['Total Processed Records', `${kpi.total_records}`, 'All active clinical binders', 'Weekly total volume']
+          ],
+          headStyles: { fillColor: [198, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        // 2. Services Distribution Breakdown Table
+        let nextY = doc.previousAutoTable.finalY + 10;
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
         doc.setTextColor(79, 70, 229);
-        doc.text("1. Demographics Summary", 14, 55);
-        
+        doc.text("2. Clinical Services Distribution Breakdown", 14, nextY);
+
+        const totalServices = (b.consultations || 0) + (b.medical_certificates || 0) + (b.immunizations || 0) + (b.maternal_care || 0);
+        const getPct = (val) => totalServices > 0 ? ((val / totalServices) * 100).toFixed(1) + '%' : '0%';
+
         doc.autoTable({
-          startY: 58,
+          startY: nextY + 3,
           theme: 'striped',
-          head: [['Metric Description', 'Tally count']],
+          head: [['Clinical Service Category', 'Record Count', 'Percentage Share of Clinical Workload']],
           body: [
-            ['Total Registered Patients', pat.total.toString()],
-            ['Active Patient Folders', pat.active.toString()],
-            ['Archived Profiles', pat.archived.toString()]
-          ]
+            ['Consultation Records', `${b.consultations || 0}`, getPct(b.consultations || 0)],
+            ['Medical Certificates', `${b.medical_certificates || 0}`, getPct(b.medical_certificates || 0)],
+            ['Immunization & Vaccination', `${b.immunizations || 0}`, getPct(b.immunizations || 0)],
+            ['Maternal Care & Prenatal Monitoring', `${b.maternal_care || 0}`, getPct(b.maternal_care || 0)]
+          ],
+          foot: [['TOTAL CLINICAL FILINGS', `${totalServices}`, '100%']],
+          headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [238, 242, 255], textColor: [67, 56, 202], fontStyle: 'bold' }
         });
 
-        const nextY1 = doc.previousAutoTable.finalY + 12;
-        doc.text("2. Document Filing Summary", 14, nextY1);
+        // 3. Visual Charts Snapshots
+        nextY = doc.previousAutoTable.finalY + 10;
+        const barImg = getCanvasDataURL('chart-mon-fri-bars');
+        const donutImg = getCanvasDataURL('chart-services-donut');
+        const trendImg = getCanvasDataURL('chart-weekly-trend');
+
+        if (barImg) {
+          if (nextY + 65 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(30, 41, 59);
+          doc.text("3. Visual Activity Diagram (Monday to Friday Volume)", 14, nextY);
+          doc.addImage(barImg, 'PNG', 14, nextY + 3, 182, 58);
+          nextY += 66;
+        }
+
+        if (donutImg || trendImg) {
+          if (nextY + 60 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(30, 41, 59);
+          doc.text("4. Services Distribution & Multi-Week Trend Visuals", 14, nextY);
+          if (donutImg && trendImg) {
+            doc.addImage(donutImg, 'PNG', 14, nextY + 3, 88, 52);
+            doc.addImage(trendImg, 'PNG', 108, nextY + 3, 88, 52);
+          } else if (donutImg) {
+            doc.addImage(donutImg, 'PNG', 14, nextY + 3, 100, 52);
+          } else if (trendImg) {
+            doc.addImage(trendImg, 'PNG', 14, nextY + 3, 182, 52);
+          }
+          nextY += 60;
+        }
+
+        // 4. Daily Table
+        if (nextY + 40 > 280) { doc.addPage(); nextY = 20; }
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(37, 99, 235);
+        doc.text("5. Monday to Friday Daily Records Breakdown", 14, nextY);
+
         doc.autoTable({
-          startY: nextY1 + 3,
+          startY: nextY + 3,
           theme: 'striped',
-          head: [['Filing Binder Category', 'Digitized Document count']],
-          body: [
-            ['Consultation Records', currentReportData.consultations.length.toString()],
-            ['Childhood Immunizations', currentReportData.immunizations.length.toString()],
-            ['Anti-Rabies Vaccinations', currentReportData.antiRabies.length.toString()],
-            ['Maternal Care Records', currentReportData.maternalCares.length.toString()],
-            ['Total Scanned Files Registry', currentReportData.allRecords.length.toString()]
-          ]
+          head: [['Day of Week', 'Exact Date', 'Consultations', 'Medical Certs', 'Patients', 'Total Records']],
+          body: weeklyAnalyticsData.mon_to_fri_days.map(d => [
+            d.day_name,
+            d.date_formatted,
+            d.consultations.toString(),
+            d.medical_certificates.toString(),
+            d.patient_monitoring.toString(),
+            d.total_records.toString()
+          ]),
+          foot: [[
+            'WEEK TOTAL',
+            '5 Days',
+            kpi.total_consultations.toString(),
+            kpi.total_medical_certificates.toString(),
+            kpi.total_patients_monitored.toString(),
+            kpi.total_records.toString()
+          ]],
+          headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [254, 242, 242], textColor: [153, 27, 27], fontStyle: 'bold' }
         });
 
-        const nextY2 = doc.previousAutoTable.finalY + 12;
-        doc.text("3. Demographic Duplicates Warning Summary", 14, nextY2);
+        // 5. Multi-Week Historical Trend Table
+        nextY = doc.previousAutoTable.finalY + 10;
+        if (weeklyAnalyticsData.historical_trend && weeklyAnalyticsData.historical_trend.length > 0) {
+          if (nextY + 35 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(16, 185, 129);
+          doc.text("6. Multi-Week Volume Trajectory History", 14, nextY);
+
+          doc.autoTable({
+            startY: nextY + 3,
+            theme: 'striped',
+            head: [['Week Interval', 'Date Range Span', 'Consultations', 'Medical Certificates', 'Patients Monitored', 'Total Volume']],
+            body: weeklyAnalyticsData.historical_trend.map(t => [
+              t.week_label,
+              t.date_range,
+              t.consultations.toString(),
+              t.medical_certificates.toString(),
+              t.patients_monitored.toString(),
+              t.total_records.toString()
+            ]),
+            headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' }
+          });
+          nextY = doc.previousAutoTable.finalY + 10;
+        }
+
+        // 6. Patient Monitoring Stream
+        const streamList = weeklyAnalyticsData.patient_monitoring_stream || [];
+        if (nextY + 35 > 280) { doc.addPage(); nextY = 20; }
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(198, 40, 40);
+        doc.text(`7. Patient Monitoring Activity Stream (${streamList.length} Encounters)`, 14, nextY);
+
+        const streamBody = streamList.length > 0 ? streamList.map(s => [
+          s.date || formatDate(s.created_at),
+          s.patient_number || 'N/A',
+          s.patient_name || 'N/A',
+          s.record_category_display || 'Clinical Record',
+          s.file_name || 'Structured Form Record'
+        ]) : [['No clinical encounters recorded during this Monday-Friday week.', '', '', '', '']];
+
         doc.autoTable({
-          startY: nextY2 + 3,
+          startY: nextY + 3,
           theme: 'striped',
-          head: [['Warning review state', 'Flag count']],
-          body: [
-            ['Pending Warnings Review', dup.pending.toString()],
-            ['Reviewed Overlap Conflicts', dup.reviewed.toString()],
-            ['Ignored Warnings', dup.ignored.toString()]
-          ]
+          head: [['Encounter Date', 'Patient No.', 'Patient Full Name', 'Service Category', 'Document File']],
+          body: streamBody,
+          headStyles: { fillColor: [198, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' }
         });
 
-        doc.save(`keepup-summary-report-${Date.now()}.pdf`);
-        showToast('PDF summary report downloaded successfully.', 'success');
+        addPdfFooter(doc);
+        doc.save(`keepup-weekly-analytics-${Date.now()}.pdf`);
+        showToast('Complete Weekly Analytics PDF downloaded successfully.', 'success');
+        await recordExportAudit('PDF');
         return;
       }
-      else {
-        // Record sections (Consultation, Anti-Rabies, Immunization, Maternal Care)
-        let list = currentReportData.allRecords;
-        if (currentTab === 'consultations') list = currentReportData.consultations;
-        if (currentTab === 'immunizations') list = currentReportData.immunizations;
-        if (currentTab === 'anti-rabies') list = currentReportData.antiRabies;
-        if (currentTab === 'maternal-care') list = currentReportData.maternalCares;
 
-        headers = [['Filing Date', 'Patient No.', 'Patient Name', 'Document File Name']];
-        body = list.map(c => [
-          formatDate(c.created_at),
-          c.patient_number,
-          c.patient_name,
-          c.file_name
-        ]);
+      if (currentTab === 'monthly') {
+        if (!monthlyAnalyticsData) {
+          showToast('No monthly analytics data loaded.', 'warning');
+          return;
+        }
+        const m = monthlyAnalyticsData.month;
+        const kpi = monthlyAnalyticsData.kpi;
+        const comp = monthlyAnalyticsData.comparison;
+        const b = kpi.breakdown || {};
+
+        // Document Title & Executive Header
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(17);
+        doc.setTextColor(30, 41, 59);
+        doc.text("KEEP UP SYSTEM - MONTHLY HEALTHCARE ANALYTICS", 14, 20);
+
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(9.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Month Period: ${m.label} (Full Calendar Month)`, 14, 26);
+        doc.text(`Month-over-Month Insight: ${comp.patient_comparison_text}`, 14, 31);
+        doc.text(`Report Generated: ${timestamp}`, 14, 36);
+
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(14, 40, 196, 40);
+
+        // 1. Monthly Core KPIs Table
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(37, 99, 235);
+        doc.text("1. Monthly Key Performance Indicators", 14, 47);
+
+        doc.autoTable({
+          startY: 50,
+          theme: 'striped',
+          head: [['Monthly Metric KPI', 'Month Total', 'Average Performance', 'MoM Comparison']],
+          body: [
+            ['Total Consultations', `${kpi.total_consultations}`, `${kpi.weekly_avg_consultations} / week (${kpi.daily_avg_consultations} / day)`, `${comp.consultation_change_percent}% change`],
+            ['Medical Certificates Issued', `${kpi.total_medical_certificates}`, `${kpi.weekly_avg_medical_certificates} / week`, `${comp.medcert_change_percent}% change`],
+            ['Patients Monitored & Encounter Reach', `${kpi.total_patients_monitored}`, 'Monthly unique individuals', comp.patient_comparison_text],
+            ['Total Processed Records', `${kpi.total_records}`, 'All active clinical binders', 'Total monthly workload']
+          ],
+          headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        // 2. Services Breakdown Table
+        let nextY = doc.previousAutoTable.finalY + 10;
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(79, 70, 229);
+        doc.text("2. Monthly Clinical Services Breakdown", 14, nextY);
+
+        const totalServices = (b.consultations || 0) + (b.medical_certificates || 0) + (b.immunizations || 0) + (b.maternal_care || 0);
+        const getPct = (val) => totalServices > 0 ? ((val / totalServices) * 100).toFixed(1) + '%' : '0%';
+
+        doc.autoTable({
+          startY: nextY + 3,
+          theme: 'striped',
+          head: [['Clinical Service Category', 'Record Count', 'Percentage Share']],
+          body: [
+            ['Consultation Records', `${b.consultations || 0}`, getPct(b.consultations || 0)],
+            ['Medical Certificates', `${b.medical_certificates || 0}`, getPct(b.medical_certificates || 0)],
+            ['Immunization & Vaccination', `${b.immunizations || 0}`, getPct(b.immunizations || 0)],
+            ['Maternal Care & Prenatal', `${b.maternal_care || 0}`, getPct(b.maternal_care || 0)]
+          ],
+          foot: [['MONTHLY TOTAL FILINGS', `${totalServices}`, '100%']],
+          headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [238, 242, 255], textColor: [67, 56, 202], fontStyle: 'bold' }
+        });
+
+        // 3. Visual Charts Snapshots
+        nextY = doc.previousAutoTable.finalY + 10;
+        const mBarImg = getCanvasDataURL('chart-monthly-weeks-bars');
+        const mDonutImg = getCanvasDataURL('chart-monthly-services-donut');
+        const mTrendImg = getCanvasDataURL('chart-monthly-trend');
+
+        if (mBarImg) {
+          if (nextY + 65 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(30, 41, 59);
+          doc.text("3. Week-by-Week Visual Activity Breakdown", 14, nextY);
+          doc.addImage(mBarImg, 'PNG', 14, nextY + 3, 182, 58);
+          nextY += 66;
+        }
+
+        if (mDonutImg || mTrendImg) {
+          if (nextY + 60 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(30, 41, 59);
+          doc.text("4. Monthly Services Distribution & 6-Month Trajectory", 14, nextY);
+          if (mDonutImg && mTrendImg) {
+            doc.addImage(mDonutImg, 'PNG', 14, nextY + 3, 88, 52);
+            doc.addImage(mTrendImg, 'PNG', 108, nextY + 3, 88, 52);
+          } else if (mDonutImg) {
+            doc.addImage(mDonutImg, 'PNG', 14, nextY + 3, 100, 52);
+          } else if (mTrendImg) {
+            doc.addImage(mTrendImg, 'PNG', 14, nextY + 3, 182, 52);
+          }
+          nextY += 60;
+        }
+
+        // 4. Weeks Breakdown Table
+        if (nextY + 40 > 280) { doc.addPage(); nextY = 20; }
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(198, 40, 40);
+        doc.text("5. Week-by-Week Calendar Records Log", 14, nextY);
+
+        doc.autoTable({
+          startY: nextY + 3,
+          theme: 'striped',
+          head: [['Week Interval', 'Date Span', 'Consultations', 'Medical Certs', 'Patients', 'Total Records']],
+          body: monthlyAnalyticsData.weeks_breakdown.map(w => [
+            w.week_label,
+            w.date_range,
+            w.consultations.toString(),
+            w.medical_certificates.toString(),
+            w.patient_monitoring.toString(),
+            w.total_records.toString()
+          ]),
+          foot: [[
+            'MONTH TOTAL',
+            m.label,
+            kpi.total_consultations.toString(),
+            kpi.total_medical_certificates.toString(),
+            kpi.total_patients_monitored.toString(),
+            kpi.total_records.toString()
+          ]],
+          headStyles: { fillColor: [198, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [238, 242, 255], textColor: [49, 46, 129], fontStyle: 'bold' }
+        });
+
+        // 5. 6-Month Trajectory History Table
+        nextY = doc.previousAutoTable.finalY + 10;
+        if (monthlyAnalyticsData.historical_trend && monthlyAnalyticsData.historical_trend.length > 0) {
+          if (nextY + 35 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(16, 185, 129);
+          doc.text("6. 6-Month Volume Trajectory History", 14, nextY);
+
+          doc.autoTable({
+            startY: nextY + 3,
+            theme: 'striped',
+            head: [['Month Interval', 'Consultations', 'Medical Certificates', 'Patients Monitored', 'Total Volume']],
+            body: monthlyAnalyticsData.historical_trend.map(t => [
+              t.month_label,
+              t.consultations.toString(),
+              t.medical_certificates.toString(),
+              t.patients_monitored.toString(),
+              t.total_records.toString()
+            ]),
+            headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' }
+          });
+          nextY = doc.previousAutoTable.finalY + 10;
+        }
+
+        // 6. Patient Monitoring Stream
+        const mStreamList = monthlyAnalyticsData.patient_monitoring_stream || [];
+        if (nextY + 35 > 280) { doc.addPage(); nextY = 20; }
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(37, 99, 235);
+        doc.text(`7. Monthly Patient Monitoring Stream (${mStreamList.length} Records)`, 14, nextY);
+
+        const mStreamBody = mStreamList.length > 0 ? mStreamList.map(s => [
+          s.date || formatDate(s.created_at),
+          s.patient_number || 'N/A',
+          s.patient_name || 'N/A',
+          s.record_category_display || 'Clinical Record',
+          s.file_name || 'Structured Form Record'
+        ]) : [['No clinical encounters recorded during this month.', '', '', '', '']];
+
+        doc.autoTable({
+          startY: nextY + 3,
+          theme: 'striped',
+          head: [['Encounter Date', 'Patient No.', 'Patient Full Name', 'Service Category', 'Document File']],
+          body: mStreamBody,
+          headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        addPdfFooter(doc);
+        doc.save(`keepup-monthly-analytics-${Date.now()}.pdf`);
+        showToast('Complete Monthly Analytics PDF downloaded successfully.', 'success');
+        await recordExportAudit('PDF');
+        return;
       }
 
-      // Render table layout in PDF
-      doc.autoTable({
-        startY: 50,
-        head: headers,
-        body: body,
-        theme: 'striped',
-        headStyles: {
-          fillColor: [79, 70, 229], // matching Indigo 600 branding color
-          textColor: [255, 255, 255],
-          fontStyle: 'bold'
-        },
-        styles: {
-          fontSize: 9,
-          cellPadding: 4
+      if (currentTab === 'yearly') {
+        if (!yearlyAnalyticsData) {
+          showToast('No yearly analytics data loaded.', 'warning');
+          return;
         }
-      });
+        const y = yearlyAnalyticsData.year;
+        const kpi = yearlyAnalyticsData.kpi;
+        const comp = yearlyAnalyticsData.comparison;
+        const b = kpi.breakdown || {};
 
-      doc.save(`keepup-report-${currentTab}-${Date.now()}.pdf`);
-      showToast('PDF report downloaded successfully.', 'success');
+        // Document Title & Executive Header
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(17);
+        doc.setTextColor(30, 41, 59);
+        doc.text("KEEP UP SYSTEM - YEARLY HEALTHCARE ANALYTICS", 14, 20);
+
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(9.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Annual Period: ${y.label} (Full Calendar Year)`, 14, 26);
+        doc.text(`Year-over-Year Insight: ${comp.patient_comparison_text}`, 14, 31);
+        doc.text(`Report Generated: ${timestamp}`, 14, 36);
+
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(14, 40, 196, 40);
+
+        // 1. Annual Core KPIs Table
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(124, 58, 237);
+        doc.text("1. Annual Key Performance Indicators", 14, 47);
+
+        doc.autoTable({
+          startY: 50,
+          theme: 'striped',
+          head: [['Annual Metric KPI', 'Year Total', 'Monthly Average', 'YoY Comparison']],
+          body: [
+            ['Total Consultations', `${kpi.total_consultations}`, `${kpi.monthly_avg_consultations} / month`, `${comp.consultation_change_percent}% change`],
+            ['Medical Certificates Issued', `${kpi.total_medical_certificates}`, `${kpi.monthly_avg_medical_certificates} / month`, `${comp.medcert_change_percent}% change`],
+            ['Annual Patients Monitored', `${kpi.total_patients_monitored}`, 'Annual unique patients', comp.patient_comparison_text],
+            ['Total Processed Records', `${kpi.total_records}`, 'All active clinical binders', 'Annual system records']
+          ],
+          headStyles: { fillColor: [124, 58, 237], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        // 2. Services Breakdown Table
+        let nextY = doc.previousAutoTable.finalY + 10;
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(79, 70, 229);
+        doc.text("2. Annual Clinical Services Breakdown", 14, nextY);
+
+        const totalServices = (b.consultations || 0) + (b.medical_certificates || 0) + (b.immunizations || 0) + (b.maternal_care || 0);
+        const getPct = (val) => totalServices > 0 ? ((val / totalServices) * 100).toFixed(1) + '%' : '0%';
+
+        doc.autoTable({
+          startY: nextY + 3,
+          theme: 'striped',
+          head: [['Clinical Service Category', 'Annual Count', 'Percentage Share']],
+          body: [
+            ['Consultation Records', `${b.consultations || 0}`, getPct(b.consultations || 0)],
+            ['Medical Certificates', `${b.medical_certificates || 0}`, getPct(b.medical_certificates || 0)],
+            ['Immunization & Vaccination', `${b.immunizations || 0}`, getPct(b.immunizations || 0)],
+            ['Maternal Care & Prenatal', `${b.maternal_care || 0}`, getPct(b.maternal_care || 0)]
+          ],
+          foot: [['ANNUAL TOTAL CLINICAL FILINGS', `${totalServices}`, '100%']],
+          headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [245, 243, 255], textColor: [109, 40, 217], fontStyle: 'bold' }
+        });
+
+        // 3. Visual Charts Snapshots
+        nextY = doc.previousAutoTable.finalY + 10;
+        const yBarImg = getCanvasDataURL('chart-yearly-months-bars');
+        const yDonutImg = getCanvasDataURL('chart-yearly-services-donut');
+        const yTrendImg = getCanvasDataURL('chart-yearly-trend');
+
+        if (yBarImg) {
+          if (nextY + 65 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(30, 41, 59);
+          doc.text("3. 12-Month Activity Breakdown Diagram", 14, nextY);
+          doc.addImage(yBarImg, 'PNG', 14, nextY + 3, 182, 58);
+          nextY += 66;
+        }
+
+        if (yDonutImg || yTrendImg) {
+          if (nextY + 60 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(30, 41, 59);
+          doc.text("4. Annual Services Distribution & Multi-Year Growth Trajectory", 14, nextY);
+          if (yDonutImg && yTrendImg) {
+            doc.addImage(yDonutImg, 'PNG', 14, nextY + 3, 88, 52);
+            doc.addImage(yTrendImg, 'PNG', 108, nextY + 3, 88, 52);
+          } else if (yDonutImg) {
+            doc.addImage(yDonutImg, 'PNG', 14, nextY + 3, 100, 52);
+          } else if (yTrendImg) {
+            doc.addImage(yTrendImg, 'PNG', 14, nextY + 3, 182, 52);
+          }
+          nextY += 60;
+        }
+
+        // 4. 12-Month Table
+        if (nextY + 40 > 280) { doc.addPage(); nextY = 20; }
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(16, 185, 129);
+        doc.text("5. 12-Month Activity Log (January to December)", 14, nextY);
+
+        doc.autoTable({
+          startY: nextY + 3,
+          theme: 'striped',
+          head: [['Month', 'Consultations', 'Medical Certs', 'Patients', 'Total Records']],
+          body: yearlyAnalyticsData.months_breakdown.map(m => [
+            m.month_name,
+            m.consultations.toString(),
+            m.medical_certificates.toString(),
+            m.patient_monitoring.toString(),
+            m.total_records.toString()
+          ]),
+          foot: [[
+            'ANNUAL TOTAL',
+            kpi.total_consultations.toString(),
+            kpi.total_medical_certificates.toString(),
+            kpi.total_patients_monitored.toString(),
+            kpi.total_records.toString()
+          ]],
+          headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [245, 243, 255], textColor: [109, 40, 217], fontStyle: 'bold' }
+        });
+
+        // 5. Multi-Year Trend Table
+        nextY = doc.previousAutoTable.finalY + 10;
+        if (yearlyAnalyticsData.historical_trend && yearlyAnalyticsData.historical_trend.length > 0) {
+          if (nextY + 35 > 280) { doc.addPage(); nextY = 20; }
+          doc.setFont("Helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(124, 58, 237);
+          doc.text("6. Multi-Year Volume Growth History", 14, nextY);
+
+          doc.autoTable({
+            startY: nextY + 3,
+            theme: 'striped',
+            head: [['Year Interval', 'Consultations', 'Medical Certificates', 'Patients Monitored', 'Annual Total Volume']],
+            body: yearlyAnalyticsData.historical_trend.map(t => [
+              t.year_label,
+              t.consultations.toString(),
+              t.medical_certificates.toString(),
+              t.patients_monitored.toString(),
+              t.total_records.toString()
+            ]),
+            headStyles: { fillColor: [124, 58, 237], textColor: [255, 255, 255], fontStyle: 'bold' }
+          });
+        }
+
+        addPdfFooter(doc);
+        doc.save(`keepup-yearly-analytics-${Date.now()}.pdf`);
+        showToast('Complete Yearly Analytics PDF downloaded successfully.', 'success');
+        await recordExportAudit('PDF');
+        return;
+      }
+    }
+
+    // CLIENT-SIDE EXPORTS: MASTER ALL-ANALYTICS PDF (Weekly + Monthly + Yearly Combined)
+    async function exportMasterPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const timestamp = new Date().toLocaleString();
+
+      showToast('Compiling Master Analytics PDF (Weekly + Monthly + Yearly)...', 'info');
+
+      // Ensure data is loaded
+      try {
+        if (!weeklyAnalyticsData) await loadWeeklyAnalytics();
+        if (!monthlyAnalyticsData) await loadMonthlyAnalytics();
+        if (!yearlyAnalyticsData) await loadYearlyAnalytics();
+      } catch (e) {
+        console.warn('Error preloading data for master export:', e);
+      }
+
+      // Title & Executive Master Cover Header
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(18);
+      doc.setTextColor(30, 41, 59);
+      doc.text("KEEP UP SYSTEM - MASTER HEALTHCARE ANALYTICS REPORT", 14, 20);
+
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Comprehensive Rural Health Unit (RHU) Clinical Intelligence & Encounter Registry", 14, 26);
+      doc.text(`Scope: Combined Weekly, Monthly & Yearly Healthcare Analytics | Generated: ${timestamp}`, 14, 31);
+
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.5);
+      doc.line(14, 35, 196, 35);
+
+      // PART 1: WEEKLY OVERVIEW
+      let curY = 43;
+      if (weeklyAnalyticsData) {
+        const wk = weeklyAnalyticsData.kpi;
+        const wb = wk.breakdown || {};
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(198, 40, 40);
+        doc.text(`PART 1: WEEKLY ANALYTICS (${weeklyAnalyticsData.week.label})`, 14, curY);
+
+        doc.autoTable({
+          startY: curY + 4,
+          theme: 'striped',
+          head: [['Metric', 'Weekly Tally', 'Workload Average', 'WoW Insight']],
+          body: [
+            ['Total Consultations', `${wk.total_consultations}`, `${wk.daily_avg_consultations} / day`, `${weeklyAnalyticsData.comparison.consultation_change_percent}% change`],
+            ['Medical Certificates', `${wk.total_medical_certificates}`, `${wk.daily_avg_medical_certificates} / day`, `${weeklyAnalyticsData.comparison.medcert_change_percent}% change`],
+            ['Patients Monitored', `${wk.total_patients_monitored}`, 'Unique patient reach', weeklyAnalyticsData.comparison.patient_comparison_text],
+            ['Total Records Filed', `${wk.total_records}`, 'All active binders', 'Current week workload']
+          ],
+          headStyles: { fillColor: [198, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        curY = doc.previousAutoTable.finalY + 8;
+        doc.autoTable({
+          startY: curY,
+          theme: 'striped',
+          head: [['Day of Week', 'Date', 'Consultations', 'Medical Certs', 'Patients', 'Total Records']],
+          body: weeklyAnalyticsData.mon_to_fri_days.map(d => [d.day_name, d.date_formatted, d.consultations, d.medical_certificates, d.patient_monitoring, d.total_records]),
+          foot: [['WEEK TOTAL', '5 Days', wk.total_consultations, wk.total_medical_certificates, wk.total_patients_monitored, wk.total_records]],
+          headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [254, 242, 242], textColor: [153, 27, 27], fontStyle: 'bold' }
+        });
+      }
+
+      // PART 2: MONTHLY OVERVIEW (New Page)
+      doc.addPage();
+      curY = 22;
+      if (monthlyAnalyticsData) {
+        const mk = monthlyAnalyticsData.kpi;
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(13);
+        doc.setTextColor(37, 99, 235);
+        doc.text(`PART 2: MONTHLY ANALYTICS (${monthlyAnalyticsData.month.label})`, 14, curY);
+
+        doc.autoTable({
+          startY: curY + 4,
+          theme: 'striped',
+          head: [['Metric', 'Month Total', 'Weekly Average', 'MoM Insight']],
+          body: [
+            ['Total Consultations', `${mk.total_consultations}`, `${mk.weekly_avg_consultations} / week`, `${monthlyAnalyticsData.comparison.consultation_change_percent}% change`],
+            ['Medical Certificates', `${mk.total_medical_certificates}`, `${mk.weekly_avg_medical_certificates} / week`, `${monthlyAnalyticsData.comparison.medcert_change_percent}% change`],
+            ['Patients Monitored', `${mk.total_patients_monitored}`, 'Monthly reach', monthlyAnalyticsData.comparison.patient_comparison_text],
+            ['Total Records Processed', `${mk.total_records}`, 'All active binders', 'Monthly total volume']
+          ],
+          headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        curY = doc.previousAutoTable.finalY + 8;
+        doc.autoTable({
+          startY: curY,
+          theme: 'striped',
+          head: [['Week Interval', 'Date Span', 'Consultations', 'Medical Certs', 'Patients', 'Total Records']],
+          body: monthlyAnalyticsData.weeks_breakdown.map(w => [w.week_label, w.date_range, w.consultations, w.medical_certificates, w.patient_monitoring, w.total_records]),
+          foot: [['MONTH TOTAL', monthlyAnalyticsData.month.label, mk.total_consultations, mk.total_medical_certificates, mk.total_patients_monitored, mk.total_records]],
+          headStyles: { fillColor: [198, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [238, 242, 255], textColor: [49, 46, 129], fontStyle: 'bold' }
+        });
+      }
+
+      // PART 3: YEARLY OVERVIEW (New Page)
+      doc.addPage();
+      curY = 22;
+      if (yearlyAnalyticsData) {
+        const yk = yearlyAnalyticsData.kpi;
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(13);
+        doc.setTextColor(124, 58, 237);
+        doc.text(`PART 3: ANNUAL HEALTHCARE ANALYTICS (${yearlyAnalyticsData.year.label})`, 14, curY);
+
+        doc.autoTable({
+          startY: curY + 4,
+          theme: 'striped',
+          head: [['Metric', 'Year Total', 'Monthly Average', 'YoY Insight']],
+          body: [
+            ['Total Consultations', `${yk.total_consultations}`, `${yk.monthly_avg_consultations} / month`, `${yearlyAnalyticsData.comparison.consultation_change_percent}% change`],
+            ['Medical Certificates', `${yk.total_medical_certificates}`, `${yk.monthly_avg_medical_certificates} / month`, `${yearlyAnalyticsData.comparison.medcert_change_percent}% change`],
+            ['Patients Monitored', `${yk.total_patients_monitored}`, 'Annual reach', yearlyAnalyticsData.comparison.patient_comparison_text],
+            ['Total System Records', `${yk.total_records}`, 'All active binders', 'Full annual volume']
+          ],
+          headStyles: { fillColor: [124, 58, 237], textColor: [255, 255, 255], fontStyle: 'bold' }
+        });
+
+        curY = doc.previousAutoTable.finalY + 8;
+        doc.autoTable({
+          startY: curY,
+          theme: 'striped',
+          head: [['Month', 'Consultations', 'Medical Certs', 'Patients', 'Total Records']],
+          body: yearlyAnalyticsData.months_breakdown.map(m => [m.month_name, m.consultations, m.medical_certificates, m.patient_monitoring, m.total_records]),
+          foot: [['ANNUAL TOTAL', yk.total_consultations, yk.total_medical_certificates, yk.total_patients_monitored, yk.total_records]],
+          headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], fontStyle: 'bold' },
+          footStyles: { fillColor: [245, 243, 255], textColor: [109, 40, 217], fontStyle: 'bold' }
+        });
+      }
+
+      addPdfFooter(doc);
+      doc.save(`keepup-master-analytics-report-${Date.now()}.pdf`);
+      showToast('Master Analytics PDF (Weekly, Monthly, Yearly) downloaded successfully!', 'success');
       await recordExportAudit('PDF');
     }
 

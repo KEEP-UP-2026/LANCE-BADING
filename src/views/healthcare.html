@@ -53,9 +53,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -94,28 +92,38 @@
       </header>
 
       <div class="welcome-banner">
-        <h2 class="welcome-title">Welcome back, <span id="welcome-user-name">Doctor</span>!</h2>
-        <p class="welcome-desc">Healthcare Portal - Keep Up File Management System. Access patient histories, record lookups, and medical treatment timelines.</p>
+        <h2 class="welcome-title">Welcome back, <span id="welcome-user-name">Healthcare Personnel</span>!</h2>
+        <p class="welcome-desc">Healthcare Personnel Portal &bull; Search and retrieve patient records and view permitted patient clinical information.</p>
       </div>
 
       <!-- Quick Lookups Grid -->
-      <div class="stats-grid">
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stats-card glass-panel stats-card-btn" onclick="navigateTo('/dashboard/search')">
+          <div class="stats-info">
+            <span class="stats-label" style="color: #60a5fa;">Search &amp; Retrieve Records</span>
+            <span class="stats-value" style="color: #3b82f6; font-size: 20px;">Search Portal</span>
+          </div>
+          <div class="stats-icon-wrapper" style="color: #3b82f6; background: rgba(59, 130, 246, 0.1);">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </div>
+        </div>
+
         <div class="stats-card glass-panel stats-card-btn" onclick="navigateTo('/dashboard/patients')">
           <div class="stats-info">
-            <span class="stats-label">Patient Registry</span>
+            <span class="stats-label" style="color: #34d399;">Permitted Patient Info</span>
             <span class="stats-value" id="stats-total-patients">0</span>
           </div>
-          <div class="stats-icon-wrapper" style="color: var(--color-primary);">
+          <div class="stats-icon-wrapper" style="color: #10b981; background: rgba(16, 185, 129, 0.1);">
             <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
           </div>
         </div>
 
-        <div class="stats-card glass-panel stats-card-btn" onclick="navigateTo('/dashboard/search')">
+        <div class="stats-card glass-panel stats-card-btn" onclick="navigateTo('/dashboard/documents')">
           <div class="stats-info">
-            <span class="stats-label">Indexed Documents</span>
+            <span class="stats-label" style="color: #a78bfa;">Clinical Records Filed</span>
             <span class="stats-value" id="stats-total-files">0</span>
           </div>
-          <div class="stats-icon-wrapper" style="color: var(--color-info);">
+          <div class="stats-icon-wrapper" style="color: #8b5cf6; background: rgba(139, 92, 246, 0.1);">
             <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
           </div>
         </div>
@@ -123,32 +131,33 @@
 
       <!-- Quick Records Search box -->
       <div class="content-card glass-panel" style="margin-bottom: 30px;">
-        <h3 class="card-title">Quick Demographics & File Lookup</h3>
-        <p class="card-subtitle">Scan files or patients directly by keyword or character query.</p>
+        <h3 class="card-title">Search &amp; Retrieve Patient Records</h3>
+        <p class="card-subtitle">Search across patient demographic records, medical binders, and OCR-extracted clinical documents.</p>
         <div class="quick-search-box">
-          <input class="quick-search-field" type="text" id="quick-search-query" placeholder="Type a name, patient number, or category keyword (e.g. rabies, vaccine)...">
-          <button class="btn btn-primary" id="quick-search-btn">Search</button>
+          <input class="quick-search-field" type="text" id="quick-search-query" placeholder="Search by patient name, patient number, birth date, diagnosis, or keyword...">
+          <button class="btn btn-primary" id="quick-search-btn" style="padding: 12px 24px; font-weight: 700;">Search &amp; Retrieve</button>
         </div>
       </div>
 
       <!-- Recent Records Stream -->
       <div class="content-card glass-panel" style="flex: 1; min-height: 300px; margin-bottom: 0;">
-        <h3 class="card-title" style="margin-bottom: 4px;">Latest Filed Medical Records</h3>
-        <p class="card-subtitle">Filing queue of scanned digital documents in the Rural Health Unit binder.</p>
+        <h3 class="card-title" style="margin-bottom: 4px;">Latest Clinical Records &amp; Retrieved Files</h3>
+        <p class="card-subtitle">Recent patient records filed in the RHU binders ready for clinical review and retrieval.</p>
 
         <div class="table-responsive" style="margin-top: 20px;">
           <table class="data-table">
             <thead>
               <tr>
                 <th>File Attachment</th>
-                <th>Patient Details</th>
+                <th>Permitted Patient Details</th>
                 <th>Medical Category</th>
-                <th> Firing Date</th>
+                <th>Filing Date</th>
+                <th style="text-align: right;">Action</th>
               </tr>
             </thead>
             <tbody id="recent-records-stream">
               <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-muted);">Retrieving clinic records timeline...</td>
+                <td colspan="5" style="text-align: center; color: var(--text-muted);">Retrieving clinic records timeline...</td>
               </tr>
             </tbody>
           </table>
@@ -207,13 +216,6 @@
       searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') runQuickSearch();
       });
-
-      // 6. Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
-      });
     });
 
     async function loadDashboardData() {
@@ -245,18 +247,26 @@
         const recentList = allRecords.slice(0, 5);
         let html = '';
         recentList.forEach(rec => {
-          const fileLink = `<a href="${rec.file_url}" target="_blank" style="color: var(--color-primary); font-weight: 600;" class="hover-underline">${escapeHtml(rec.file_name)}</a>`;
+          const fileLink = `<a href="/dashboard/records/view/${rec.id}" style="color: var(--color-primary); font-weight: 700;" class="hover-underline">${escapeHtml(rec.file_name)}</a>`;
           
           const profileLink = `<a href="/dashboard/patients/profile/${rec.patient_id}" style="color: #25282D; font-weight: 700;" class="hover-underline">${escapeHtml(rec.patient_name)}</a>`;
           
           const dateStr = new Date(rec.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
+          const retrieveBtn = `
+            <a href="/dashboard/records/view/${rec.id}" class="btn btn-secondary" style="font-size: 11px; padding: 5px 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: 700;">
+              <svg style="width: 13px; height: 13px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              Retrieve Record
+            </a>
+          `;
+
           html += `
             <tr>
               <td>${fileLink}</td>
-              <td>${profileLink} (${escapeHtml(rec.patient_number)})</td>
+              <td>${profileLink} <span style="font-size: 11px; color: var(--text-muted);">(${escapeHtml(rec.patient_number)})</span></td>
               <td><span class="badge" style="background: #F5F7FA; color: #25282D; border: 1px solid #e2e8f0;">${formatCategory(rec.record_type)}</span></td>
               <td>${dateStr}</td>
+              <td style="text-align: right;">${retrieveBtn}</td>
             </tr>
           `;
         });

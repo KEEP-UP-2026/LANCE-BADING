@@ -212,9 +212,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -635,7 +633,7 @@
       currentUser = await loadUserProfile();
       if (!currentUser) return;
 
-      if (currentUser.role !== 'RECORDS_STAFF') {
+      if (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF') {
         window.location.href = '/dashboard/patients?error=unauthorized';
         return;
       }
@@ -771,12 +769,6 @@
           showToast(error.message || 'Failed to update patient profile.', 'error');
           saveBtn.classList.remove('loading');
           saveBtn.disabled = false;
-        }
-      });
-
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
         }
       });
     });

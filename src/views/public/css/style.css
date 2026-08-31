@@ -411,14 +411,21 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-brand-logo, .sidebar-brand-icon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: #C62828;
+  border-radius: 50%;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25);
   flex-shrink: 0;
-  color: #FFFFFF;
+  overflow: hidden;
+}
+
+.sidebar-brand-logo img, .sidebar-brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1.5px solid #E2E8F0;
 }
 
 .sidebar-brand-name {

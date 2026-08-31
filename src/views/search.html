@@ -232,9 +232,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -349,9 +347,9 @@
       if (!currentUser) return;
 
       // Restrict access on frontend
-      const allowedRoles = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
+      const allowedRoles = ['RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
       if (!allowedRoles.includes(currentUser.role)) {
-        window.location.href = '/dashboard/administrative?error=unauthorized';
+        window.location.href = '/login';
         return;
       }
 
@@ -387,7 +385,6 @@
         typingTimer = setTimeout(performSearch, 500); // 500ms delay after typing stops
       });
 
-      // 5. Hook filter pills
       const filterPills = document.querySelectorAll('.filter-pill');
       filterPills.forEach(pill => {
         pill.addEventListener('click', (e) => {
@@ -396,13 +393,6 @@
           activeFilter = e.target.getAttribute('data-filter');
           applyFilters();
         });
-      });
-
-      // 6. Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
       });
     });
 

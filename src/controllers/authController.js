@@ -66,6 +66,7 @@ const AuthController = {
 
       // 7. Store authenticated user data via cookie (HttpOnly for security)
       res.cookie('token', token, {
+        path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -117,7 +118,7 @@ const AuthController = {
       if (req.user) {
         await AuditMiddleware.logActivity(req.user.id, req.user.email, 'USER_LOGOUT', 'User logged out successfully.', req);
       }
-      res.clearCookie('token');
+      res.clearCookie('token', { path: '/' });
       return res.status(200).json({ 
         success: true, 
         message: 'Logged out successfully.',
@@ -142,12 +143,12 @@ const AuthController = {
       // Fetch fresh record from DB to ensure status and role are accurate
       const user = await UserModel.findById(req.user.id);
       if (!user) {
-        res.clearCookie('token');
+        res.clearCookie('token', { path: '/' });
         return res.status(401).json({ success: false, message: 'User no longer exists.' });
       }
 
       if (user.status === 'INACTIVE') {
-        res.clearCookie('token');
+        res.clearCookie('token', { path: '/' });
         return res.status(403).json({ success: false, message: 'Account is disabled.', redirectUrl: '/login?error=account_disabled' });
       }
 

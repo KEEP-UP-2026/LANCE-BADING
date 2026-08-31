@@ -347,6 +347,12 @@
       border: 1px solid #c7d2fe;
     }
 
+    .badge-maternal {
+      background: #fdf2f8;
+      color: #be185d;
+      border: 1px solid #fbcfe8;
+    }
+
     .badge-other {
       background: #f1f5f9;
       color: #475569;
@@ -466,9 +472,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 20px; height: 20px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -507,40 +511,10 @@
         <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
       </header>
 
-      <!-- ─── 1. CATEGORY SWITCHER TABS & ACTION INLINE ─── -->
+      <!-- ─── 1. CONTEXTUAL ACTION BUTTONS BAR ─── -->
       <div style="margin-bottom: 20px;">
         <div class="category-tab-pills" style="margin-bottom: 0;">
-          <button class="category-tab-btn active" id="tab-itr" onclick="switchCategory('itr')">
-            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-            Individual Treatment Record
-            <span class="badge-count" id="badge-itr-count">0</span>
-          </button>
-
-          <button class="category-tab-btn" id="tab-consultations" onclick="switchCategory('consultations')">
-            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-            Consultation Records
-            <span class="badge-count" id="badge-consultations-count">0</span>
-          </button>
-
-          <button class="category-tab-btn" id="tab-immunizations" onclick="switchCategory('immunizations')">
-            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/></svg>
-            Immunizations
-            <span class="badge-count" id="badge-immunizations-count">0</span>
-          </button>
-
-          <button class="category-tab-btn" id="tab-medcert" onclick="switchCategory('medcert')">
-            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/></svg>
-            Medical Certificates
-            <span class="badge-count" id="badge-medcert-count">0</span>
-          </button>
-
-          <button class="category-tab-btn" id="tab-all" onclick="switchCategory('all')">
-            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-            All Categories
-            <span class="badge-count" id="badge-all-count">0</span>
-          </button>
-
-          <!-- Contextual Action Buttons inline with category tabs -->
+          <!-- Contextual Action Buttons inline -->
           <button type="button" class="category-tab-btn btn-manual-itr-tab" id="btn-open-manual-itr" onclick="openManualItrModal()" style="display: inline-flex;">
             <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             + Manual ITR Entry
@@ -559,6 +533,11 @@
           <button type="button" class="category-tab-btn btn-manual-medcert-tab" id="btn-open-manual-medcert" onclick="openManualMedCertModal()" style="background: #e0e7ff; color: #3730a3; border: 1.5px solid #a5b4fc; font-weight: 700; display: none;">
             <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/></svg>
             + Manual Medical Certificate Entry
+          </button>
+
+          <button type="button" class="category-tab-btn btn-manual-maternal-tab" id="btn-open-manual-maternal" onclick="openManualMaternalModal()" style="background: #fdf2f8; color: #be185d; border: 1.5px solid #fbcfe8; font-weight: 700; display: none;">
+            <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: currentColor;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            + Manual Maternal Record Entry
           </button>
         </div>
       </div>
@@ -2033,6 +2012,321 @@
 
     </div>
   </div>
+
+  <!-- ─── MANUAL MATERNAL CARE & PRENATAL RECORD ENTRY MODAL ─── -->
+  <div id="manual-maternal-modal" style="display: none; position: fixed; inset: 0; z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+    <!-- Backdrop -->
+    <div id="manual-maternal-backdrop" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px);" onclick="closeManualMaternalModal()"></div>
+
+    <!-- Modal Dialog Box -->
+    <div style="position: relative; background: #ffffff; width: 100%; max-width: 960px; max-height: 92vh; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; overflow: hidden; z-index: 10001; animation: modalSlideUp 0.25s ease-out;">
+
+      <!-- Modal Header -->
+      <div style="padding: 16px 24px; background: #9d174d; color: #ffffff; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #831843;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+            <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: #ffffff;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 0.02em; color: #ffffff;">MANUAL MATERNAL CARE & PRENATAL RECORD ENTRY</h3>
+            <span style="font-size: 12px; color: #fbcfe8; font-weight: 500;">RHU Clinical Form • Maternal Health, Obstetric History, and Prenatal Monitoring</span>
+          </div>
+        </div>
+        <button type="button" onclick="closeManualMaternalModal()" style="background: transparent; border: none; color: #ffffff; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 6px;" title="Close Modal">
+          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable Form) -->
+      <div style="padding: 20px 24px; overflow-y: auto; flex: 1; font-size: 13px; color: #1e293b; background: #fdf2f8;">
+
+        <!-- Clinical Form Canvas Container -->
+        <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+
+          <!-- SECTION 1: IMPORMASYON NG INA / PASYENTE (PATIENT INFORMATION) -->
+          <div class="section-header" style="background: #be185d; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-bottom: 8px;">
+            === 1. IMPORMASYON NG INA / PASYENTE (PATIENT DEMOGRAPHICS) ===
+          </div>
+
+          <table style="width: 100%; margin-bottom: 12px; border-collapse: collapse;">
+            <tr>
+              <td colspan="3" style="padding: 6px;">
+                <strong>Pumili ng Nakatalang Pasyente sa Registry (Opsyonal):</strong>
+                <select id="manual-maternal-patient-select" class="form-control" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 7px 10px; width: 100%; border-color: #f472b6;" onchange="onManualMaternalPatientSelected()">
+                  <option value="">-- Walang Existing Record / Walk-in Patient (Direct Entry) --</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 45%; padding: 6px;">
+                <strong>Buong Pangalan ng Ina (Full Name): <span style="color: #be185d;">*</span></strong>
+                <input type="text" id="mm-patient-name" class="form-control" placeholder="Hal. Maria Dela Cruz Santos" style="margin-top: 4px; font-size: 13px; font-weight: 700; padding: 6px 10px; width: 100%;" required>
+              </td>
+              <td style="width: 30%; padding: 6px;">
+                <strong>Araw ng Kapanganakan (Birth Date):</strong>
+                <input type="date" id="mm-patient-bdate" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Edad (Age):</strong>
+                <input type="number" id="mm-patient-age" class="form-control" placeholder="e.g. 26" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 6px;">
+                <strong>Katayuan sa Buhay (Civil Status):</strong>
+                <select id="mm-patient-civil-status" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                  <option value="Married">Kasal (Married)</option>
+                  <option value="Single">Walang Asawa (Single)</option>
+                  <option value="Cohabiting">Nagsasama / Live-in</option>
+                  <option value="Widowed">Biyuda (Widowed)</option>
+                  <option value="Separated">Hiwalay (Separated)</option>
+                </select>
+              </td>
+              <td style="padding: 6px;">
+                <strong>Contact Number:</strong>
+                <input type="text" id="mm-patient-contact" class="form-control" placeholder="0912-345-6789" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="padding: 6px;">
+                <strong>PhilHealth Identification No. (PIN):</strong>
+                <input type="text" id="mm-patient-philhealth" class="form-control" placeholder="e.g. 12-345678901-2" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Tirahan (Address / Barangay):</strong>
+                <input type="text" id="mm-patient-address" class="form-control" value="Brgy. Mayloong, Paete, Laguna" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="padding: 6px;">
+                <strong>Miyembro ng 4Ps / NHTS:</strong>
+                <select id="mm-is-4ps" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                  <option value="Hindi">Hindi (Non-4Ps)</option>
+                  <option value="Oo">Oo (4Ps Beneficiary)</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 6px;">
+                <strong>Pangalan ng Asawa / Kasama (Partner's Name):</strong>
+                <input type="text" id="mm-spouse-name" class="form-control" placeholder="Hal. Juan Dela Cruz" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Hanapbuhay / Trabaho ng Asawa:</strong>
+                <input type="text" id="mm-spouse-occupation" class="form-control" placeholder="Hal. Karpintero / Mangingisda / Empleyado" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+          </table>
+
+          <!-- SECTION 2: KASAYSAYAN NG PAGBUBUNTIS AT PANGANGANAK (OBSTETRICS) -->
+          <div class="section-header" style="background: #9d174d; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-bottom: 8px;">
+            === 2. KASAYSAYAN NG PAGBUBUNTIS AT PANGANGANAK (OBSTETRICAL HISTORY - GTPAL) ===
+          </div>
+
+          <table style="width: 100%; margin-bottom: 12px; border-collapse: collapse;">
+            <tr style="background: #fdf2f8;">
+              <td style="width: 16%; padding: 6px; text-align: center; border: 1px solid #fbcfe8;">
+                <strong>Gravida (G):</strong>
+                <input type="number" id="mm-obs-gravida" class="form-control" value="1" min="1" style="margin-top: 4px; font-size: 13px; font-weight: 700; text-align: center; padding: 5px; width: 100%;">
+                <span style="font-size: 10.5px; color: #64748b;">Kabuuan</span>
+              </td>
+              <td style="width: 16%; padding: 6px; text-align: center; border: 1px solid #fbcfe8;">
+                <strong>Para (P):</strong>
+                <input type="number" id="mm-obs-para" class="form-control" value="0" min="0" style="margin-top: 4px; font-size: 13px; font-weight: 700; text-align: center; padding: 5px; width: 100%;">
+                <span style="font-size: 10.5px; color: #64748b;">Nanganak</span>
+              </td>
+              <td style="width: 17%; padding: 6px; text-align: center; border: 1px solid #fbcfe8;">
+                <strong>Full Term (T):</strong>
+                <input type="number" id="mm-obs-term" class="form-control" value="0" min="0" style="margin-top: 4px; font-size: 13px; text-align: center; padding: 5px; width: 100%;">
+                <span style="font-size: 10.5px; color: #64748b;">37+ linggo</span>
+              </td>
+              <td style="width: 17%; padding: 6px; text-align: center; border: 1px solid #fbcfe8;">
+                <strong>Preterm (P):</strong>
+                <input type="number" id="mm-obs-preterm" class="form-control" value="0" min="0" style="margin-top: 4px; font-size: 13px; text-align: center; padding: 5px; width: 100%;">
+                <span style="font-size: 10.5px; color: #64748b;">&lt;37 linggo</span>
+              </td>
+              <td style="width: 17%; padding: 6px; text-align: center; border: 1px solid #fbcfe8;">
+                <strong>Abortion (A):</strong>
+                <input type="number" id="mm-obs-abortion" class="form-control" value="0" min="0" style="margin-top: 4px; font-size: 13px; text-align: center; padding: 5px; width: 100%;">
+                <span style="font-size: 10.5px; color: #64748b;">Nakunan</span>
+              </td>
+              <td style="width: 17%; padding: 6px; text-align: center; border: 1px solid #fbcfe8;">
+                <strong>Living (L):</strong>
+                <input type="number" id="mm-obs-living" class="form-control" value="0" min="0" style="margin-top: 4px; font-size: 13px; font-weight: 700; text-align: center; padding: 5px; width: 100%;">
+                <span style="font-size: 10.5px; color: #64748b;">Buhay</span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 6px; border-top: 1px solid #e2e8f0;">
+                <strong>Huling Regla / LMP: <span style="color: #be185d;">*</span></strong>
+                <input type="date" id="mm-obs-lmp" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td colspan="2" style="padding: 6px; border-top: 1px solid #e2e8f0;">
+                <strong>Inaasahang Panganganak / EDC / EDD:</strong>
+                <input type="date" id="mm-obs-edc" class="form-control" style="margin-top: 4px; font-size: 13px; font-weight: 700; color: #be185d; padding: 6px 10px; width: 100%;">
+              </td>
+              <td colspan="2" style="padding: 6px; border-top: 1px solid #e2e8f0;">
+                <strong>Gulang ng Buntis (AOG Weeks):</strong>
+                <input type="number" step="0.1" id="mm-obs-aog" class="form-control" placeholder="Hal. 24" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+          </table>
+
+          <!-- SECTION 3: KASALUKUYANG PAGSUSURI SA PAGBUBUNTIS (PRENATAL ASSESSMENT) -->
+          <div class="section-header" style="background: #be185d; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-bottom: 8px;">
+            === 3. KASALUKUYANG PAGSUSURI SA PAGBUBUNTIS (PRENATAL CLINICAL ASSESSMENT) ===
+          </div>
+
+          <table style="width: 100%; margin-bottom: 12px; border-collapse: collapse;">
+            <tr>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Petsa ng Pagbisita (Visit Date):</strong>
+                <input type="date" id="mm-visit-date" class="form-control" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Presyon ng Dugo (BP mmHg):</strong>
+                <input type="text" id="mm-vitals-bp" class="form-control" placeholder="e.g. 110/70" style="margin-top: 4px; font-size: 13px; font-weight: 700; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Timbang (Weight kg):</strong>
+                <input type="number" step="0.1" id="mm-vitals-weight" class="form-control" placeholder="e.g. 58.5" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Taas (Height cm):</strong>
+                <input type="number" step="0.1" id="mm-vitals-height" class="form-control" placeholder="e.g. 154" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 6px;">
+                <strong>Fundal Height (cm):</strong>
+                <input type="number" step="0.5" id="mm-fundal-height" class="form-control" placeholder="e.g. 24" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="padding: 6px;">
+                <strong>Fetal Heart Tone (FHT bpm):</strong>
+                <input type="text" id="mm-fht" class="form-control" placeholder="e.g. 142 bpm / regular" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="padding: 6px;">
+                <strong>Posisyon ng Bata (Presentation):</strong>
+                <select id="mm-fetal-presentation" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                  <option value="Cephalic (Ulo sa Ilalim)">Cephalic (Ulo sa Ilalim - Normal)</option>
+                  <option value="Breech (Suhi)">Breech (Suhi)</option>
+                  <option value="Transverse (Pahiga)">Transverse (Pahiga)</option>
+                  <option value="Not yet determined">Hindi pa matukoy / Maaga pa</option>
+                </select>
+              </td>
+              <td style="padding: 6px;">
+                <strong>Tetanus Toxoid / Td Status:</strong>
+                <select id="mm-tt-status" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                  <option value="TT1">TT1 (Unang Bakuna)</option>
+                  <option value="TT2">TT2 (Pangalawang Bakuna)</option>
+                  <option value="TT3">TT3 (Pangatlong Bakuna)</option>
+                  <option value="TT4">TT4 (Pang-apat na Bakuna)</option>
+                  <option value="TT5 / Fully Immunized">TT5 (Fully Immunized Mother)</option>
+                  <option value="Not Given / Due">Hindi pa nabibigyan / Nakabinbin</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Bakal at Folic Acid (Supplementation Given):</strong>
+                <input type="text" id="mm-iron-folic" class="form-control" value="Iron + Folic Acid Tablets (60mg/400mcg) 30 tabs given" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Mga Panganib / Danger Signs Screened:</strong>
+                <input type="text" id="mm-danger-signs" class="form-control" value="Walang banta ng pagdurugo, matinding pananakit ng ulo, o pamamanas" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+          </table>
+
+          <!-- SECTION 4: MGA PAGSUSURI SA LAB AT ULTRASOUND (LABORATORY SCREENINGS) -->
+          <div class="section-header" style="background: #9d174d; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-bottom: 8px;">
+            === 4. MGA PAGSUSURI SA LAB AT ULTRASOUND (LABORATORY & DIAGNOSTIC SCREENINGS) ===
+          </div>
+
+          <table style="width: 100%; margin-bottom: 12px; border-collapse: collapse;">
+            <tr>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Uri ng Dugo (Blood Type & Rh):</strong>
+                <input type="text" id="mm-lab-blood-type" class="form-control" placeholder="Hal. O Positive (O+)" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Hemoglobin / CBC:</strong>
+                <input type="text" id="mm-lab-hemoglobin" class="form-control" placeholder="Hal. 12.2 g/dL (Normal)" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>Urinalysis (Protina/Asukal):</strong>
+                <input type="text" id="mm-lab-urinalysis" class="form-control" placeholder="Protein: Neg, Sugar: Neg" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>FBS / OGTT (Blood Sugar):</strong>
+                <input type="text" id="mm-lab-sugar" class="form-control" placeholder="Hal. 88 mg/dL (Normal)" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Infectious Screenings (HBsAg, Syphilis, HIV):</strong>
+                <input type="text" id="mm-lab-infectious" class="form-control" placeholder="Hal. HBsAg: Non-Reactive, VDRL: Non-Reactive, HIV: Non-Reactive" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Resulta ng Pelvic Ultrasound / Sonography:</strong>
+                <input type="text" id="mm-lab-ultrasound" class="form-control" placeholder="Hal. Single live intrauterine pregnancy, normohydramnios, anterior placenta" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+          </table>
+
+          <!-- SECTION 5: PLANO NG PANGANGALAGA AT NAG-ALAGANG HEALTHCARE WORKER -->
+          <div class="section-header" style="background: #be185d; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-bottom: 8px;">
+            === 5. PLANO NG PANGANGALAGA AT NAG-ALAGANG HEALTHCARE WORKER (MANAGEMENT & PROVIDER) ===
+          </div>
+
+          <table style="width: 100%; margin-bottom: 6px; border-collapse: collapse;">
+            <tr>
+              <td colspan="2" style="padding: 6px;">
+                <strong>Klinikal na Impresyon / Diyagnosis (Clinical Impression): <span style="color: #be185d;">*</span></strong>
+                <input type="text" id="mm-diagnosis" class="form-control" placeholder="Hal. G1P0, 24 weeks AOG, Normal Intrauterine Pregnancy" style="margin-top: 4px; font-size: 13px; font-weight: 700; padding: 6px 10px; width: 100%;" required>
+              </td>
+              <td style="width: 30%; padding: 6px;">
+                <strong>Araw ng Susunod na Pagbisita (Next Prenatal Visit):</strong>
+                <input type="date" id="mm-next-visit" class="form-control" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding: 6px;">
+                <strong>Plano ng Paggamot, Tagubilin at Nutrisyon (Management & Clinical Advice):</strong>
+                <textarea id="mm-management-plan" class="form-control" rows="2" placeholder="Hal. Ipagpatuloy ang pag-inom ng Ferrous Sulfate + Folic Acid 1 tab araw-araw. Kumain ng masustansyang pagkain, gulay, at prutas. Magpahinga nang sapat at magpa-checkup agad kung makaranas ng pananakit o pagdurugo." style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 40%; padding: 6px;">
+                <strong>Pangalan ng Midwife / Nars / Doktor: <span style="color: #be185d;">*</span></strong>
+                <input type="text" id="mm-provider-name" class="form-control" placeholder="Hal. Ma. Elena Ramos, RM / Dr. Santos" style="margin-top: 4px; font-size: 13px; font-weight: 700; padding: 6px 10px; width: 100%;" required>
+              </td>
+              <td style="width: 25%; padding: 6px;">
+                <strong>PRC License Number:</strong>
+                <input type="text" id="mm-provider-license" class="form-control" placeholder="Hal. RM-0089123" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+              <td style="width: 35%; padding: 6px;">
+                <strong>Klinika / RHU Facility:</strong>
+                <input type="text" id="mm-facility-name" class="form-control" value="PAETE RURAL HEALTH UNIT (Paete, Laguna)" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+              </td>
+            </tr>
+          </table>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Bottom Actions -->
+      <div style="padding: 16px 24px; background: #ffffff; border-top: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
+        <button type="button" class="btn-pill btn-pill-secondary" onclick="closeManualMaternalModal()">
+          Cancel / Discard
+        </button>
+        <button type="button" class="btn-pill" id="btn-save-manual-maternal" style="background: #be185d; color: #ffffff; border: 1.5px solid #be185d; font-weight: 800; padding: 9px 24px;" onclick="submitManualMaternal()">
+          <span class="btn-text">Save &amp; File Maternal Record</span>
+          <span class="spinner" style="display: none;"></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
     </main>
   </div>
 
@@ -2040,6 +2334,7 @@
   <script src="/js/toast.js"></script>
   <script src="/js/api.js"></script>
   <script>
+    let currentUser = null;
     let currentCategoryKey = 'itr';
     let currentSearchQuery = '';
     let currentPage = 1;
@@ -2063,6 +2358,9 @@
       }
       if (path.includes('/medcert') || path.includes('/medical_certificate') || path.includes('/certificate')) {
         return 'medcert';
+      }
+      if (path.includes('/maternal') || path.includes('/prenatal')) {
+        return 'maternal';
       }
       if (path.includes('/all')) {
         return 'all';
@@ -2103,39 +2401,67 @@
         icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>',
         apiCategory: 'MEDICAL_CERTIFICATE'
       },
+      maternal: {
+        title: 'Maternal Records',
+        badge: 'Maternal Care',
+        badgeClass: 'badge-maternal',
+        desc: 'Browse maternal care, prenatal monitoring, and pregnancy health records recorded in the RHU registry.',
+        icon: '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>',
+        apiCategory: 'MATERNAL_CARE_RECORD'
+      },
       all: {
         title: 'All Digitized Documents',
         badge: 'Central Archive',
         badgeClass: 'badge-other',
-        desc: 'All healthcare files, consultation notes, and immunizations recorded in the RHU registry.',
+        desc: 'All healthcare files, consultation notes, immunizations, and maternal records in the RHU registry.',
         icon: '<path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>',
         apiCategory: 'ALL'
       }
     };
 
     function updateHeroBanner(catKey) {
-      // Update tab pill active styles
-      document.querySelectorAll('#tab-itr, #tab-consultations, #tab-immunizations, #tab-medcert, #tab-all').forEach(btn => btn.classList.remove('active'));
-      const activeTabBtn = document.getElementById(`tab-${catKey}`);
-      if (activeTabBtn) activeTabBtn.classList.add('active');
+      const meta = categoryMeta[catKey] || categoryMeta.itr;
+      const heroBadge = document.getElementById('hero-category-badge');
+      if (heroBadge) {
+        heroBadge.textContent = meta.badge;
+        heroBadge.className = `doc-category-badge ${meta.badgeClass}`;
+      }
+      const heroTitle = document.getElementById('hero-category-title');
+      if (heroTitle) heroTitle.textContent = meta.title;
+      const heroDesc = document.getElementById('hero-category-desc');
+      if (heroDesc) heroDesc.textContent = meta.desc;
 
-      // Dynamically show ONLY the button corresponding to the current active category page
       const btnItr = document.getElementById('btn-open-manual-itr');
       const btnConsult = document.getElementById('btn-open-manual-consult');
       const btnVax = document.getElementById('btn-open-manual-immunization');
       const btnMedCert = document.getElementById('btn-open-manual-medcert');
+      const btnMaternal = document.getElementById('btn-open-manual-maternal');
 
+      // HEALTHCARE PERSONNEL can view all records but CANNOT add! RECORDS_STAFF and ADMINISTRATIVE_STAFF can add!
+      const isWriter = currentUser && (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF');
+      if (!isWriter) {
+        if (btnItr) btnItr.style.display = 'none';
+        if (btnConsult) btnConsult.style.display = 'none';
+        if (btnVax) btnVax.style.display = 'none';
+        if (btnMedCert) btnMedCert.style.display = 'none';
+        if (btnMaternal) btnMaternal.style.display = 'none';
+        return;
+      }
+
+      // Dynamically show ONLY the button corresponding to the current active category page for authorized writers
       if (btnItr) btnItr.style.display = (catKey === 'itr') ? 'inline-flex' : 'none';
       if (btnConsult) btnConsult.style.display = (catKey === 'consultations') ? 'inline-flex' : 'none';
       if (btnVax) btnVax.style.display = (catKey === 'immunizations') ? 'inline-flex' : 'none';
       if (btnMedCert) btnMedCert.style.display = (catKey === 'medcert') ? 'inline-flex' : 'none';
+      if (btnMaternal) btnMaternal.style.display = (catKey === 'maternal') ? 'inline-flex' : 'none';
 
-      // On 'all' category tab, show all manual buttons
+      // On 'all' category tab, show all manual buttons for Records Staff
       if (catKey === 'all') {
         if (btnItr) btnItr.style.display = 'inline-flex';
         if (btnConsult) btnConsult.style.display = 'inline-flex';
         if (btnVax) btnVax.style.display = 'inline-flex';
         if (btnMedCert) btnMedCert.style.display = 'inline-flex';
+        if (btnMaternal) btnMaternal.style.display = 'inline-flex';
       }
     }
 
@@ -2195,17 +2521,6 @@
         document.getElementById('stat-unique-patients').textContent = stats.total_patients || 0;
         document.getElementById('stat-recent-count').textContent = stats.recent_30_days || 0;
 
-        // Update counts on tabs if matching
-        if (currentCategoryKey === 'itr') {
-          document.getElementById('badge-itr-count').textContent = stats.total_records || 0;
-        } else if (currentCategoryKey === 'consultations') {
-          document.getElementById('badge-consultations-count').textContent = stats.total_records || 0;
-        } else if (currentCategoryKey === 'immunizations') {
-          document.getElementById('badge-immunizations-count').textContent = stats.total_records || 0;
-        } else if (currentCategoryKey === 'all') {
-          document.getElementById('badge-all-count').textContent = stats.total_records || 0;
-        }
-
         // Render rows / cards
         if (loadedRecords.length === 0) {
           tbody.innerHTML = '';
@@ -2256,6 +2571,7 @@
       if (norm.includes('CONSULTATION')) return 'badge-consult';
       if (norm.includes('IMMUNIZATION') || norm.includes('RABIES') || norm.includes('VAX')) return 'badge-immunize';
       if (norm.includes('MEDICAL_CERTIFICATE') || norm.includes('MEDCERT') || norm.includes('CERTIFICATE')) return 'badge-medcert';
+      if (norm.includes('MATERNAL') || norm.includes('PRENATAL')) return 'badge-maternal';
       return 'badge-other';
     }
 
@@ -2474,6 +2790,10 @@
 
     // Open Manual ITR Creation Modal
     async function openManualItrModal(preselectedPatientId = null) {
+      if (!currentUser || (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF')) {
+        if (window.showToast) window.showToast('You are not authorized to create records.', 'warning');
+        return;
+      }
       const modal = document.getElementById('manual-itr-modal');
       const select = document.getElementById('manual-patient-select');
       const badge = document.getElementById('manual-patient-badge');
@@ -2979,6 +3299,10 @@
     }
 
     async function openManualConsultModal(preselectPatientId = '') {
+      if (!currentUser || (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF')) {
+        if (window.showToast) window.showToast('You are not authorized to create records.', 'warning');
+        return;
+      }
       const modal = document.getElementById('manual-consult-modal');
       if (!modal) return;
 
@@ -3251,6 +3575,10 @@
     }
 
     async function openManualImmunizationModal(preselectPatientId = '') {
+      if (!currentUser || (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF')) {
+        if (window.showToast) window.showToast('You are not authorized to create records.', 'warning');
+        return;
+      }
       const modal = document.getElementById('manual-immunization-modal');
       if (!modal) return;
 
@@ -3498,6 +3826,10 @@
 
     // ─── MANUAL MEDICAL CERTIFICATE MODAL LOGIC ───
     async function openManualMedCertModal(preselectPatientId = '') {
+      if (!currentUser || (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF')) {
+        if (window.showToast) window.showToast('You are not authorized to create records.', 'warning');
+        return;
+      }
       const modal = document.getElementById('manual-medcert-modal');
       if (!modal) return;
 
@@ -3506,7 +3838,7 @@
 
       // Ensure patients cache is populated
       if (allPatientsCache.length === 0) {
-        await populateAllPatientsDropdown();
+        await ensurePatientsLoaded();
       }
 
       // Populate medcert patient select dropdown
@@ -3769,6 +4101,302 @@
       }
     }
 
+    // ─── MANUAL MATERNAL CARE & PRENATAL MODAL LOGIC ───
+    async function openManualMaternalModal(preselectPatientId = '') {
+      if (!currentUser || (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF')) {
+        if (window.showToast) window.showToast('You are not authorized to create records.', 'warning');
+        return;
+      }
+      const modal = document.getElementById('manual-maternal-modal');
+      if (!modal) return;
+
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      // Ensure patients cache is populated
+      if (allPatientsCache.length === 0) {
+        await ensurePatientsLoaded();
+      }
+
+      // Populate maternal patient select dropdown
+      const select = document.getElementById('manual-maternal-patient-select');
+      if (select) {
+        select.innerHTML = '<option value="">-- Walang Existing Record / Walk-in Patient (Direct Entry) --</option>' +
+          allPatientsCache.map(p => {
+            const sexTag = p.sex ? ` (${p.sex.charAt(0)})` : '';
+            return `<option value="${p.id}">${p.last_name}, ${p.first_name}${p.middle_name ? ' ' + p.middle_name : ''}${sexTag} - [${p.patient_number || 'ID: ' + p.id.substring(0, 8)}]</option>`;
+          }).join('');
+
+        if (preselectPatientId) {
+          select.value = preselectPatientId;
+          onManualMaternalPatientSelected();
+        } else {
+          resetManualMaternalForm();
+        }
+      }
+
+      // Pre-fill today's date for visit date
+      const visitDateInput = document.getElementById('mm-visit-date');
+      if (visitDateInput && !visitDateInput.value) {
+        visitDateInput.value = new Date().toISOString().split('T')[0];
+      }
+
+      // Auto-calculate EDC / AOG when LMP is selected
+      const lmpInput = document.getElementById('mm-obs-lmp');
+      if (lmpInput && !lmpInput.dataset.listenerBound) {
+        lmpInput.dataset.listenerBound = 'true';
+        lmpInput.addEventListener('change', () => {
+          if (!lmpInput.value) return;
+          const lmpDate = new Date(lmpInput.value);
+          if (isNaN(lmpDate.getTime())) return;
+          // Calculate EDD (+280 days / 40 weeks)
+          const eddDate = new Date(lmpDate.getTime() + (280 * 24 * 60 * 60 * 1000));
+          const edcInput = document.getElementById('mm-obs-edc');
+          if (edcInput) edcInput.value = eddDate.toISOString().split('T')[0];
+
+          // Calculate AOG in weeks
+          const now = new Date();
+          const diffMs = now.getTime() - lmpDate.getTime();
+          if (diffMs > 0) {
+            const diffWeeks = (diffMs / (7 * 24 * 60 * 60 * 1000)).toFixed(1);
+            const aogInput = document.getElementById('mm-obs-aog');
+            if (aogInput) aogInput.value = diffWeeks;
+          }
+        });
+      }
+    }
+
+    function closeManualMaternalModal() {
+      const modal = document.getElementById('manual-maternal-modal');
+      if (modal) modal.style.display = 'none';
+      document.body.style.overflow = '';
+      resetManualMaternalForm();
+    }
+
+    function onManualMaternalPatientSelected() {
+      const select = document.getElementById('manual-maternal-patient-select');
+      if (!select) return;
+      const patientId = select.value;
+      if (!patientId) {
+        resetManualMaternalForm();
+        return;
+      }
+
+      const p = allPatientsCache.find(pt => pt.id === patientId);
+      if (!p) return;
+
+      const nameInput = document.getElementById('mm-patient-name');
+      if (nameInput) nameInput.value = `${p.first_name || ''} ${p.middle_name ? p.middle_name + ' ' : ''}${p.last_name || ''}`.trim();
+
+      const bdateInput = document.getElementById('mm-patient-bdate');
+      if (bdateInput && p.birth_date) {
+        bdateInput.value = p.birth_date.split('T')[0];
+      }
+
+      const ageInput = document.getElementById('mm-patient-age');
+      if (ageInput) {
+        if (p.age) ageInput.value = p.age;
+        else if (p.birth_date) {
+          const birthYr = new Date(p.birth_date).getFullYear();
+          const currYr = new Date().getFullYear();
+          ageInput.value = currYr - birthYr;
+        }
+      }
+
+      const civilStatusInput = document.getElementById('mm-patient-civil-status');
+      if (civilStatusInput && p.civil_status) {
+        civilStatusInput.value = p.civil_status;
+      }
+
+      const addrInput = document.getElementById('mm-patient-address');
+      if (addrInput && p.address) {
+        addrInput.value = p.address;
+      }
+
+      const contactInput = document.getElementById('mm-patient-contact');
+      if (contactInput && p.contact_number) {
+        contactInput.value = p.contact_number;
+      }
+
+      const philInput = document.getElementById('mm-patient-philhealth');
+      if (philInput && p.philhealth_number) {
+        philInput.value = p.philhealth_number;
+      }
+    }
+
+    function resetManualMaternalForm() {
+      const select = document.getElementById('manual-maternal-patient-select');
+      if (select) select.value = '';
+
+      ['mm-patient-name', 'mm-patient-bdate', 'mm-patient-age', 'mm-patient-contact',
+       'mm-patient-philhealth', 'mm-spouse-name', 'mm-spouse-occupation',
+       'mm-obs-lmp', 'mm-obs-edc', 'mm-obs-aog', 'mm-vitals-bp', 'mm-vitals-weight',
+       'mm-vitals-height', 'mm-fundal-height', 'mm-fht', 'mm-lab-blood-type',
+       'mm-lab-hemoglobin', 'mm-lab-urinalysis', 'mm-lab-sugar', 'mm-lab-infectious',
+       'mm-lab-ultrasound', 'mm-diagnosis', 'mm-next-visit', 'mm-provider-name', 'mm-provider-license'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const visitDate = document.getElementById('mm-visit-date');
+      if (visitDate) visitDate.value = todayStr;
+
+      const gravida = document.getElementById('mm-obs-gravida');
+      if (gravida) gravida.value = '1';
+      const para = document.getElementById('mm-obs-para');
+      if (para) para.value = '0';
+      const term = document.getElementById('mm-obs-term');
+      if (term) term.value = '0';
+      const preterm = document.getElementById('mm-obs-preterm');
+      if (preterm) preterm.value = '0';
+      const abortion = document.getElementById('mm-obs-abortion');
+      if (abortion) abortion.value = '0';
+      const living = document.getElementById('mm-obs-living');
+      if (living) living.value = '0';
+
+      const addr = document.getElementById('mm-patient-address');
+      if (addr) addr.value = 'Brgy. Mayloong, Paete, Laguna';
+
+      const facility = document.getElementById('mm-facility-name');
+      if (facility) facility.value = 'PAETE RURAL HEALTH UNIT (Paete, Laguna)';
+
+      const ironFolic = document.getElementById('mm-iron-folic');
+      if (ironFolic) ironFolic.value = 'Iron + Folic Acid Tablets (60mg/400mcg) 30 tabs given';
+
+      const danger = document.getElementById('mm-danger-signs');
+      if (danger) danger.value = 'Walang banta ng pagdurugo, matinding pananakit ng ulo, o pamamanas';
+    }
+
+    function collectManualMaternalData() {
+      return {
+        patient_demographics: {
+          name: document.getElementById('mm-patient-name')?.value?.trim() || '',
+          birth_date: document.getElementById('mm-patient-bdate')?.value || null,
+          age: document.getElementById('mm-patient-age')?.value?.trim() || '',
+          civil_status: document.getElementById('mm-patient-civil-status')?.value || 'Married',
+          address: document.getElementById('mm-patient-address')?.value?.trim() || '',
+          contact_number: document.getElementById('mm-patient-contact')?.value?.trim() || '',
+          philhealth_number: document.getElementById('mm-patient-philhealth')?.value?.trim() || '',
+          spouse_name: document.getElementById('mm-spouse-name')?.value?.trim() || '',
+          spouse_occupation: document.getElementById('mm-spouse-occupation')?.value?.trim() || '',
+          is_4ps_member: document.getElementById('mm-is-4ps')?.value || 'Hindi'
+        },
+        obstetrical_history: {
+          gravida: parseInt(document.getElementById('mm-obs-gravida')?.value || '1', 10),
+          para: parseInt(document.getElementById('mm-obs-para')?.value || '0', 10),
+          full_term: parseInt(document.getElementById('mm-obs-term')?.value || '0', 10),
+          preterm: parseInt(document.getElementById('mm-obs-preterm')?.value || '0', 10),
+          abortion: parseInt(document.getElementById('mm-obs-abortion')?.value || '0', 10),
+          living_children: parseInt(document.getElementById('mm-obs-living')?.value || '0', 10),
+          last_menstrual_period: document.getElementById('mm-obs-lmp')?.value || '',
+          lmp: document.getElementById('mm-obs-lmp')?.value || '',
+          expected_date_confinement: document.getElementById('mm-obs-edc')?.value || '',
+          edc: document.getElementById('mm-obs-edc')?.value || '',
+          gestational_age_weeks: document.getElementById('mm-obs-aog')?.value || ''
+        },
+        prenatal_assessment: {
+          visit_date: document.getElementById('mm-visit-date')?.value || '',
+          blood_pressure: document.getElementById('mm-vitals-bp')?.value?.trim() || '',
+          weight_kg: document.getElementById('mm-vitals-weight')?.value?.trim() || '',
+          height_cm: document.getElementById('mm-vitals-height')?.value?.trim() || '',
+          fundal_height_cm: document.getElementById('mm-fundal-height')?.value?.trim() || '',
+          fetal_heart_tone_bpm: document.getElementById('mm-fht')?.value?.trim() || '',
+          fetal_presentation: document.getElementById('mm-fetal-presentation')?.value || '',
+          tetanus_toxoid_status: document.getElementById('mm-tt-status')?.value || '',
+          micronutrient_supplementation: document.getElementById('mm-iron-folic')?.value?.trim() || '',
+          risk_factors_danger_signs: document.getElementById('mm-danger-signs')?.value?.trim() || ''
+        },
+        laboratory_screenings: {
+          blood_type: document.getElementById('mm-lab-blood-type')?.value?.trim() || '',
+          hemoglobin_hematocrit: document.getElementById('mm-lab-hemoglobin')?.value?.trim() || '',
+          urinalysis: document.getElementById('mm-lab-urinalysis')?.value?.trim() || '',
+          blood_sugar_ogtt: document.getElementById('mm-lab-sugar')?.value?.trim() || '',
+          infectious_screenings: document.getElementById('mm-lab-infectious')?.value?.trim() || '',
+          ultrasound_findings: document.getElementById('mm-lab-ultrasound')?.value?.trim() || ''
+        },
+        clinical_impression_and_plan: {
+          diagnosis_impression: document.getElementById('mm-diagnosis')?.value?.trim() || '',
+          clinical_management: document.getElementById('mm-management-plan')?.value?.trim() || '',
+          next_prenatal_visit: document.getElementById('mm-next-visit')?.value || '',
+          attending_provider: document.getElementById('mm-provider-name')?.value?.trim() || '',
+          prc_license: document.getElementById('mm-provider-license')?.value?.trim() || '',
+          facility: document.getElementById('mm-facility-name')?.value?.trim() || 'PAETE RURAL HEALTH UNIT'
+        }
+      };
+    }
+
+    async function submitManualMaternal() {
+      const patientSelect = document.getElementById('manual-maternal-patient-select');
+      const patientId = patientSelect ? patientSelect.value : '';
+      const patientName = document.getElementById('mm-patient-name')?.value?.trim() || '';
+
+      if (!patientName) {
+        if (window.showToast) window.showToast('Please enter the patient name (Pangalan ng Ina).', 'error');
+        else alert('Please enter the patient name (Pangalan ng Ina).');
+        return;
+      }
+
+      const diagnosis = document.getElementById('mm-diagnosis')?.value?.trim() || '';
+      if (!diagnosis) {
+        if (window.showToast) window.showToast('Please provide a Clinical Impression / Diagnosis.', 'error');
+        else alert('Please provide a Clinical Impression / Diagnosis.');
+        return;
+      }
+
+      const providerName = document.getElementById('mm-provider-name')?.value?.trim() || '';
+      if (!providerName) {
+        if (window.showToast) window.showToast('Please enter the attending Midwife, Nurse, or Doctor name.', 'error');
+        else alert('Please enter the attending Midwife, Nurse, or Doctor name.');
+        return;
+      }
+
+      const saveBtn = document.getElementById('btn-save-manual-maternal');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.querySelector('.btn-text').textContent = 'Saving Maternal Record...';
+        saveBtn.querySelector('.spinner').style.display = 'inline-block';
+      }
+
+      try {
+        const structuredData = collectManualMaternalData();
+        const cleanNameSlug = patientName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 16);
+        const fileName = `Maternal_${cleanNameSlug}_${Date.now()}.pdf`;
+
+        const payload = {
+          patient_id: patientId || undefined,
+          patient_name: patientName,
+          record_type: 'MATERNAL_CARE_RECORD',
+          structured_json: structuredData,
+          file_name: fileName
+        };
+
+        const res = await API.fetchJson('/api/records/manual-create', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (res && res.success) {
+          if (window.showToast) window.showToast('Maternal Care Record successfully saved and filed!', 'success');
+          closeManualMaternalModal();
+          // Reload documents list
+          await fetchDocuments();
+        } else {
+          throw new Error(res.message || 'Failed to create manual maternal record.');
+        }
+      } catch (err) {
+        console.error('Submit manual maternal record error:', err);
+        if (window.showToast) window.showToast(err.message || 'An error occurred while saving maternal record.', 'error');
+        else alert(err.message || 'An error occurred while saving maternal record.');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.querySelector('.btn-text').textContent = 'Save & File Maternal Record';
+          saveBtn.querySelector('.spinner').style.display = 'none';
+        }
+      }
+    }
+
     // Expose all interactive functions to window scope for onclick handlers
     window.switchCategory = switchCategory;
     window.setViewMode = setViewMode;
@@ -3805,10 +4433,20 @@
     window.resetManualMedCertForm = resetManualMedCertForm;
     window.collectManualMedCertData = collectManualMedCertData;
     window.submitManualMedCert = submitManualMedCert;
+    window.openManualMaternalModal = openManualMaternalModal;
+    window.closeManualMaternalModal = closeManualMaternalModal;
+    window.onManualMaternalPatientSelected = onManualMaternalPatientSelected;
+    window.resetManualMaternalForm = resetManualMaternalForm;
+    window.collectManualMaternalData = collectManualMaternalData;
+    window.submitManualMaternal = submitManualMaternal;
 
     // Initialize page
     document.addEventListener('DOMContentLoaded', async () => {
-      const user = await loadUserProfile();
+      currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      // Inject sidebar navigation links
+      injectSidebarLinks(currentUser.role);
       
       const logoutBtn = document.getElementById('logout-btn');
       if (logoutBtn) {
@@ -3820,19 +4458,23 @@
       updateHeroBanner(currentCategoryKey);
       await fetchDocuments();
 
-      // Check if open manual modal requested in URL
+      // Check if open manual modal requested in URL (RECORDS_STAFF or ADMINISTRATIVE_STAFF)
       const urlParams = new URLSearchParams(window.location.search);
       const createAction = urlParams.get('create') || urlParams.get('action');
       const preselectPatient = urlParams.get('patient_id');
 
-      if (createAction === 'itr' || createAction === 'create-itr') {
-        openManualItrModal(preselectPatient);
-      } else if (createAction === 'consultation' || createAction === 'create-consultation') {
-        openManualConsultModal(preselectPatient);
-      } else if (createAction === 'immunization' || createAction === 'create-immunization') {
-        openManualImmunizationModal(preselectPatient);
-      } else if (createAction === 'medcert' || createAction === 'create-medcert' || createAction === 'medical-certificate') {
-        openManualMedCertModal(preselectPatient);
+      if (currentUser && (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF')) {
+        if (createAction === 'itr' || createAction === 'create-itr') {
+          openManualItrModal(preselectPatient);
+        } else if (createAction === 'consultation' || createAction === 'create-consultation') {
+          openManualConsultModal(preselectPatient);
+        } else if (createAction === 'immunization' || createAction === 'create-immunization') {
+          openManualImmunizationModal(preselectPatient);
+        } else if (createAction === 'medcert' || createAction === 'create-medcert' || createAction === 'medical-certificate') {
+          openManualMedCertModal(preselectPatient);
+        } else if (createAction === 'maternal' || createAction === 'create-maternal' || createAction === 'prenatal') {
+          openManualMaternalModal(preselectPatient);
+        }
       }
 
       // Handle browser back/forward buttons

@@ -685,7 +685,7 @@ const RecordController = {
 
       const finalRecordType = record_type || 'PATIENT_INFORMATION_SHEET';
       const recordId = crypto.randomUUID();
-      const prefix = finalRecordType === 'MEDICAL_CERTIFICATE' ? 'MedCert' : (finalRecordType === 'IMMUNIZATION_RECORD' ? 'Immunization' : (finalRecordType === 'CONSULTATION_RECORD' ? 'Consultation' : 'Manual_ITR'));
+      const prefix = finalRecordType === 'MATERNAL_CARE_RECORD' ? 'Maternal' : (finalRecordType === 'MEDICAL_CERTIFICATE' ? 'MedCert' : (finalRecordType === 'IMMUNIZATION_RECORD' ? 'Immunization' : (finalRecordType === 'CONSULTATION_RECORD' ? 'Consultation' : 'Manual_ITR')));
       const sanitizedName = file_name && file_name.trim()
         ? sanitizeFilename(file_name)
         : `${prefix}_${patient.patient_number || patient.id}_${Date.now()}.pdf`;
@@ -792,6 +792,36 @@ const RecordController = {
         if (medCertAuth.facility_address) textParts.push(`Facility Address: ${medCertAuth.facility_address}`);
         if (medCertAuth.facility_contact) textParts.push(`Facility Contact: ${medCertAuth.facility_contact}`);
 
+        // Maternal Care Specific Fields
+        const obstetrics = structured_json.obstetrical_history || structured_json.obstetrics || {};
+        if (obstetrics.gravida !== undefined || obstetrics.para !== undefined) {
+          textParts.push(`Obstetrical History: G${obstetrics.gravida ?? 0} P${obstetrics.para ?? 0} (${obstetrics.full_term ?? 0}-${obstetrics.preterm ?? 0}-${obstetrics.abortion ?? 0}-${obstetrics.living_children ?? 0})`);
+        }
+        if (obstetrics.last_menstrual_period || obstetrics.lmp) textParts.push(`LMP: ${obstetrics.last_menstrual_period || obstetrics.lmp}`);
+        if (obstetrics.expected_date_confinement || obstetrics.edc || obstetrics.edd) textParts.push(`EDC / EDD: ${obstetrics.expected_date_confinement || obstetrics.edc || obstetrics.edd}`);
+        if (obstetrics.gestational_age_weeks) textParts.push(`Gestational Age: ${obstetrics.gestational_age_weeks} weeks`);
+
+        const prenatal = structured_json.prenatal_assessment || structured_json.current_pregnancy || {};
+        if (prenatal.fundal_height_cm) textParts.push(`Fundal Height: ${prenatal.fundal_height_cm} cm`);
+        if (prenatal.fetal_heart_tone_bpm) textParts.push(`Fetal Heart Tone: ${prenatal.fetal_heart_tone_bpm} bpm`);
+        if (prenatal.fetal_presentation) textParts.push(`Fetal Presentation: ${prenatal.fetal_presentation}`);
+        if (prenatal.tetanus_toxoid_status) textParts.push(`Tetanus Toxoid Status: ${prenatal.tetanus_toxoid_status}`);
+        if (prenatal.micronutrient_supplementation) textParts.push(`Micronutrient Supplementation: ${prenatal.micronutrient_supplementation}`);
+        if (prenatal.risk_factors_danger_signs) textParts.push(`Risk Factors / Danger Signs: ${prenatal.risk_factors_danger_signs}`);
+
+        const maternalLabs = structured_json.laboratory_screenings || {};
+        if (maternalLabs.blood_type) textParts.push(`Blood Type: ${maternalLabs.blood_type}`);
+        if (maternalLabs.hemoglobin_hematocrit) textParts.push(`CBC / Hemoglobin: ${maternalLabs.hemoglobin_hematocrit}`);
+        if (maternalLabs.urinalysis) textParts.push(`Urinalysis: ${maternalLabs.urinalysis}`);
+        if (maternalLabs.infectious_screenings) textParts.push(`Infectious Screenings: ${maternalLabs.infectious_screenings}`);
+        if (maternalLabs.ultrasound_findings) textParts.push(`Ultrasound: ${maternalLabs.ultrasound_findings}`);
+
+        const maternalPlan = structured_json.clinical_impression_and_plan || structured_json.maternal_care_plan || {};
+        if (maternalPlan.diagnosis_impression) textParts.push(`Impression / Diagnosis: ${maternalPlan.diagnosis_impression}`);
+        if (maternalPlan.clinical_management) textParts.push(`Management Plan: ${maternalPlan.clinical_management}`);
+        if (maternalPlan.next_prenatal_visit) textParts.push(`Next Prenatal Visit: ${maternalPlan.next_prenatal_visit}`);
+        if (maternalPlan.attending_provider) textParts.push(`Attending Midwife / Provider: ${maternalPlan.attending_provider}`);
+
         // Consultations Table
         const consultList = structured_json.consultation_records || structured_json.consultations || [];
         if (Array.isArray(consultList)) {
@@ -840,9 +870,11 @@ const RecordController = {
         req
       );
 
+      const typeLabel = finalRecordType === 'MATERNAL_CARE_RECORD' ? 'Maternal Care Record' : (finalRecordType === 'MEDICAL_CERTIFICATE' ? 'Medical Certificate' : (finalRecordType === 'IMMUNIZATION_RECORD' ? 'Immunization Record' : (finalRecordType === 'CONSULTATION_RECORD' ? 'Consultation Record' : 'Individual Treatment Record')));
+
       return res.status(201).json({
         success: true,
-        message: 'Individual Treatment Record created and filed successfully.',
+        message: `${typeLabel} created and filed successfully.`,
         record: newRecord
       });
 
@@ -943,6 +975,7 @@ const RecordController = {
         if (['CONSULTATION_RECORD', 'CONSULTATION', 'CONSULTATIONS'].includes(c)) return 'CONSULTATION_RECORD';
         if (['IMMUNIZATION_RECORD', 'IMMUNIZATION', 'IMMUNIZATIONS', 'VACCINE', 'VACCINATION', 'ANTI_RABIES_RECORD'].includes(c)) return 'IMMUNIZATION_RECORD';
         if (['MEDICAL_CERTIFICATE', 'MEDCERT', 'MED_CERT', 'MEDICAL_CERT', 'CERTIFICATE'].includes(c)) return 'MEDICAL_CERTIFICATE';
+        if (['MATERNAL_CARE_RECORD', 'MATERNAL', 'MATERNAL_CARE', 'PRENATAL'].includes(c)) return 'MATERNAL_CARE_RECORD';
         return c;
       };
 
@@ -1261,6 +1294,9 @@ const RecordController = {
         }
 
         if (!storagePath) {
+          if (record.structured_json || record.extracted_text) {
+            return res.redirect(`/dashboard/records/view/${record.id}`);
+          }
           return res.status(404).json({ success: false, message: 'File storage path not found for this record.' });
         }
 
@@ -1270,6 +1306,9 @@ const RecordController = {
           .createSignedUrl(storagePath, 60); // 60 seconds
           
         if (error || !data || !data.signedUrl) {
+          if (record.structured_json || record.extracted_text) {
+            return res.redirect(`/dashboard/records/view/${record.id}`);
+          }
           console.error('Supabase signed URL generation failed:', error);
           return res.status(500).json({ success: false, message: 'Failed to retrieve the secure document link.' });
         }
@@ -1296,6 +1335,9 @@ const RecordController = {
         }
           
         if (!foundPath) {
+          if (record.structured_json || record.extracted_text) {
+            return res.redirect(`/dashboard/records/view/${record.id}`);
+          }
           return res.status(404).json({ success: false, message: 'Medical record file not found on disk.' });
         }
         

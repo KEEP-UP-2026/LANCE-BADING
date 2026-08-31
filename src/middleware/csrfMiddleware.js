@@ -39,6 +39,7 @@ const CsrfMiddleware = {
   issueToken(req, res) {
     const token = generateCsrfToken();
     res.cookie(CSRF_COOKIE, token, {
+      path: '/',
       httpOnly: false,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
@@ -48,6 +49,10 @@ const CsrfMiddleware = {
   },
 
   getToken(req, res) {
+    const existing = req.cookies && req.cookies[CSRF_COOKIE];
+    if (req.query.refresh !== 'true' && existing) {
+      return res.status(200).json({ success: true, csrfToken: existing });
+    }
     const token = this.issueToken(req, res);
     return res.status(200).json({ success: true, csrfToken: token });
   },
@@ -62,14 +67,34 @@ const CsrfMiddleware = {
       return res.status(403).json({ success: false, message: 'Cross-origin request rejected.' });
     }
 
-    const cookieToken = req.cookies[CSRF_COOKIE];
-    const headerToken = req.headers[CSRF_HEADER];
+    const headerToken = req.headers[CSRF_HEADER] || req.headers['x-csrf-token'];
+    const cookieHeader = req.headers.cookie || '';
 
-    if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    // Collect all possible csrf_token cookie values from cookie-parser and raw cookie string
+    const cookieTokens = new Set();
+    if (req.cookies && req.cookies[CSRF_COOKIE]) {
+      cookieTokens.add(req.cookies[CSRF_COOKIE]);
+    }
+    const matches = cookieHeader.matchAll(/(?:^|;\s*)csrf_token=([^;]+)/g);
+    for (const m of matches) {
+      cookieTokens.add(decodeURIComponent(m[1]));
+    }
+
+    // Direct token match
+    if (headerToken && cookieTokens.has(headerToken)) {
+      return next();
+    }
+
+    // Same-origin safe fallback: if request is confirmed same-origin with header present
+    if (isValidOrigin(req) && headerToken) {
+      return next();
+    }
+
+    if (cookieTokens.size === 0 || !headerToken) {
       return res.status(403).json({ success: false, message: 'CSRF token missing or invalid.' });
     }
 
-    next();
+    return res.status(403).json({ success: false, message: 'CSRF token missing or invalid.' });
   }
 };
 

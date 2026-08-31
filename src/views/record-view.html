@@ -129,9 +129,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -254,6 +252,9 @@
               </button>
               <button type="button" class="form-subnav-btn" id="subtab-medcert-sheet" onclick="switchItrPaperPage('medcert')">
                 Medical Certificate Sheet
+              </button>
+              <button type="button" class="form-subnav-btn" id="subtab-maternal-sheet" onclick="switchItrPaperPage('maternal')">
+                Maternal Care &amp; Prenatal Record
               </button>
             </div>
 
@@ -1325,6 +1326,116 @@
               </table>
             </div>
 
+            <!-- ─── MATERNAL CARE & PRENATAL RECORD SHEET ─── -->
+            <div id="maternal-paper-sheet" class="itr-paper" style="display: none;">
+              <!-- HEADER -->
+              <div class="header" style="border-bottom: 2px solid #be185d; padding-bottom: 12px;">
+                <div class="sub-header">Republic of the Philippines</div>
+                <div class="sub-header">Province of Laguna</div>
+                <div class="sub-header">Municipality of Paete</div>
+                <h2 style="color: #9d174d; margin: 4px 0;">PAETE RURAL HEALTH UNIT</h2>
+                <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                <div style="margin-top: 14px; padding: 6px 16px; background: #fce7f3; color: #9d174d; font-size: 15px; font-weight: 900; border: 1.5px solid #f9a8d4; border-radius: 6px; display: inline-block; letter-spacing: 0.05em;">
+                  MATERNAL CARE &amp; PRENATAL MONITORING RECORD
+                </div>
+              </div>
+
+              <!-- SECTION 1: PATIENT DEMOGRAPHICS -->
+              <div class="section-header" style="background: #9d174d; color: #ffffff;">1. IMPORMASYON NG PASYENTE (PATIENT INFORMATION)</div>
+              <table>
+                <tr>
+                  <td style="width: 50%;"><strong>Pangalan (Name):</strong><br><input type="text" id="view-mat-name" style="width: 95%; font-weight: 700; margin-top: 4px;" readonly></td>
+                  <td style="width: 25%;"><strong>Petsa ng Kapanganakan:</strong><br><input type="date" id="view-mat-bdate" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td style="width: 25%;"><strong>Edad (Age):</strong><br><input type="text" id="view-mat-age" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+                <tr>
+                  <td><strong>Tirahan (Address):</strong><br><input type="text" id="view-mat-address" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Civil Status:</strong><br><input type="text" id="view-mat-civil-status" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Contact No.:</strong><br><input type="text" id="view-mat-contact" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+                <tr>
+                  <td><strong>PhilHealth No.:</strong><br><input type="text" id="view-mat-philhealth" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Pangalan ng Asawa (Spouse):</strong><br><input type="text" id="view-mat-spouse" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>4Ps Member:</strong><br><input type="text" id="view-mat-4ps" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+              </table>
+
+              <!-- SECTION 2: OBSTETRICAL HISTORY -->
+              <div class="section-header" style="background: #9d174d; color: #ffffff;">2. KASAYSAYANG OBSTETRIKAL (OBSTETRICAL HISTORY — G-P-T-P-A-L)</div>
+              <table>
+                <tr>
+                  <td style="width: 16%;"><strong>G (Gravida):</strong><br><input type="text" id="view-mat-gravida" style="width: 90%; margin-top: 4px;" readonly></td>
+                  <td style="width: 16%;"><strong>P (Para):</strong><br><input type="text" id="view-mat-para" style="width: 90%; margin-top: 4px;" readonly></td>
+                  <td style="width: 16%;"><strong>T (Full Term):</strong><br><input type="text" id="view-mat-term" style="width: 90%; margin-top: 4px;" readonly></td>
+                  <td style="width: 16%;"><strong>P (Preterm):</strong><br><input type="text" id="view-mat-preterm" style="width: 90%; margin-top: 4px;" readonly></td>
+                  <td style="width: 16%;"><strong>A (Abortion):</strong><br><input type="text" id="view-mat-abortion" style="width: 90%; margin-top: 4px;" readonly></td>
+                  <td style="width: 16%;"><strong>L (Living):</strong><br><input type="text" id="view-mat-living" style="width: 90%; margin-top: 4px;" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2"><strong>LMP (Last Menstrual Period):</strong><br><input type="date" id="view-mat-lmp" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td colspan="2"><strong>EDC / EDD (Expected Due Date):</strong><br><input type="date" id="view-mat-edc" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td colspan="2"><strong>AOG (Age of Gestation, weeks):</strong><br><input type="text" id="view-mat-aog" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+              </table>
+
+              <!-- SECTION 3: PRENATAL ASSESSMENT -->
+              <div class="section-header" style="background: #9d174d; color: #ffffff;">3. PAGTATASA SA PRENATAL (PRENATAL ASSESSMENT)</div>
+              <table>
+                <tr>
+                  <td style="width: 25%;"><strong>Visit Date:</strong><br><input type="date" id="view-mat-visit-date" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td style="width: 25%;"><strong>Blood Pressure:</strong><br><input type="text" id="view-mat-bp" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td style="width: 25%;"><strong>Weight (kg):</strong><br><input type="text" id="view-mat-weight" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td style="width: 25%;"><strong>Height (cm):</strong><br><input type="text" id="view-mat-height" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+                <tr>
+                  <td><strong>Fundal Height (cm):</strong><br><input type="text" id="view-mat-fundal" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Fetal Heart Tone (bpm):</strong><br><input type="text" id="view-mat-fht" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Fetal Presentation:</strong><br><input type="text" id="view-mat-presentation" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Tetanus Toxoid Status:</strong><br><input type="text" id="view-mat-tt-status" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+                <tr>
+                  <td colspan="2"><strong>Micronutrient Supplementation (Iron/Folic):</strong><br><input type="text" id="view-mat-iron-folic" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td colspan="2"><strong>Risk Factors / Danger Signs:</strong><br><input type="text" id="view-mat-danger-signs" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+              </table>
+
+              <!-- SECTION 4: LABORATORY SCREENINGS -->
+              <div class="section-header" style="background: #9d174d; color: #ffffff;">4. RESULTA NG LABORATORYO (LABORATORY SCREENINGS)</div>
+              <table>
+                <tr>
+                  <td style="width: 33%;"><strong>Blood Type / Rh:</strong><br><input type="text" id="view-mat-blood-type" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td style="width: 33%;"><strong>CBC / Hemoglobin-Hematocrit:</strong><br><input type="text" id="view-mat-hemoglobin" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td style="width: 33%;"><strong>Urinalysis:</strong><br><input type="text" id="view-mat-urinalysis" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+                <tr>
+                  <td><strong>Blood Sugar / OGTT:</strong><br><input type="text" id="view-mat-sugar" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Infectious Screenings (Hep B / Syphilis):</strong><br><input type="text" id="view-mat-infectious" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td><strong>Ultrasound Findings:</strong><br><input type="text" id="view-mat-ultrasound" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+              </table>
+
+              <!-- SECTION 5: CLINICAL IMPRESSION & PLAN -->
+              <div class="section-header" style="background: #9d174d; color: #ffffff;">5. IMPRESYON AT PLANO (CLINICAL IMPRESSION &amp; MANAGEMENT PLAN)</div>
+              <table>
+                <tr>
+                  <td style="width: 50%;"><strong>Diagnosis / Impression:</strong><br><textarea id="view-mat-diagnosis" rows="3" style="width: 95%; margin-top: 4px; resize: vertical;" readonly></textarea></td>
+                  <td style="width: 50%;"><strong>Clinical Management / Interventions:</strong><br><textarea id="view-mat-management" rows="3" style="width: 95%; margin-top: 4px; resize: vertical;" readonly></textarea></td>
+                </tr>
+                <tr>
+                  <td><strong>Next Prenatal Visit:</strong><br><input type="date" id="view-mat-next-visit" style="width: 95%; margin-top: 4px;" readonly></td>
+                  <td>
+                    <strong>Attending Provider / Midwife:</strong><br>
+                    <input type="text" id="view-mat-provider" placeholder="Full Name" style="width: 95%; margin-top: 4px;" readonly>
+                    <input type="text" id="view-mat-prc-license" placeholder="PRC License #" style="width: 95%; margin-top: 6px;" readonly>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2"><strong>Health Facility:</strong><br><input type="text" id="view-mat-facility" style="width: 95%; margin-top: 4px;" readonly></td>
+                </tr>
+              </table>
+            </div>
+            <!-- ─── END MATERNAL PANEL ─── -->
+
           </div>
 
           <!-- TAB CONTENT 2: ORIGINAL DOCUMENT SCAN -->
@@ -1398,13 +1509,6 @@
 
       // 3. Fetch record details
       await loadRecordDetails();
-
-      // Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
-      });
     });
 
     // Convert Extracted Digital Text to Structured JSON
@@ -2003,8 +2107,8 @@
           populateFormFieldsFromJson(structuredJson);
         }
 
-        // Hide edit/archive/delete controls if not RECORDS_STAFF
-        if (currentUser.role !== 'RECORDS_STAFF') {
+        // Hide edit/archive/delete controls if not RECORDS_STAFF and not ADMINISTRATIVE_STAFF
+        if (currentUser.role !== 'RECORDS_STAFF' && currentUser.role !== 'ADMINISTRATIVE_STAFF') {
           document.getElementById('save-changes-btn').style.display = 'none';
           document.getElementById('archive-record-btn').style.display = 'none';
           document.getElementById('delete-record-btn').style.display = 'none';
@@ -2039,29 +2143,34 @@
       const pc = document.getElementById('consultation-paper-sheet');
       const pi = document.getElementById('immunization-paper-sheet');
       const pmc = document.getElementById('medcert-paper-sheet');
+      const pmat = document.getElementById('maternal-paper-sheet');
       const btn1 = document.getElementById('subtab-itr-p1');
       const btn2 = document.getElementById('subtab-itr-p2');
       const btnc = document.getElementById('subtab-consult-sheet');
       const btni = document.getElementById('subtab-immunize-sheet');
       const btnmc = document.getElementById('subtab-medcert-sheet');
+      const btnmat = document.getElementById('subtab-maternal-sheet');
       
       const isP1 = (page === 1 || page === '1');
       const isP2 = (page === 2 || page === '2');
       const isConsult = (page === 'consult' || page === 3 || page === '3');
       const isImmunize = (page === 'immunize' || page === 'vaccine' || page === 4 || page === '4');
       const isMedCert = (page === 'medcert' || page === 'med_cert' || page === 'certificate' || page === 5 || page === '5');
+      const isMaternal = (page === 'maternal' || page === 'prenatal' || page === 6 || page === '6');
 
       if (p1) p1.style.display = isP1 ? 'block' : 'none';
       if (p2) p2.style.display = isP2 ? 'block' : 'none';
       if (pc) pc.style.display = isConsult ? 'block' : 'none';
       if (pi) pi.style.display = isImmunize ? 'block' : 'none';
       if (pmc) pmc.style.display = isMedCert ? 'block' : 'none';
+      if (pmat) pmat.style.display = isMaternal ? 'block' : 'none';
 
       if (btn1) btn1.classList.toggle('active', isP1);
       if (btn2) btn2.classList.toggle('active', isP2);
       if (btnc) btnc.classList.toggle('active', isConsult);
       if (btni) btni.classList.toggle('active', isImmunize);
       if (btnmc) btnmc.classList.toggle('active', isMedCert);
+      if (btnmat) btnmat.classList.toggle('active', isMaternal);
     };
 
     // Tab Switcher
@@ -2172,17 +2281,75 @@
       const hasP2Data = !!(data.philhealth_membership || data.past_medical_history || data.immunizations || data.immunization_history || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2);
       const hasP1Data = !!(data.header || (data.patient_demographics && data.patient_demographics.name) || data.smoking_cessation_profile || (data.consultation_records && data.consultation_records.length > 0) || data.itr_page_number === 1);
 
+      const isMaternalRecord = (currentRecord && (currentRecord.record_type === 'MATERNAL_CARE_RECORD' || currentRecord.record_type === 'MATERNAL' || currentRecord.record_type === 'MATERNAL_CARE' || currentRecord.record_type === 'PRENATAL')) ||
+                               data.record_type === 'MATERNAL_CARE_RECORD' ||
+                               !!(data.obstetrical_history || data.prenatal_assessment);
+
       if (isMedCertRecord) {
         switchItrPaperPage('medcert');
       } else if (isImmunizeRecord) {
         switchItrPaperPage('immunize');
       } else if (isConsultRecord) {
         switchItrPaperPage('consult');
+      } else if (isMaternalRecord) {
+        switchItrPaperPage('maternal');
       } else if (hasP2Data && !hasP1Data) {
         switchItrPaperPage(2);
       } else {
         switchItrPaperPage(1);
       }
+
+      // --- MATERNAL CARE RECORD POPULATION ---
+      const obs = data.obstetrical_history || data.obstetrics || {};
+      const prn = data.prenatal_assessment || data.current_pregnancy || {};
+      const labs = data.laboratory_screenings || {};
+      const plan = data.clinical_impression_and_plan || data.maternal_care_plan || {};
+      const matDem = data.patient_demographics || d || {};
+
+      setField('view-mat-name', matDem.name || d.name || (currentRecord && currentRecord.patient_name) || '');
+      setField('view-mat-bdate', matDem.birth_date || d.birth_date || '');
+      setField('view-mat-age', matDem.age || d.age || '');
+      setField('view-mat-civil-status', matDem.civil_status || '');
+      setField('view-mat-address', matDem.address || d.address || '');
+      setField('view-mat-contact', matDem.contact_number || d.contact_number || '');
+      setField('view-mat-philhealth', matDem.philhealth_number || '');
+      setField('view-mat-spouse', matDem.spouse_name || '');
+      setField('view-mat-4ps', matDem.is_4ps_member || '');
+
+      setField('view-mat-gravida', obs.gravida !== undefined ? String(obs.gravida) : '');
+      setField('view-mat-para', obs.para !== undefined ? String(obs.para) : '');
+      setField('view-mat-term', obs.full_term !== undefined ? String(obs.full_term) : '');
+      setField('view-mat-preterm', obs.preterm !== undefined ? String(obs.preterm) : '');
+      setField('view-mat-abortion', obs.abortion !== undefined ? String(obs.abortion) : '');
+      setField('view-mat-living', obs.living_children !== undefined ? String(obs.living_children) : '');
+      setField('view-mat-lmp', obs.last_menstrual_period || obs.lmp || '');
+      setField('view-mat-edc', obs.expected_date_confinement || obs.edc || '');
+      setField('view-mat-aog', obs.gestational_age_weeks ? String(obs.gestational_age_weeks) + ' weeks' : '');
+
+      setField('view-mat-visit-date', prn.visit_date || '');
+      setField('view-mat-bp', prn.blood_pressure || '');
+      setField('view-mat-weight', prn.weight_kg || '');
+      setField('view-mat-height', prn.height_cm || '');
+      setField('view-mat-fundal', prn.fundal_height_cm || '');
+      setField('view-mat-fht', prn.fetal_heart_tone_bpm || '');
+      setField('view-mat-presentation', prn.fetal_presentation || '');
+      setField('view-mat-tt-status', prn.tetanus_toxoid_status || '');
+      setField('view-mat-iron-folic', prn.micronutrient_supplementation || '');
+      setField('view-mat-danger-signs', prn.risk_factors_danger_signs || '');
+
+      setField('view-mat-blood-type', labs.blood_type || '');
+      setField('view-mat-hemoglobin', labs.hemoglobin_hematocrit || '');
+      setField('view-mat-urinalysis', labs.urinalysis || '');
+      setField('view-mat-sugar', labs.blood_sugar_ogtt || '');
+      setField('view-mat-infectious', labs.infectious_screenings || '');
+      setField('view-mat-ultrasound', labs.ultrasound_findings || '');
+
+      setField('view-mat-diagnosis', plan.diagnosis_impression || '');
+      setField('view-mat-management', plan.clinical_management || '');
+      setField('view-mat-next-visit', plan.next_prenatal_visit || '');
+      setField('view-mat-provider', plan.attending_provider || '');
+      setField('view-mat-prc-license', plan.prc_license || '');
+      setField('view-mat-facility', plan.facility || 'PAETE RURAL HEALTH UNIT');
 
       // --- MEDICAL CERTIFICATE POPULATION ---
       const cf = data.clinical_findings || data.clinical_details || {};

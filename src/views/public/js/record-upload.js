@@ -2282,15 +2282,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     uploadZone.style.display      = 'flex';
     enhancementStage.style.display = 'none';
     reviewPanel.style.display      = 'none';
-    uploadStage.style.display      = 'block';
     document.getElementById('main-content-card').style.maxWidth = '900px';
   }
-
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-      await API.logout();
-    }
-  });
 });
 
 // ─── Helpers defined at module scope (accessible from DOMContentLoaded) ──────

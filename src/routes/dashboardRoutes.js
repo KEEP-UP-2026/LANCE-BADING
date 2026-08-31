@@ -28,9 +28,16 @@ router.get('/admin/users',
   }
 );
 
-// Records Staff page
+router.get('/admin/audit', 
+  AuthMiddleware.requirePageAuth(['RHU_ADMINISTRATOR']), 
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/admin-audit.html'));
+  }
+);
+
+// Records Staff & Administrative Staff page
 router.get('/records', 
-  AuthMiddleware.requirePageAuth(['RECORDS_STAFF']), 
+  AuthMiddleware.requirePageAuth(['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF']), 
   (req, res) => {
     res.sendFile(path.join(__dirname, '../views/records.html'));
   }
@@ -52,17 +59,17 @@ router.get('/administrative',
   }
 );
 
-// Reports Dashboard
+// Reports Dashboard (Administrative Staff ONLY)
 router.get('/reports',
-  AuthMiddleware.requirePageAuth(['RHU_ADMINISTRATOR', 'ADMINISTRATIVE_STAFF', 'RECORDS_STAFF']),
+  AuthMiddleware.requirePageAuth(['ADMINISTRATIVE_STAFF']),
   (req, res) => {
     res.sendFile(path.join(__dirname, '../views/reports.html'));
   }
 );
 
-// Patient Management Page Routes
-const ALLOWED_READ_ROLES = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
-const ALLOWED_WRITE_ROLES = ['RECORDS_STAFF'];
+// Patient Management Page Routes (Clinical Staff only)
+const ALLOWED_READ_ROLES = ['RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
+const ALLOWED_WRITE_ROLES = ['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF'];
 
 router.get('/patients', 
   AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
@@ -115,14 +122,14 @@ router.get('/search',
 );
 
 router.get('/duplicates',
-  AuthMiddleware.requirePageAuth(['RHU_ADMINISTRATOR', 'RECORDS_STAFF']),
+  AuthMiddleware.requirePageAuth(['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF']),
   (req, res) => {
     res.sendFile(path.join(__dirname, '../views/duplicate-warnings.html'));
   }
 );
 
 router.get('/archives',
-  AuthMiddleware.requirePageAuth(['RHU_ADMINISTRATOR', 'RECORDS_STAFF']),
+  AuthMiddleware.requirePageAuth(['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF']),
   (req, res) => {
     res.sendFile(path.join(__dirname, '../views/archives.html'));
   }

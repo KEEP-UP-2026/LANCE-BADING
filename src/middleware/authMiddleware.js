@@ -37,13 +37,13 @@ const AuthMiddleware = {
       const user = await UserModel.findById(decoded.id);
 
       if (!user) {
-        res.clearCookie('token');
+        res.clearCookie('token', { path: '/' });
         req.user = null;
         return next();
       }
 
       if (user.status === 'INACTIVE') {
-        res.clearCookie('token');
+        res.clearCookie('token', { path: '/' });
         req.user = null;
         return next();
       }
@@ -52,7 +52,7 @@ const AuthMiddleware = {
       next();
     } catch (error) {
       console.error('JWT authentication error:', error);
-      res.clearCookie('token');
+      res.clearCookie('token', { path: '/' });
       req.user = null;
       next();
     }
@@ -68,7 +68,7 @@ const AuthMiddleware = {
 
       // 2. Check if account is active (already verified in authenticate, but double check)
       if (req.user.status === 'INACTIVE') {
-        res.clearCookie('token');
+        res.clearCookie('token', { path: '/' });
         return res.redirect('/login?error=account_disabled');
       }
 
@@ -96,7 +96,7 @@ const AuthMiddleware = {
 
       // 2. Check if account is active
       if (req.user.status === 'INACTIVE') {
-        res.clearCookie('token');
+        res.clearCookie('token', { path: '/' });
         return res.status(403).json({ 
           success: false, 
           message: 'Account disabled. Please contact your administrator.' 

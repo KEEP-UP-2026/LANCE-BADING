@@ -130,6 +130,10 @@ app.get('/login', AuthMiddleware.authenticate, (req, res) => {
   res.sendFile(path.join(__dirname, 'src/views/login.html'));
 });
 
+app.get('/reports', (req, res) => {
+  res.redirect('/dashboard/reports');
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);

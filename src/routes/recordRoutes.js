@@ -4,8 +4,8 @@ const RecordController = require('../controllers/recordController');
 const AuthMiddleware = require('../middleware/authMiddleware');
 const RateLimitMiddleware = require('../middleware/rateLimitMiddleware');
 
-const ALLOWED_READ_ROLES = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
-const ALLOWED_WRITE_ROLES = ['RECORDS_STAFF'];
+const ALLOWED_READ_ROLES = ['RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
+const ALLOWED_WRITE_ROLES = ['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF'];
 
 router.use(AuthMiddleware.authenticate);
 

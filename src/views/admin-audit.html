@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log Review - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .audit-filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .filter-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .filter-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .action-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .action-login { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); }
+    .action-logout { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.25); }
+    .action-create { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .action-modify { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .action-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+    .action-export { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.25); }
+    .action-other { background: rgba(255, 255, 255, 0.05); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav" id="layout-nav-links">
+        <!-- Injected dynamically via api.js -->
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <div class="welcome-banner">
+        <h2 class="welcome-title">Audit Log Review & Security Trails</h2>
+        <p class="welcome-desc">Immutable system activity monitoring for authentication events, user role assignments, account activations/deactivations, and data exports.</p>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+        <div class="stats-card glass-panel" style="padding: 16px;">
+          <div class="stats-info">
+            <span class="stats-label">Total Logged Events</span>
+            <span class="stats-value" id="count-total-events">-</span>
+          </div>
+        </div>
+        <div class="stats-card glass-panel" style="padding: 16px;">
+          <div class="stats-info">
+            <span class="stats-label">Authentication Events</span>
+            <span class="stats-value" style="color: #60a5fa;" id="count-auth-events">-</span>
+          </div>
+        </div>
+        <div class="stats-card glass-panel" style="padding: 16px;">
+          <div class="stats-info">
+            <span class="stats-label">User Management Logs</span>
+            <span class="stats-value" style="color: #34d399;" id="count-user-events">-</span>
+          </div>
+        </div>
+        <div class="stats-card glass-panel" style="padding: 16px;">
+          <div class="stats-info">
+            <span class="stats-label">Data Export Records</span>
+            <span class="stats-value" style="color: #a78bfa;" id="count-export-events">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Log Panel -->
+      <div class="content-card glass-panel">
+        <div class="card-title-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 class="card-title">System Event History</h3>
+            <p class="card-subtitle">Detailed timeline of authorized personnel actions and system access.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="refresh-logs-btn" class="btn btn-secondary" style="font-size: 12px; padding: 8px 14px; gap: 6px; display: inline-flex; align-items: center;">
+              <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              Refresh
+            </button>
+            <button id="export-audit-csv-btn" class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; gap: 6px; display: inline-flex; align-items: center; background: linear-gradient(135deg, #059669, #10B981); border: none;">
+              <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+              Export Audit CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="audit-filters">
+          <input type="text" id="filter-search" class="filter-input" placeholder="Search actor, action, IP, or details..." style="flex: 1; min-width: 220px;">
+          
+          <select id="filter-action" class="filter-input">
+            <option value="">All Action Types</option>
+            <option value="LOGIN">LOGIN</option>
+            <option value="LOGOUT">LOGOUT</option>
+            <option value="USER_CREATE">USER_CREATE</option>
+            <option value="USER_UPDATE">USER_UPDATE</option>
+            <option value="USER_STATUS_TOGGLE">USER_STATUS_TOGGLE</option>
+            <option value="EXPORT">EXPORT</option>
+          </select>
+
+          <select id="filter-timespan" class="filter-input">
+            <option value="ALL">All Time</option>
+            <option value="TODAY">Today</option>
+            <option value="7DAYS">Last 7 Days</option>
+            <option value="30DAYS">Last 30 Days</option>
+          </select>
+        </div>
+
+        <!-- Audit Table -->
+        <div class="table-responsive" style="overflow-x: auto;">
+          <table class="table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; font-size: 12px; color: var(--text-secondary);">
+                <th style="padding: 12px 14px;">Timestamp</th>
+                <th style="padding: 12px 14px;">Event Action</th>
+                <th style="padding: 12px 14px;">Actor Account</th>
+                <th style="padding: 12px 14px;">Event Details & Activity</th>
+                <th style="padding: 12px 14px;">Client IP</th>
+              </tr>
+            </thead>
+            <tbody id="audit-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                  Loading system audit logs...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let allLogs = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Authenticate user
+      const currentUser = await loadUserProfile();
+      if (!currentUser) return;
+
+      // 2. Dynamic navigation
+      injectSidebarLinks(currentUser.role);
+
+      // Mobile initials
+      const mobileInitials = document.getElementById('mobile-user-initials');
+      if (mobileInitials && currentUser.full_name) {
+        mobileInitials.textContent = currentUser.full_name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .substring(0, 2)
+          .toUpperCase();
+      }
+
+      // 3. Load logs
+      await loadAuditLogs();
+
+      // 4. Attach filter handlers
+      document.getElementById('filter-search').addEventListener('input', applyFilters);
+      document.getElementById('filter-action').addEventListener('change', applyFilters);
+      document.getElementById('filter-timespan').addEventListener('change', applyFilters);
+      document.getElementById('refresh-logs-btn').addEventListener('click', loadAuditLogs);
+      document.getElementById('export-audit-csv-btn').addEventListener('click', exportAuditLogsCSV);
+    });
+
+    async function loadAuditLogs() {
+      try {
+        const res = await API.fetchJson('/api/reports/audit-logs');
+        if (res && res.success) {
+          allLogs = res.logs || [];
+          updateMetrics(allLogs);
+          applyFilters();
+        } else {
+          showToast('Failed to retrieve audit logs.', 'error');
+        }
+      } catch (err) {
+        console.error('Audit log loading error:', err);
+        showToast('Error loading audit log records.', 'error');
+      }
+    }
+
+    function updateMetrics(logs) {
+      document.getElementById('count-total-events').textContent = logs.length;
+      document.getElementById('count-auth-events').textContent = logs.filter(l => (l.action || '').includes('LOG')).length;
+      document.getElementById('count-user-events').textContent = logs.filter(l => (l.action || '').includes('USER')).length;
+      document.getElementById('count-export-events').textContent = logs.filter(l => (l.action || '').includes('EXPORT')).length;
+    }
+
+    function getActionBadge(action) {
+      const act = (action || '').toUpperCase();
+      let badgeClass = 'action-other';
+      if (act.includes('LOGIN')) badgeClass = 'action-login';
+      else if (act.includes('LOGOUT')) badgeClass = 'action-logout';
+      else if (act.includes('CREATE') || act.includes('ADD')) badgeClass = 'action-create';
+      else if (act.includes('STATUS') || act.includes('TOGGLE')) badgeClass = 'action-modify';
+      else if (act.includes('DELETE') || act.includes('ARCHIVE')) badgeClass = 'action-danger';
+      else if (act.includes('EXPORT')) badgeClass = 'action-export';
+      return `<span class="action-badge ${badgeClass}">${escapeHtml(action)}</span>`;
+    }
+
+    function applyFilters() {
+      const query = (document.getElementById('filter-search').value || '').toLowerCase().trim();
+      const actionFilter = document.getElementById('filter-action').value;
+      const timespanFilter = document.getElementById('filter-timespan').value;
+
+      const now = new Date();
+
+      const filtered = allLogs.filter(log => {
+        // Search query
+        if (query) {
+          const matchTarget = `${log.action || ''} ${log.actor_display || ''} ${log.user_email || ''} ${log.details || ''} ${log.ip_address || ''}`.toLowerCase();
+          if (!matchTarget.includes(query)) return false;
+        }
+
+        // Action filter
+        if (actionFilter && !(log.action || '').toUpperCase().includes(actionFilter)) {
+          return false;
+        }
+
+        // Timespan filter
+        if (timespanFilter !== 'ALL') {
+          const logDate = new Date(log.created_at);
+          const diffMs = now - logDate;
+          const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+          if (timespanFilter === 'TODAY' && diffDays > 1) return false;
+          if (timespanFilter === '7DAYS' && diffDays > 7) return false;
+          if (timespanFilter === '30DAYS' && diffDays > 30) return false;
+        }
+
+        return true;
+      });
+
+      renderTable(filtered);
+    }
+
+    function renderTable(logs) {
+      const tbody = document.getElementById('audit-table-body');
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">
+              No audit records match the selected filters.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = logs.map(log => {
+        const dateFormatted = new Date(log.created_at).toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+
+        const actor = escapeHtml(log.actor_display || log.user_email || 'System / Anonymous');
+        const roleNote = log.actor_sublabel ? `<div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(log.actor_sublabel)}</div>` : '';
+        const details = escapeHtml(log.details || 'No additional activity metadata.');
+        const ip = escapeHtml(log.ip_address || '127.0.0.1');
+
+        return `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px;">
+            <td style="padding: 12px 14px; white-space: nowrap; color: var(--text-secondary); font-size: 12px;">
+              ${dateFormatted}
+            </td>
+            <td style="padding: 12px 14px; white-space: nowrap;">
+              ${getActionBadge(log.action)}
+            </td>
+            <td style="padding: 12px 14px;">
+              <strong>${actor}</strong>
+              ${roleNote}
+            </td>
+            <td style="padding: 12px 14px; color: var(--text-primary); max-width: 400px; word-break: break-word;">
+              ${details}
+            </td>
+            <td style="padding: 12px 14px; font-family: monospace; font-size: 12px; color: var(--text-secondary);">
+              ${ip}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function exportAuditLogsCSV() {
+      if (allLogs.length === 0) {
+        showToast('No audit logs available to export.', 'warning');
+        return;
+      }
+
+      const headers = ['ID', 'Timestamp', 'Action', 'Actor Email / Display', 'Details', 'IP Address'];
+      const rows = allLogs.map(l => [
+        `"${(l.id || '').toString().replace(/"/g, '""')}"`,
+        `"${(l.created_at || '').toString().replace(/"/g, '""')}"`,
+        `"${(l.action || '').toString().replace(/"/g, '""')}"`,
+        `"${(l.actor_display || l.user_email || '').toString().replace(/"/g, '""')}"`,
+        `"${(l.details || '').toString().replace(/"/g, '""')}"`,
+        `"${(l.ip_address || '').toString().replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `keepup-audit-logs-${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showToast('Audit logs exported to CSV successfully.', 'success');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

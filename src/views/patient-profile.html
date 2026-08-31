@@ -297,9 +297,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-brand-logo">
-          <svg style="width: 24px; height: 24px; fill: #fff;" viewBox="0 0 24 24">
-            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-          </svg>
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
         </div>
         <span class="sidebar-brand-name">Keep Up</span>
       </div>
@@ -452,14 +450,6 @@
 
           <!-- Action buttons column (Right Stack) -->
           <div class="profile-actions-col">
-            <a href="/dashboard/patients" class="btn-pill btn-pill-secondary">
-              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-              Back to Directory
-            </a>
-            <a href="#" id="manual-itr-action-btn" class="btn-pill" style="display: none; background: #059669; color: #ffffff; border: 1.5px solid #059669; font-weight: 700; align-items: center; gap: 6px;">
-              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-              + Manual ITR
-            </a>
             <a href="#" id="scan-document-action-btn" class="btn-pill btn-pill-primary" style="display: none;">
               <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: currentColor;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
               + Scan / Upload
@@ -521,12 +511,23 @@
                 <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
               </div>
               <div class="category-info">
-                <h4 class="category-title">Maternal Care</h4>
+                <h4 class="category-title">Maternal Records</h4>
                 <span class="category-status" id="count-MATERNAL_CARE_RECORD">0 documents filed</span>
               </div>
             </div>
 
-            <!-- Category 5: Other Health Records -->
+            <!-- Category 5: Medical Certificates -->
+            <div class="category-card" id="card-MEDICAL_CERTIFICATE" onclick="selectCategory('MEDICAL_CERTIFICATE')">
+              <div class="category-icon" style="background: #e0e7ff; color: #4338ca;">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/></svg>
+              </div>
+              <div class="category-info">
+                <h4 class="category-title">Medical Certificates</h4>
+                <span class="category-status" id="count-MEDICAL_CERTIFICATE">0 documents filed</span>
+              </div>
+            </div>
+
+            <!-- Category 6: Other Health Records -->
             <div class="category-card" id="card-OTHER" onclick="selectCategory('OTHER')">
               <div class="category-icon" style="background: #f3e8ff; color: #9333ea;">
                 <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
@@ -680,7 +681,7 @@
       nameElem.textContent = fullName || 'Patient Profile Picture';
       subElem.textContent = patientNumber ? `Patient No: ${patientNumber}` : 'Full resolution picture';
       
-      if (currentUser && currentUser.role === 'RECORDS_STAFF') {
+      if (currentUser && (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF')) {
         changeBtn.style.display = 'inline-flex';
       } else {
         changeBtn.style.display = 'none';
@@ -722,8 +723,8 @@
       // 4. Inject Navigation Links
       injectSidebarLinks(currentUser.role);
 
-      // 5. If RECORDS_STAFF, configure action buttons
-      if (currentUser && currentUser.role === 'RECORDS_STAFF') {
+      // 5. If RECORDS_STAFF or ADMINISTRATIVE_STAFF, configure action buttons
+      if (currentUser && (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF')) {
         const manualItrBtn = document.getElementById('manual-itr-action-btn');
         if (manualItrBtn) {
           manualItrBtn.href = `/dashboard/documents/itr?create=itr&patient_id=${patientId}`;
@@ -772,7 +773,7 @@
         if (overlayBtn) {
           overlayBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (currentUser.role === 'RECORDS_STAFF') photoInput.click();
+            if (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF') photoInput.click();
           });
         }
 
@@ -782,7 +783,7 @@
               const fullName = document.getElementById('patient-fullname').textContent;
               const patNum = document.getElementById('patient-number').textContent;
               openViewPhotoModal(currentPatientPhotoUrl, fullName, patNum);
-            } else if (currentUser.role === 'RECORDS_STAFF') {
+            } else if (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF') {
               photoInput.click();
             }
           });
@@ -810,13 +811,6 @@
       // 6. Fetch and render patient profile data
       await loadPatientProfile();
       await loadPatientRecords();
-
-      // 7. Logout handler
-      document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to log out of the KEEP UP System?')) {
-          await API.logout();
-        }
-      });
     });
 
     // Fetch demographics and render in panel
@@ -894,8 +888,10 @@
           }
 
           // Toggle records-staff actions for archived vs active profiles
-          if (currentUser && currentUser.role === 'RECORDS_STAFF') {
+          if (currentUser && (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF')) {
             const isArchived = p.status === 'ARCHIVED';
+            const isMale = currentPatientSex && ((currentPatientSex.includes('MALE') && !currentPatientSex.includes('FEMALE')) || currentPatientSex === 'M');
+
             const scanBtn = document.getElementById('scan-document-action-btn');
             if (scanBtn) scanBtn.style.setProperty('display', isArchived ? 'none' : 'inline-flex', 'important');
 
@@ -943,8 +939,11 @@
       if (targetCat === 'MATERNAL_CARE_RECORD') {
         return norm === 'MATERNAL_CARE_RECORD' || norm === 'MATERNAL_CARE' || norm === 'PRENATAL';
       }
+      if (targetCat === 'MEDICAL_CERTIFICATE') {
+        return norm === 'MEDICAL_CERTIFICATE' || norm === 'MEDCERT' || norm === 'CERTIFICATE';
+      }
       if (targetCat === 'OTHER') {
-        const knowns = ['PATIENT_INFORMATION_SHEET','INDIVIDUAL_TREATMENT_RECORD','ITR','CONSULTATION_RECORD','CONSULTATION','IMMUNIZATION_RECORD','IMMUNIZATION','ANTI_RABIES_RECORD','VACCINATION','MATERNAL_CARE_RECORD','MATERNAL_CARE','PRENATAL'];
+        const knowns = ['PATIENT_INFORMATION_SHEET','INDIVIDUAL_TREATMENT_RECORD','ITR','CONSULTATION_RECORD','CONSULTATION','IMMUNIZATION_RECORD','IMMUNIZATION','ANTI_RABIES_RECORD','VACCINATION','MATERNAL_CARE_RECORD','MATERNAL_CARE','PRENATAL','MEDICAL_CERTIFICATE','MEDCERT','CERTIFICATE'];
         return !knowns.includes(norm);
       }
       return norm === targetCat.toUpperCase();
@@ -964,6 +963,7 @@
             'CONSULTATION_RECORD',
             'IMMUNIZATION_RECORD',
             'MATERNAL_CARE_RECORD',
+            'MEDICAL_CERTIFICATE',
             'OTHER'
           ];
 
@@ -1019,8 +1019,26 @@
       // Manage "+ Add Document" button visibility and link
       const addBtn = document.getElementById('add-document-btn');
       if (addBtn) {
-        if (currentUser && currentUser.role === 'RECORDS_STAFF') {
-          addBtn.href = `/dashboard/records/upload/${patientId}`;
+        if (currentUser && (currentUser.role === 'RECORDS_STAFF' || currentUser.role === 'ADMINISTRATIVE_STAFF')) {
+          if (type === 'MATERNAL_CARE_RECORD') {
+            addBtn.href = `/dashboard/documents/maternal?create=maternal&patient_id=${patientId}`;
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> + Manual Maternal Entry`;
+          } else if (type === 'CONSULTATION_RECORD') {
+            addBtn.href = `/dashboard/documents/consultations?create=consultation&patient_id=${patientId}`;
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> + Manual Consultation`;
+          } else if (type === 'IMMUNIZATION_RECORD') {
+            addBtn.href = `/dashboard/documents/immunizations?create=immunization&patient_id=${patientId}`;
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> + Manual Immunization`;
+          } else if (type === 'MEDICAL_CERTIFICATE') {
+            addBtn.href = `/dashboard/documents/medcert?create=medcert&patient_id=${patientId}`;
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> + Manual MedCert`;
+          } else if (type === 'PATIENT_INFORMATION_SHEET') {
+            addBtn.href = `/dashboard/documents/itr?create=itr&patient_id=${patientId}`;
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> + Manual ITR`;
+          } else {
+            addBtn.href = `/dashboard/records/upload/${patientId}`;
+            addBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> + Add Document`;
+          }
           addBtn.style.setProperty('display', 'inline-flex', 'important');
         } else {
           addBtn.style.setProperty('display', 'none', 'important');
@@ -1202,7 +1220,8 @@
         case 'PATIENT_INFORMATION_SHEET': return 'Individual Treatment Record Binder';
         case 'CONSULTATION_RECORD': return 'Consultation Records Binder';
         case 'IMMUNIZATION_RECORD': return 'Immunizations & Vaccine Records Binder';
-        case 'MATERNAL_CARE_RECORD': return 'Maternal Care Binder';
+        case 'MATERNAL_CARE_RECORD': return 'Maternal Records Binder';
+        case 'MEDICAL_CERTIFICATE': return 'Medical Certificates Binder';
         case 'OTHER': return 'Other Health Records Binder';
         default: return type ? type.replace(/_/g, ' ') : 'Health Records Binder';
       }
