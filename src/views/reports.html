@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="/images/LOGO.jpg">
+  <link rel="shortcut icon" href="/images/LOGO.jpg">
   <title>Healthcare Analytics & Reports - KEEP UP</title>
   <link rel="stylesheet" href="/css/style.css">
   <!-- Load jsPDF and AutoTable locally for client-side PDF export -->
@@ -105,22 +107,6 @@
     .chart-box:hover {
       box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
       transform: translateY(-2px);
-    }
-    .chart-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3.5px;
-      background: linear-gradient(90deg, #4F46E5 0%, #06B6D4 50%, #10B981 100%);
-      opacity: 0.95;
-    }
-    .chart-box.chart-box-accent-rose::before {
-      background: linear-gradient(90deg, #E11D48 0%, #F59E0B 50%, #10B981 100%);
-    }
-    .chart-box.chart-box-accent-violet::before {
-      background: linear-gradient(90deg, #7C3AED 0%, #2563EB 50%, #06B6D4 100%);
     }
     .chart-header {
       display: flex;
@@ -696,7 +682,7 @@
           <!-- Top Analytics KPI Grid -->
           <div class="analytics-grid">
             <!-- KPI 1: Patient Monitoring & Comparison Card (PROMINENT REQUEST) -->
-            <div class="analytics-card" style="border-top: 4px solid #C62828;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Patient Monitoring & Growth</span>
@@ -712,7 +698,7 @@
             </div>
 
             <!-- KPI 2: Weekly Consultations Card -->
-            <div class="analytics-card" style="border-top: 4px solid #2563EB;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Total of Consultation</span>
@@ -727,7 +713,7 @@
             </div>
 
             <!-- KPI 3: Weekly Medical Certificates Card -->
-            <div class="analytics-card" style="border-top: 4px solid #059669;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Medical Certificates Issued</span>
@@ -742,7 +728,7 @@
             </div>
 
             <!-- KPI 4: Total Records Mon-Fri -->
-            <div class="analytics-card" style="border-top: 4px solid #7C3AED;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Total Mon–Fri Records</span>
@@ -928,7 +914,7 @@
 
           <!-- Top Monthly KPI Grid -->
           <div class="analytics-grid">
-            <div class="analytics-card" style="border-top: 4px solid #C62828;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Monthly Patient Reach</span>
@@ -943,7 +929,7 @@
               </div>
             </div>
 
-            <div class="analytics-card" style="border-top: 4px solid #2563EB;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Monthly Consultations</span>
@@ -957,7 +943,7 @@
               </div>
             </div>
 
-            <div class="analytics-card" style="border-top: 4px solid #059669;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Medical Certificates Issued</span>
@@ -971,7 +957,7 @@
               </div>
             </div>
 
-            <div class="analytics-card" style="border-top: 4px solid #7C3AED;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Total Monthly Records</span>
@@ -1158,7 +1144,7 @@
 
           <!-- Top Yearly KPI Grid -->
           <div class="analytics-grid">
-            <div class="analytics-card" style="border-top: 4px solid #C62828;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Annual Patient Reach</span>
@@ -1173,7 +1159,7 @@
               </div>
             </div>
 
-            <div class="analytics-card" style="border-top: 4px solid #2563EB;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Annual Consultations</span>
@@ -1187,7 +1173,7 @@
               </div>
             </div>
 
-            <div class="analytics-card" style="border-top: 4px solid #059669;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Annual Medical Certificates</span>
@@ -1201,7 +1187,7 @@
               </div>
             </div>
 
-            <div class="analytics-card" style="border-top: 4px solid #7C3AED;">
+            <div class="analytics-card">
               <div>
                 <div class="analytics-card-title">
                   <span>Total Annual Records</span>

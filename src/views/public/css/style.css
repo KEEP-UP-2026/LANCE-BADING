@@ -136,16 +136,6 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-lg);
 }
 
-.login-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: #C62828;
-}
-
 .brand-section {
   margin-bottom: 30px;
 }
@@ -522,12 +512,12 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   padding: 10px 14px;
-  color: #25282D;
-  font-size: 13px;
-  font-weight: 700;
+  color: #334155;
+  font-size: 13.5px;
+  font-weight: 600;
   border-radius: 10px;
   gap: 12px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   border: 1px solid transparent;
 }
 
@@ -536,30 +526,29 @@ h1, h2, h3, h4, h5, h6 {
   height: 18px;
   fill: currentColor;
   color: #64748b;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 .nav-link:hover {
-  background: #FCE8E8;
-  color: #C62828;
-  transform: translateX(4px);
+  background: #f1f5f9;
+  color: #0f172a;
+  transform: none;
 }
 
 .nav-link:hover svg {
-  color: #C62828;
-  transform: scale(1.1);
+  color: #0f172a;
+  transform: none;
 }
 
 .nav-link.active {
-  background: #FCE8E8;
-  color: #C62828;
-  border: 1px solid #fca5a5;
-  border-left: 4px solid #C62828;
-  font-weight: 800;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+  font-weight: 700;
 }
 
 .nav-link.active svg {
-  color: #C62828;
+  color: #dc2626;
 }
 
 .sidebar-footer {
@@ -572,15 +561,15 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   width: 100%;
   padding: 10px 14px;
-  color: #C62828;
+  color: #DC2626;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: 10px;
-  background: #FCE8E8;
-  border: 1px solid #fca5a5;
+  background: #FEF2F2;
+  border: 1px solid #FEE2E2;
   cursor: pointer;
   gap: 10px;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .logout-btn svg {
@@ -590,8 +579,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .logout-btn:hover {
-  background: #C62828;
+  background: #DC2626;
   color: #FFFFFF;
+  border-color: #DC2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
 }
 
 /* Main Content Area */
@@ -1208,19 +1199,19 @@ input:checked + .slider:before {
 
 .toast-success {
   background: #059669;
-  border-left: 5px solid #047857;
+  border: 1px solid #047857;
 }
 .toast-error {
-  background: #C62828;
-  border-left: 5px solid #b71c1c;
+  background: #DC2626;
+  border: 1px solid #B91C1C;
 }
 .toast-warning {
-  background: #d97706;
-  border-left: 5px solid #b45309;
+  background: #D97706;
+  border: 1px solid #B45309;
 }
 .toast-info {
-  background: #2563eb;
-  border-left: 5px solid #1d4ed8;
+  background: #2563EB;
+  border: 1px solid #1D4ED8;
 }
 
 /* Audit Log Items */
