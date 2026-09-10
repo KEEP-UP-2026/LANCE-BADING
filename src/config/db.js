@@ -145,6 +145,9 @@ function initLocalDb() {
 
 const forceLocal = process.env.FORCE_LOCAL_DB === 'true';
 
+// Always ensure local DB file exists as fallback
+initLocalDb();
+
 if (supabaseUrl && supabaseKey && !forceLocal) {
   try {
     console.log('Connecting to Supabase at:', supabaseUrl);
@@ -158,7 +161,6 @@ if (supabaseUrl && supabaseKey && !forceLocal) {
   } catch (error) {
     console.error('Failed to initialize Supabase client:', error.message);
     console.log('Falling back to local JSON database...');
-    initLocalDb();
   }
 } else {
   if (forceLocal) {
@@ -166,7 +168,6 @@ if (supabaseUrl && supabaseKey && !forceLocal) {
   } else {
     console.log('Supabase URL/Key not provided in .env. Running in local JSON database mode.');
   }
-  initLocalDb();
 }
 
 module.exports = {
