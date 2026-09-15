@@ -198,7 +198,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow: visible;
     }
     .donut-center-badge {
       position: absolute;
@@ -251,12 +251,66 @@
       padding: 7px 11px;
       border-radius: 9px;
       border: 1px solid #E2E8F0;
-      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
     }
-    .donut-mini-item:hover {
-      background: #F1F5F9;
-      border-color: #CBD5E1;
-      transform: translateX(2px);
+    .donut-mini-item:hover,
+    .donut-mini-item.active-legend {
+      background: #FFFFFF !important;
+      border-color: #6366F1 !important;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.18);
+      transform: translateX(3px);
+    }
+    /* Floating HTML Tooltip for Donut Charts - Never covered by center badge */
+    .donut-chart-tooltip {
+      position: absolute;
+      z-index: 100;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #FFFFFF;
+      border-radius: 10px;
+      padding: 7px 12px;
+      box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.4), 0 4px 6px -2px rgba(15, 23, 42, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-family: inherit;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform, opacity, left, top;
+    }
+    .donut-tooltip-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+    .donut-tooltip-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px currentColor;
+    }
+    .donut-tooltip-title {
+      font-weight: 700;
+      color: #F8FAFC;
+      letter-spacing: -0.1px;
+    }
+    .donut-tooltip-value {
+      font-weight: 800;
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 1.5px 6px;
+      border-radius: 6px;
+      margin-left: 2px;
+    }
+    .donut-tooltip-percent {
+      font-weight: 600;
+      color: #94A3B8;
+      font-size: 11px;
     }
     .donut-mini-header {
       display: flex;
@@ -1634,7 +1688,123 @@
       borderWidth: 1
     };
 
-    function renderDonutMiniLegends(containerId, labels, values, colors) {
+    /* Custom Floating HTML Tooltip for Donut Charts - Renders outside the doughnut ring and above all elements */
+    function donutHtmlTooltip(context) {
+      const { chart, tooltip } = context;
+      const parent = chart.canvas.parentNode;
+      if (!parent) return;
+
+      let tooltipEl = parent.querySelector('.donut-chart-tooltip');
+      if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.className = 'donut-chart-tooltip';
+        parent.appendChild(tooltipEl);
+      }
+
+      const legendContainer = parent.parentElement ? parent.parentElement.querySelector('.donut-mini-legends') : null;
+
+      // Hide if tooltip opacity is 0
+      if (tooltip.opacity === 0) {
+        tooltipEl.style.opacity = '0';
+        tooltipEl.style.pointerEvents = 'none';
+        if (legendContainer) {
+          legendContainer.querySelectorAll('.donut-mini-item').forEach(el => el.classList.remove('active-legend'));
+        }
+        return;
+      }
+
+      if (tooltip.body && tooltip.dataPoints && tooltip.dataPoints.length) {
+        const dp = tooltip.dataPoints[0];
+        const dataset = chart.data.datasets[dp.datasetIndex];
+        const total = chart._totalDonutValue !== undefined ? chart._totalDonutValue : dataset.data.reduce((s, v) => s + v, 0);
+        const rawVal = total > 0 ? dp.raw : 0;
+        const pct = total > 0 ? ((rawVal / total) * 100).toFixed(1) : '0.0';
+        const color = (dataset.backgroundColor && dataset.backgroundColor[dp.dataIndex]) || '#4F46E5';
+        const label = dp.label || '';
+
+        tooltipEl.innerHTML = `
+          <div class="donut-tooltip-inner">
+            <span class="donut-tooltip-indicator" style="background-color: ${color}; color: ${color};"></span>
+            <span class="donut-tooltip-title">${escapeHtml(label)}:</span>
+            <span class="donut-tooltip-value">${rawVal}</span>
+            <span class="donut-tooltip-percent">(${pct}%)</span>
+          </div>
+        `;
+
+        if (legendContainer) {
+          legendContainer.querySelectorAll('.donut-mini-item').forEach((el, idx) => {
+            if (idx === dp.dataIndex) {
+              el.classList.add('active-legend');
+            } else {
+              el.classList.remove('active-legend');
+            }
+          });
+        }
+      }
+
+      // Position calculations relative to parent (.donut-wrapper)
+      const canvas = chart.canvas;
+      const canvasX = canvas.offsetLeft + tooltip.caretX;
+      const canvasY = canvas.offsetTop + tooltip.caretY;
+      const centerX = canvas.offsetLeft + (chart.width / 2);
+      const centerY = canvas.offsetTop + (chart.height / 2);
+
+      const dx = canvasX - centerX;
+      const dy = canvasY - centerY;
+
+      const tooltipWidth = tooltipEl.offsetWidth || 160;
+      const tooltipHeight = tooltipEl.offsetHeight || 34;
+
+      let left = canvasX;
+      let top = canvasY;
+      let transX = '-50%';
+      let transY = '-50%';
+
+      if (Math.abs(dx) >= Math.abs(dy)) {
+        if (dx >= 0) {
+          // Right half: place cleanly to the right of the arc
+          left = canvasX + 16;
+          transX = '0%';
+          transY = '-50%';
+        } else {
+          // Left half: place to the left if space exists, otherwise above/below
+          if (canvasX - tooltipWidth - 16 >= 6) {
+            left = canvasX - 16;
+            transX = '-100%';
+            transY = '-50%';
+          } else {
+            left = Math.max(6, canvasX - (tooltipWidth / 2));
+            transX = '0%';
+            if (dy < 0) {
+              top = canvasY - 14;
+              transY = '-100%';
+            } else {
+              top = canvasY + 14;
+              transY = '0%';
+            }
+          }
+        }
+      } else {
+        left = Math.max(6, canvasX - (tooltipWidth / 2));
+        transX = '0%';
+        if (dy < 0) {
+          // Top half: place above the arc
+          top = canvasY - 14;
+          transY = '-100%';
+        } else {
+          // Bottom half: place below the arc
+          top = canvasY + 14;
+          transY = '0%';
+        }
+      }
+
+      tooltipEl.style.opacity = '1';
+      tooltipEl.style.left = `${left}px`;
+      tooltipEl.style.top = `${top}px`;
+      tooltipEl.style.transform = `translate(${transX}, ${transY})`;
+    }
+
+    function renderDonutMiniLegends(containerId, labels, values, colors, chartGetter) {
       const container = document.getElementById(containerId);
       if (!container) return;
       const total = values.reduce((s, v) => s + v, 0);
@@ -1642,7 +1812,7 @@
         const val = values[idx] || 0;
         const pct = total > 0 ? Math.round((val / total) * 100) : 0;
         return `
-          <div class="donut-mini-item" title="${escapeHtml(l)}: ${val} records (${pct}%)">
+          <div class="donut-mini-item" data-index="${idx}" title="${escapeHtml(l)}: ${val} records (${pct}%)">
             <div class="donut-mini-header">
               <span class="donut-mini-dot" style="background: ${colors[idx]};"></span>
               <span>${escapeHtml(l)}</span>
@@ -1654,6 +1824,32 @@
           </div>
         `;
       }).join('');
+
+      if (typeof chartGetter === 'function') {
+        const items = container.querySelectorAll('.donut-mini-item');
+        items.forEach((item, idx) => {
+          item.addEventListener('mouseenter', () => {
+            const chart = chartGetter();
+            if (chart && chart.setActiveElements) {
+              chart.setActiveElements([{ datasetIndex: 0, index: idx }]);
+              if (chart.tooltip && chart.tooltip.setActiveElements) {
+                chart.tooltip.setActiveElements([{ datasetIndex: 0, index: idx }], { x: 0, y: 0 });
+              }
+              chart.update();
+            }
+          });
+          item.addEventListener('mouseleave', () => {
+            const chart = chartGetter();
+            if (chart && chart.setActiveElements) {
+              chart.setActiveElements([]);
+              if (chart.tooltip && chart.tooltip.setActiveElements) {
+                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+              }
+              chart.update();
+            }
+          });
+        });
+      }
     }
 
     // Render Chart.js Diagrams
@@ -1774,9 +1970,6 @@
         const countEl = document.getElementById('donut-weekly-total-num');
         if (countEl) countEl.textContent = totalVal;
 
-        // Render Mini-Legends Beside Doughnut
-        renderDonutMiniLegends('donut-weekly-mini-legends', donutLabels, donutValues, donutColors);
-
         chartDonut = new Chart(ctx, {
           type: 'doughnut',
           data: {
@@ -1803,18 +1996,16 @@
             plugins: {
               legend: { display: false },
               tooltip: {
-                ...modernChartTooltip,
-                callbacks: {
-                  label: function(ctx) {
-                    const label = ctx.label || '';
-                    const val = totalVal > 0 ? ctx.raw : 0;
-                    return ` ${label}: ${val} (${totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0}%)`;
-                  }
-                }
+                enabled: false,
+                external: donutHtmlTooltip
               }
             }
           }
         });
+        chartDonut._totalDonutValue = totalVal;
+
+        // Render Mini-Legends Beside Doughnut (with bidirectional hover sync)
+        renderDonutMiniLegends('donut-weekly-mini-legends', donutLabels, donutValues, donutColors, () => chartDonut);
       }
 
       // 3. Multi-Week Trend Line Chart
@@ -2180,9 +2371,6 @@
         const countEl = document.getElementById('donut-monthly-total-num');
         if (countEl) countEl.textContent = totalVal;
 
-        // Render Mini-Legends Beside Doughnut
-        renderDonutMiniLegends('donut-monthly-mini-legends', donutLabels, donutValues, donutColors);
-
         chartMonthlyDonut = new Chart(ctx, {
           type: 'doughnut',
           data: {
@@ -2205,17 +2393,16 @@
             plugins: {
               legend: { display: false },
               tooltip: {
-                ...modernChartTooltip,
-                callbacks: {
-                  label: (ctx) => {
-                    const val = totalVal > 0 ? ctx.raw : 0;
-                    return ` ${ctx.label}: ${val} (${totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0}%)`;
-                  }
-                }
+                enabled: false,
+                external: donutHtmlTooltip
               }
             }
           }
         });
+        chartMonthlyDonut._totalDonutValue = totalVal;
+
+        // Render Mini-Legends Beside Doughnut (with bidirectional hover sync)
+        renderDonutMiniLegends('donut-monthly-mini-legends', donutLabels, donutValues, donutColors, () => chartMonthlyDonut);
       }
 
       // 3. 6-Month Trajectory Line Chart
@@ -2561,9 +2748,6 @@
         const countEl = document.getElementById('donut-yearly-total-num');
         if (countEl) countEl.textContent = totalVal;
 
-        // Render Mini-Legends Beside Doughnut
-        renderDonutMiniLegends('donut-yearly-mini-legends', donutLabels, donutValues, donutColors);
-
         chartYearlyDonut = new Chart(ctx, {
           type: 'doughnut',
           data: {
@@ -2586,17 +2770,16 @@
             plugins: {
               legend: { display: false },
               tooltip: {
-                ...modernChartTooltip,
-                callbacks: {
-                  label: (ctx) => {
-                    const val = totalVal > 0 ? ctx.raw : 0;
-                    return ` ${ctx.label}: ${val} (${totalVal > 0 ? ((val / totalVal) * 100).toFixed(1) : 0}%)`;
-                  }
-                }
+                enabled: false,
+                external: donutHtmlTooltip
               }
             }
           }
         });
+        chartYearlyDonut._totalDonutValue = totalVal;
+
+        // Render Mini-Legends Beside Doughnut (with bidirectional hover sync)
+        renderDonutMiniLegends('donut-yearly-mini-legends', donutLabels, donutValues, donutColors, () => chartYearlyDonut);
       }
 
       // 3. Multi-Year Trend

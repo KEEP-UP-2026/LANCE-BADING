@@ -50,7 +50,8 @@ async function getCookieForUser(baseUrl, email, password, withCsrf = false) {
 
 async function authFetch(baseUrl, path, { method = 'GET', authCookie, csrfToken, body, headers = {} } = {}) {
   const reqHeaders = { ...headers };
-  if (body && !reqHeaders['Content-Type']) {
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (body && !isFormData && !reqHeaders['Content-Type']) {
     reqHeaders['Content-Type'] = 'application/json';
   }
   if (csrfToken && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
@@ -62,7 +63,7 @@ async function authFetch(baseUrl, path, { method = 'GET', authCookie, csrfToken,
       Cookie: authCookie,
       ...reqHeaders
     },
-    body: body ? JSON.stringify(body) : undefined
+    body: isFormData ? body : (body && typeof body === 'object' ? JSON.stringify(body) : body)
   });
 }
 

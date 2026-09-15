@@ -509,7 +509,7 @@
     }
 
     async function handleDeletePatient(id, name) {
-      if (!confirm(`⚠️ PERMANENTLY DELETE patient "${name}"?\n\nThis action CANNOT be undone. All patient data will be erased.`)) return;
+      if (!confirm(`PERMANENTLY DELETE patient "${name}"?\n\nThis action CANNOT be undone. All patient data will be erased.`)) return;
       if (!confirm(`Final confirmation: Delete "${name}" permanently?`)) return;
       try {
         const res = await API.fetchJson(`/api/patients/${id}`, { method: 'DELETE' });
@@ -545,7 +545,7 @@
     }
 
     async function handleDeleteRecord(id) {
-      if (!confirm('⚠️ PERMANENTLY DELETE this document?\n\nThis action cannot be undone.')) return;
+      if (!confirm('PERMANENTLY DELETE this document?\n\nThis action cannot be undone.')) return;
       try {
         const res = await API.fetchJson(`/api/records/${id}`, { method: 'DELETE' });
         if (res && res.success) {

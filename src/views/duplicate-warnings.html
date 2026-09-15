@@ -61,32 +61,40 @@
     .duplicate-comparison-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      background: rgba(15, 23, 42, 0.4);
-      border-radius: var(--border-radius-sm);
-      padding: 20px;
+      gap: 18px;
+      background: #F8FAFC;
+      border-radius: var(--border-radius-md);
+      padding: 16px;
       margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.03);
+      border: 1.5px solid #E2E8F0;
     }
     @media (max-width: 768px) {
       .duplicate-comparison-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 14px;
       }
     }
     .compare-side {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
     .compare-side-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #334155;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding-bottom: 6px;
+      letter-spacing: 0.06em;
+      border-bottom: 1.5px solid #F1F5F9;
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .compare-detail {
       display: flex;
@@ -95,11 +103,16 @@
     }
     .compare-detail-label {
       font-size: 11px;
-      color: var(--text-muted);
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
     .compare-detail-value {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
+      color: #0F172A;
+      word-break: break-word;
     }
     .warning-actions {
       display: flex;
@@ -134,36 +147,38 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.7);
       z-index: 1000;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(6px);
     }
     .modal-content {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
+      background: #FFFFFF;
+      color: var(--text-primary);
+      border: 1.5px solid #E2E8F0;
       border-radius: var(--border-radius-md);
       max-width: 750px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
       padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
       animation: fadeIn 0.3s ease-out;
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1.5px solid #F1F5F9;
       padding-bottom: 12px;
       margin-bottom: 20px;
     }
     .modal-title {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
+      color: #0F172A;
     }
     .modal-close {
       background: transparent;
@@ -171,6 +186,10 @@
       color: var(--text-muted);
       font-size: 24px;
       cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover {
+      color: var(--color-danger);
     }
     .merge-selection-grid {
       display: grid;
@@ -179,23 +198,29 @@
       margin-bottom: 20px;
     }
     .profile-select-card {
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1.5px solid #E2E8F0;
       border-radius: var(--border-radius-sm);
       padding: 16px;
-      background: rgba(255,255,255,0.01);
+      background: #F8FAFC;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
+    .profile-select-card:hover {
+      border-color: #CBD5E1;
+      background: #F1F5F9;
+    }
     .profile-select-card.selected {
       border-color: var(--color-primary);
-      background: rgba(99, 102, 241, 0.05);
+      background: #FEF2F2;
+      box-shadow: 0 0 0 1px var(--color-primary);
     }
     .profile-select-title {
       font-weight: 700;
       font-size: 14px;
+      color: #0F172A;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -214,14 +239,16 @@
     }
     .conflict-resolver-table th, .conflict-resolver-table td {
       padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid #E2E8F0;
       text-align: left;
+      color: #0F172A;
     }
     .conflict-resolver-table th {
       font-weight: 700;
-      color: var(--text-muted);
+      color: #475569;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 11px;
+      background: #F8FAFC;
     }
     .conflict-option-label {
       display: flex;
@@ -368,7 +395,7 @@
         </table>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+      <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; border-top: 1.5px solid #F1F5F9; padding-top: 20px;">
         <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
         <button type="button" class="btn btn-primary" id="modal-confirm-btn" style="background: var(--color-danger); border-color: var(--color-danger);">
           <span class="btn-text">Merge Profiles Now</span>
@@ -451,7 +478,7 @@
               <div class="warning-card">
                 <div class="warning-header">
                   <div>
-                    <span class="warning-badge-alert" style="background: rgba(99, 102, 241, 0.1); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.2)">Match Likelihood: ${flag.similarity_score}%</span>
+                    <span class="warning-badge-alert" style="background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE;">Match Likelihood: ${flag.similarity_score}%</span>
                     <h4 class="warning-reason">${escapeHtml(flag.reason)}</h4>
                     <span class="warning-timestamp">Detected: ${detectDate}</span>
                   </div>

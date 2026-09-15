@@ -350,7 +350,7 @@
 
     // Permanent Delete Patient endpoint caller
     async function handleDeletePatient(id, name) {
-      if (!confirm(`⚠️ Are you sure you want to PERMANENTLY DELETE the patient profile for "${name}"?\nThis action CANNOT be undone.`)) {
+      if (!confirm(`Are you sure you want to PERMANENTLY DELETE the patient profile for "${name}"?\nThis action CANNOT be undone.`)) {
         return;
       }
       if (!confirm(`Final confirmation: Delete "${name}" permanently?`)) {

@@ -595,6 +595,111 @@ document.addEventListener('DOMContentLoaded', async () => {
       };
     }
 
+    const isRabiesDoc = (targetPage === 3) || /RABIES POST-EXPOSURE|POST-EXPOSURE PROPHYLAXIS CARD|ANIMAL BITE TREATMENT CENTER|\bABTC\b|ANTI-RABIES|PVRV|PCECV|SPEEDA/i.test(txt);
+    if (isRabiesDoc) {
+      const regNo = (txt.match(/Registration No\.?:\s*([^\n]+)/i) || txt.match(/\b(20\d{2}\s*-\s*\d{3,5})\b/) || [])[1] || '';
+      const regDate = (txt.match(/Date Registered:\s*([^\n]+)/i) || txt.match(/Registered:\s*([A-Za-z]{3,9}\.?\s*\d{1,2},?\s*\d{4})/i) || [])[1] || '';
+      const name = (txt.match(/Name:\s*([^\n]+)/i) || [])[1] || '';
+      const ageStr = (txt.match(/Age:\s*(\d+)/i) || [])[1] || '';
+      const sex = (txt.match(/Sex:\s*([^\n]+)/i) || [])[1] || '';
+      const address = (txt.match(/Address:\s*([^\n]+)/i) || [])[1] || '';
+
+      const expDate = (txt.match(/Date of Exposure:\s*([^\n]+)/i) || [])[1] || '';
+      const expPlace = (txt.match(/Place of Exposure:\s*([^\n]+)/i) || [])[1] || '';
+      const expType = (txt.match(/Type of Exposure:\s*([^\n]+)/i) || [])[1] || '';
+      const expSource = (txt.match(/Source of Exposure:\s*([^\n]+)/i) || [])[1] || '';
+      const expCat = (txt.match(/Category of Exposure:\s*([^\n]+)/i) || [])[1] || '';
+      const expRemarks = (txt.match(/Exposure Remarks:\s*([^\n]+)/i) || txt.match(/Remarks:\s*([^\n]+)/i) || [])[1] || '';
+
+      const washing = (txt.match(/Washing of Bite Wound:\s*([^\n]+)/i) || [])[1] || 'YES';
+      const rig = (txt.match(/RIG:\s*([^\n]+)/i) || [])[1] || 'Given';
+      const genName = (txt.match(/Generic Name:\s*([^\n]+)/i) || [])[1] || 'PVRV (PCECV)';
+      const brandName = (txt.match(/Brand Name:\s*([^\n]+)/i) || [])[1] || 'Speeda';
+      const route = (txt.match(/Route:\s*([^\n]+)/i) || [])[1] || 'ID';
+      const rigDose = (txt.match(/RIG dose[^\n:]*:\s*([^\n]+)/i) || [])[1] || '';
+
+      function parseDoseRow(pattern) {
+        const m = txt.match(new RegExp(pattern + '[\\s\\S]*?\\|\\s*Date:\\s*([^\\|]+)\\|\\s*Signature\\/Initials:\\s*([^\\|]+)\\|\\s*Notes:\\s*([^\\n]+)', 'i'));
+        if (m) {
+          return { date: m[1].trim(), signature: m[2].trim(), notes: m[3].trim() };
+        }
+        return { date: '', signature: '', notes: '' };
+      }
+
+      const d0 = parseDoseRow('Day 0|D0');
+      const d3 = parseDoseRow('Day 3|D3');
+      const d7 = parseDoseRow('Day 7|D7');
+      const d14 = parseDoseRow('Day 14|D14');
+      const d28 = parseDoseRow('Day 28\\/30|D28|D30');
+
+      const animalStatus = (txt.match(/Status of animal[^\n:]*:\s*([^\n]+)/i) || [])[1] || '';
+      const followUp = (txt.match(/Follow-up date:\s*([^\n]+)/i) || [])[1] || '';
+      const nextDoses = (txt.match(/Your next doses:\s*([^\n]+)/i) || [])[1] || '';
+
+      return {
+        header: {
+          country: 'Republic of the Philippines',
+          department: 'Department of Health',
+          program: 'National Rabies Prevention and Control Program',
+          form_title: 'RABIES POST-EXPOSURE PROPHYLAXIS CARD',
+          facility: 'Animal Bite Treatment Center (ABTC - Paete RHU)',
+          facility_address: 'J. Ramos St. B-2 Paete, Lag.',
+          record_type: 'IMMUNIZATION_RECORD',
+          record_subtype: 'RABIES_PEP'
+        },
+        registration: {
+          registration_no: regNo.trim(),
+          date_registered: regDate.trim()
+        },
+        patient_demographics: {
+          name: name.trim(),
+          age: ageStr ? parseInt(ageStr, 10) : null,
+          gender: sex.trim(),
+          sex: sex.trim(),
+          address: address.trim()
+        },
+        rabies_exposure: {
+          date_of_exposure: expDate.trim(),
+          place_of_exposure: expPlace.trim(),
+          type_of_exposure: expType.trim(),
+          source_of_exposure: expSource.trim(),
+          category_of_exposure: expCat.trim(),
+          remarks: expRemarks.trim()
+        },
+        post_exposure_prophylaxis: {
+          washing_of_bite_wound: washing.trim(),
+          rig: rig.trim(),
+          generic_name: genName.trim(),
+          brand_name: brandName.trim(),
+          route: route.trim(),
+          rig_dose: rigDose.trim()
+        },
+        vaccine_information: {
+          vaccine_name: `Anti-Rabies Vaccine (${genName.trim()})`,
+          generic_name: genName.trim(),
+          brand_and_manufacturer: brandName.trim(),
+          route: route.trim()
+        },
+        pep_schedule: {
+          d0: { day: 'Day 0', date: d0.date, signature: d0.signature, notes: d0.notes },
+          d3: { day: 'Day 3', date: d3.date, signature: d3.signature, notes: d3.notes },
+          d7: { day: 'Day 7', date: d7.date, signature: d7.signature, notes: d7.notes },
+          d14: { day: 'Day 14', date: d14.date, signature: d14.signature, notes: d14.notes },
+          d28_30: { day: 'Day 28/30', date: d28.date, signature: d28.signature, notes: d28.notes }
+        },
+        animal_observation: {
+          status_14_days: animalStatus.trim(),
+          remarks: expRemarks.trim(),
+          follow_up_date: followUp.trim()
+        },
+        reminders: {
+          next_doses: nextDoses.trim()
+        },
+        record_subtype: 'RABIES_PEP',
+        itr_page_number: 3
+      };
+    }
+
     const sections = splitSections(txt);
 
     let isPage2;
@@ -1017,6 +1122,87 @@ document.addEventListener('DOMContentLoaded', async () => {
       return status === target ? '[x]' : '[ ]';
     }
 
+    const isRabies = (data.itr_page_number === 3) || (data.record_subtype === 'RABIES_PEP') || !!data.rabies_exposure || (data.header && data.header.record_subtype === 'RABIES_PEP');
+    if (isRabies) {
+      const h = data.header || {};
+      const reg = data.registration || {};
+      const demo = data.patient_demographics || {};
+      const exp = data.rabies_exposure || {};
+      const pep = data.post_exposure_prophylaxis || {};
+      const vax = data.vaccine_information || {};
+      const sched = data.pep_schedule || {};
+      const obs = data.animal_observation || {};
+      const rem = data.reminders || {};
+
+      const lines = [];
+      lines.push('=== DEPARTMENT OF HEALTH ===');
+      lines.push(h.program || 'National Rabies Prevention and Control Program');
+      lines.push(h.form_title || 'RABIES POST-EXPOSURE PROPHYLAXIS CARD');
+      lines.push(h.facility || 'Animal Bite Treatment Center (ABTC - Paete RHU)');
+      lines.push(`Address: ${h.facility_address || 'J. Ramos St. B-2 Paete, Lag.'}`);
+      lines.push('');
+
+      lines.push('=== 1. PATIENT REGISTRATION AND DEMOGRAPHIC INFORMATION ===');
+      lines.push(`Registration No.: ${reg.registration_no || ''}`);
+      lines.push(`Date Registered: ${reg.date_registered || ''}`);
+      lines.push(`Name: ${demo.name || ''}`);
+      lines.push(`Age: ${demo.age !== undefined && demo.age !== null ? demo.age : ''}`);
+      lines.push(`Sex: ${demo.sex || demo.gender || ''}`);
+      lines.push(`Address: ${demo.address || ''}`);
+      lines.push('');
+
+      lines.push('=== 2. HISTORY OF EXPOSURE ===');
+      lines.push(`Date of Exposure: ${exp.date_of_exposure || ''}`);
+      lines.push(`Place of Exposure: ${exp.place_of_exposure || ''}`);
+      lines.push(`Type of Exposure: ${exp.type_of_exposure || ''}`);
+      lines.push(`Source of Exposure: ${exp.source_of_exposure || ''}`);
+      lines.push(`Category of Exposure: ${exp.category_of_exposure || ''}`);
+      lines.push(`Remarks: ${exp.remarks || ''}`);
+      lines.push('');
+
+      lines.push('=== 3. POST-EXPOSURE PROPHYLAXIS (PEP) ===');
+      lines.push(`A. Washing of Bite Wound: ${pep.washing_of_bite_wound || 'YES'}`);
+      lines.push(`B. RIG: ${pep.rig || 'Given'}`);
+      lines.push(`Anti-Rabies Vaccine — Generic Name: ${pep.generic_name || vax.generic_name || 'PVRV (PCECV)'}`);
+      lines.push(`Brand Name: ${pep.brand_name || vax.brand_and_manufacturer || 'Speeda'}`);
+      lines.push(`Route: ${pep.route || vax.route || 'ID'}`);
+      lines.push(`RIG dose / IU/kg / date: ${pep.rig_dose || ''}`);
+      lines.push('');
+
+      lines.push('=== 4. ANTI-RABIES VACCINE — DOSING SCHEDULE ===');
+      const doses = [
+        { k: 'd0', lbl: 'Day 0' },
+        { k: 'd3', lbl: 'Day 3' },
+        { k: 'd7', lbl: 'Day 7' },
+        { k: 'd14', lbl: 'Day 14' },
+        { k: 'd28_30', lbl: 'Day 28/30' }
+      ];
+      for (const d of doses) {
+        const row = sched[d.k] || {};
+        const dayLbl = (row.day || d.lbl).padEnd(8);
+        const dt = (row.date || '').padEnd(10);
+        const sig = (row.signature || '').padEnd(6);
+        const note = row.notes || '';
+        lines.push(`${dayLbl} | Date: ${dt} | Signature/Initials: ${sig} | Notes: ${note}`);
+      }
+      lines.push('');
+
+      lines.push('=== 5. ANIMAL OBSERVATION AND REMARKS ===');
+      lines.push(`Status of animal 14 days after exposure: ${obs.status_14_days || ''}`);
+      lines.push(`Remarks: ${obs.remarks || ''}`);
+      lines.push(`Follow-up date: ${obs.follow_up_date || ''}`);
+      lines.push('');
+
+      lines.push('=== 6. REMINDERS / NEXT DOSES ===');
+      lines.push('Observe the responsible animal for 14 days and report any changes noted during the observation period to the veterinarian / ABTC.');
+      if (rem.next_doses) {
+        lines.push(`Your next doses: ${rem.next_doses}`);
+      }
+      lines.push('Note: Bring this card on your next visit.');
+
+      return lines.join('\n');
+    }
+
     let is_page_2;
     if (data.itr_page_number === 1) {
       is_page_2 = false;
@@ -1296,23 +1482,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     return lines.join('\n');
   }
 
-  // ─── ITR Paper Page 1 / Page 2 Switcher ────────
+  // ─── ITR Paper Page 1 / Page 2 / Page 3 Switcher ────────
   window.switchItrPaperPage = function(page) {
     const p1 = document.getElementById('itr-paper-page1');
     const p2 = document.getElementById('itr-paper-page2');
+    const p3 = document.getElementById('itr-paper-page3');
     const btn1 = document.getElementById('subtab-itr-p1');
     const btn2 = document.getElementById('subtab-itr-p2');
+    const btn3 = document.getElementById('subtab-itr-p3');
     
-    if (page === 1) {
-      if (p1) p1.style.display = 'block';
+    if (page === 3) {
+      if (p1) p1.style.display = 'none';
       if (p2) p2.style.display = 'none';
-      if (btn1) btn1.classList.add('active');
+      if (p3) p3.style.display = 'block';
+      if (btn1) btn1.classList.remove('active');
       if (btn2) btn2.classList.remove('active');
-    } else {
+      if (btn3) btn3.classList.add('active');
+    } else if (page === 2) {
       if (p1) p1.style.display = 'none';
       if (p2) p2.style.display = 'block';
+      if (p3) p3.style.display = 'none';
       if (btn1) btn1.classList.remove('active');
       if (btn2) btn2.classList.add('active');
+      if (btn3) btn3.classList.remove('active');
+    } else {
+      if (p1) p1.style.display = 'block';
+      if (p2) p2.style.display = 'none';
+      if (p3) p3.style.display = 'none';
+      if (btn1) btn1.classList.add('active');
+      if (btn2) btn2.classList.remove('active');
+      if (btn3) btn3.classList.remove('active');
     }
   };
 
@@ -1334,8 +1533,78 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // Auto-switch to Page 2 if data contains PhilHealth or Page 2 history keys
-    if (data.philhealth_membership || data.past_medical_history || data.immunizations || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2) {
+    // Auto-switch to Page 3 if rabies detected
+    const isRabies = (data.record_subtype === 'RABIES_PEP') || (data.itr_page_number === 3) || !!data.rabies_exposure || (data.header && data.header.record_subtype === 'RABIES_PEP') || (data.header && String(data.header.form_title).includes('RABIES'));
+
+    if (isRabies) {
+      switchItrPaperPage(3);
+
+      const h = data.header || {};
+      setField('rabies-abtc', h.facility || 'Animal Bite Treatment Center (ABTC - Paete RHU)');
+      setField('rabies-abtc-address', h.facility_address || 'J. Ramos St. B-2 Paete, Lag.');
+
+      const reg = data.registration || {};
+      setField('rabies-reg-no', reg.registration_no || '');
+      setField('rabies-reg-date', reg.date_registered || '');
+
+      const demo = data.patient_demographics || {};
+      setField('rabies-name', demo.name || '');
+      setField('rabies-age', demo.age !== undefined && demo.age !== null ? demo.age : '');
+      setField('rabies-sex', demo.sex || demo.gender || '');
+      setField('rabies-address', demo.address || '');
+
+      const exp = data.rabies_exposure || {};
+      setField('rabies-exp-date', exp.date_of_exposure || '');
+      setField('rabies-exp-place', exp.place_of_exposure || '');
+      setField('rabies-exp-type', exp.type_of_exposure || '');
+      setField('rabies-exp-source', exp.source_of_exposure || '');
+      setField('rabies-exp-cat', exp.category_of_exposure || '');
+      setField('rabies-exp-remarks', exp.remarks || '');
+
+      const pep = data.post_exposure_prophylaxis || {};
+      const vax = data.vaccine_information || {};
+      setField('rabies-pep-washing', pep.washing_of_bite_wound || 'YES');
+      setField('rabies-pep-rig', pep.rig || 'Given');
+      setField('rabies-pep-rig-dose', pep.rig_dose || '');
+      setField('rabies-pep-generic', pep.generic_name || vax.generic_name || 'PVRV (PCECV)');
+      setField('rabies-pep-brand', pep.brand_name || vax.brand_and_manufacturer || 'Speeda');
+      setField('rabies-pep-route', pep.route || vax.route || 'ID');
+
+      const sched = data.pep_schedule || {};
+      const d0 = sched.d0 || {};
+      setField('rabies-d0-date', d0.date || '');
+      setField('rabies-d0-sig', d0.signature || '');
+      setField('rabies-d0-notes', d0.notes || '');
+
+      const d3 = sched.d3 || {};
+      setField('rabies-d3-date', d3.date || '');
+      setField('rabies-d3-sig', d3.signature || '');
+      setField('rabies-d3-notes', d3.notes || '');
+
+      const d7 = sched.d7 || {};
+      setField('rabies-d7-date', d7.date || '');
+      setField('rabies-d7-sig', d7.signature || '');
+      setField('rabies-d7-notes', d7.notes || '');
+
+      const d14 = sched.d14 || {};
+      setField('rabies-d14-date', d14.date || '');
+      setField('rabies-d14-sig', d14.signature || '');
+      setField('rabies-d14-notes', d14.notes || '');
+
+      const d28 = sched.d28_30 || sched.d28 || sched.d30 || {};
+      setField('rabies-d28-date', d28.date || '');
+      setField('rabies-d28-sig', d28.signature || '');
+      setField('rabies-d28-notes', d28.notes || '');
+
+      const obs = data.animal_observation || {};
+      setField('rabies-obs-status', obs.status_14_days || '');
+      setField('rabies-obs-remarks', obs.remarks || '');
+      setField('rabies-obs-followup', obs.follow_up_date || '');
+
+      const rem = data.reminders || {};
+      setField('rabies-reminders-doses', rem.next_doses || '');
+      return;
+    } else if (data.philhealth_membership || data.past_medical_history || data.immunizations || data.menstrual_history || data.pregnancy_history || data.itr_page_number === 2) {
       switchItrPaperPage(2);
     } else {
       switchItrPaperPage(1);
@@ -1776,7 +2045,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       enhancementStage.style.display = 'none';
       ocrLoaderPanel.style.display = 'flex';
 
-      const pageTitle = selectedPage === 2 ? 'Individual Treatment Record - Page 2' : 'Individual Treatment Record - Page 1';
+      const pageTitle = selectedPage === 3
+        ? 'Rabies Post-Exposure Prophylaxis Card (ABTC - Paete RHU)'
+        : (selectedPage === 2 ? 'Individual Treatment Record - Page 2' : 'Individual Treatment Record - Page 1');
       ocrTitle.textContent    = `Running OCR Text Extraction & Formatting for ${pageTitle}...`;
       ocrSubtitle.textContent = 'Extracting answers, structuring fields, and populating form template. Please wait...';
 
@@ -1794,7 +2065,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           document.getElementById('main-content-card').style.maxWidth = '1200px';
 
           reviewFilename.value      = preview.file_name;
-          reviewCategory.value      = preview.suggested_category;
+          reviewCategory.value      = (selectedPage === 3) ? 'IMMUNIZATION_RECORD' : preview.suggested_category;
           reviewExtractedText.value = preview.extracted_text || '';
           reviewExplanationText.textContent = `User-Confirmed Classification Target: ${pageTitle}. Matched content words: [${(preview.matched_terms || []).join(', ')}]`;
 
@@ -1804,13 +2075,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
 
           const itrBadge = document.getElementById('review-itr-page-badge');
-          itrBadge.innerHTML = `<svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> ${selectedPage === 2 ? 'ITR Page 2 (Philhealth, History & Immunizations)' : 'ITR Page 1 (Demographics, Lifestyle & Consultation)'}`;
+          itrBadge.innerHTML = `<svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> ${selectedPage === 3 ? 'Rabies PEP Card (ABTC - Paete RHU)' : (selectedPage === 2 ? 'ITR Page 2 (Philhealth, History & Immunizations)' : 'ITR Page 1 (Demographics, Lifestyle & Consultation)')}`;
           itrBadge.style.display = 'inline-flex';
 
           // Convert Extracted Digital Text into Accurate JSON and format into Standard Template
           let accurateExtractedJson = preview.itr_data;
-          if (!accurateExtractedJson || (selectedPage === 1 && !accurateExtractedJson.header) || (selectedPage === 2 && !accurateExtractedJson.philhealth_membership)) {
-            accurateExtractedJson = convertExtractedTextToAccurateJson(preview.extracted_text || '');
+          if (!accurateExtractedJson || (selectedPage === 1 && !accurateExtractedJson.header) || (selectedPage === 2 && !accurateExtractedJson.philhealth_membership) || (selectedPage === 3 && !accurateExtractedJson.rabies_exposure)) {
+            accurateExtractedJson = convertExtractedTextToAccurateJson(preview.extracted_text || '', selectedPage);
           }
           if (accurateExtractedJson && typeof accurateExtractedJson === 'object') {
             accurateExtractedJson.itr_page_number = selectedPage;
@@ -1820,7 +2091,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? preview.extracted_text
             : (preview.extracted_text && selectedPage === 2 && preview.extracted_text.includes('=== PHILHEALTH MEMBERSHIP INFORMATION ==='))
               ? preview.extracted_text
-              : formatItrToStandardTemplate(accurateExtractedJson);
+              : (preview.extracted_text && (selectedPage === 3 || preview.extracted_text.includes('RABIES POST-EXPOSURE PROPHYLAXIS CARD')))
+                ? preview.extracted_text
+                : formatItrToStandardTemplate(accurateExtractedJson);
 
           reviewExtractedText.value   = standardFormattedText;
 
@@ -1868,6 +2141,76 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getChk(id) {
       const el = document.getElementById(id);
       return el ? !!el.checked : false;
+    }
+
+    // Check if Page 3 (Rabies PEP) is active or has populated fields
+    const p3Container = document.getElementById('itr-paper-page3');
+    const isPage3Active = p3Container && p3Container.style.display !== 'none';
+    const hasPage3Data = isPage3Active || getVal('rabies-reg-no') || getVal('rabies-exp-place') || getVal('rabies-pep-generic') || getVal('rabies-d0-date');
+
+    if (hasPage3Data) {
+      return {
+        header: {
+          country: 'Republic of the Philippines',
+          department: 'Department of Health',
+          program: 'National Rabies Prevention and Control Program',
+          form_title: 'RABIES POST-EXPOSURE PROPHYLAXIS CARD',
+          facility: getVal('rabies-abtc') || 'Animal Bite Treatment Center (ABTC - Paete RHU)',
+          facility_address: getVal('rabies-abtc-address') || 'J. Ramos St. B-2 Paete, Lag.',
+          record_type: 'IMMUNIZATION_RECORD',
+          record_subtype: 'RABIES_PEP'
+        },
+        registration: {
+          registration_no: getVal('rabies-reg-no'),
+          date_registered: getVal('rabies-reg-date')
+        },
+        patient_demographics: {
+          name: getVal('rabies-name'),
+          age: getNumVal('rabies-age'),
+          gender: getVal('rabies-sex'),
+          sex: getVal('rabies-sex'),
+          address: getVal('rabies-address')
+        },
+        rabies_exposure: {
+          date_of_exposure: getVal('rabies-exp-date'),
+          place_of_exposure: getVal('rabies-exp-place'),
+          type_of_exposure: getVal('rabies-exp-type'),
+          source_of_exposure: getVal('rabies-exp-source'),
+          category_of_exposure: getVal('rabies-exp-cat'),
+          remarks: getVal('rabies-exp-remarks')
+        },
+        post_exposure_prophylaxis: {
+          washing_of_bite_wound: getVal('rabies-pep-washing') || 'YES',
+          rig: getVal('rabies-pep-rig') || 'Given',
+          generic_name: getVal('rabies-pep-generic') || 'PVRV (PCECV)',
+          brand_name: getVal('rabies-pep-brand') || 'Speeda',
+          route: getVal('rabies-pep-route') || 'ID',
+          rig_dose: getVal('rabies-pep-rig-dose')
+        },
+        vaccine_information: {
+          vaccine_name: `Anti-Rabies Vaccine (${getVal('rabies-pep-generic') || 'PVRV'})`,
+          generic_name: getVal('rabies-pep-generic') || 'PVRV (PCECV)',
+          brand_and_manufacturer: getVal('rabies-pep-brand') || 'Speeda',
+          route: getVal('rabies-pep-route') || 'ID'
+        },
+        pep_schedule: {
+          d0: { day: 'Day 0', date: getVal('rabies-d0-date'), signature: getVal('rabies-d0-sig'), notes: getVal('rabies-d0-notes') },
+          d3: { day: 'Day 3', date: getVal('rabies-d3-date'), signature: getVal('rabies-d3-sig'), notes: getVal('rabies-d3-notes') },
+          d7: { day: 'Day 7', date: getVal('rabies-d7-date'), signature: getVal('rabies-d7-sig'), notes: getVal('rabies-d7-notes') },
+          d14: { day: 'Day 14', date: getVal('rabies-d14-date'), signature: getVal('rabies-d14-sig'), notes: getVal('rabies-d14-notes') },
+          d28_30: { day: 'Day 28/30', date: getVal('rabies-d28-date'), signature: getVal('rabies-d28-sig'), notes: getVal('rabies-d28-notes') }
+        },
+        animal_observation: {
+          status_14_days: getVal('rabies-obs-status'),
+          remarks: getVal('rabies-obs-remarks'),
+          follow_up_date: getVal('rabies-obs-followup')
+        },
+        reminders: {
+          next_doses: getVal('rabies-reminders-doses')
+        },
+        record_subtype: 'RABIES_PEP',
+        itr_page_number: 3
+      };
     }
 
     // Check if Page 2 is active or has populated fields

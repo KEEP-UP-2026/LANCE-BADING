@@ -98,9 +98,27 @@ const CATEGORY_KEYWORDS = {
     { word: "laboratory", weight: 2 },
     { word: "lab result", weight: 2.5 },
     { word: "x-ray", weight: 2 },
-    { word: "medical history", weight: 2.5 }
   ],
   IMMUNIZATION_RECORD: [
+    { word: "rabies post-exposure prophylaxis card", weight: 25 },
+    { word: "rabies post-exposure prophylaxis", weight: 20 },
+    { word: "post-exposure prophylaxis", weight: 15 },
+    { word: "national rabies prevention", weight: 15 },
+    { word: "animal bite treatment center", weight: 15 },
+    { word: "abtc - paete rhu", weight: 15 },
+    { word: "abtc", weight: 12 },
+    { word: "anti-rabies", weight: 15 },
+    { word: "anti rabies", weight: 15 },
+    { word: "rabies vaccine", weight: 14 },
+    { word: "rabies", weight: 12 },
+    { word: "pvrv", weight: 10 },
+    { word: "pcecv", weight: 10 },
+    { word: "speeda", weight: 10 },
+    { word: "washing of bite wound", weight: 12 },
+    { word: "history of exposure", weight: 12 },
+    { word: "category of exposure", weight: 12 },
+    { word: "animal observation", weight: 12 },
+    { word: "dosing schedule", weight: 10 },
     { word: "immunization", weight: 4 },
     { word: "vaccination", weight: 3.5 },
     { word: "vaccine", weight: 3 },
@@ -225,6 +243,11 @@ const Classifier = {
     // Structural override: If text contains ITR section headers, boost PATIENT_INFORMATION_SHEET
     if (/PHILHEALTH MEMBERSHIP|PHILHEALTH ID|PAST MEDICAL HISTORY|PAST SURGICAL HISTORY|MENSTRUAL HISTORY|PREGNANCY HISTORY|INDIVIDUAL TREATMENT RECORD/i.test(normalizedText)) {
       scores['PATIENT_INFORMATION_SHEET'] = (scores['PATIENT_INFORMATION_SHEET'] || 0) + 100;
+    }
+
+    // Structural override: If text contains Rabies PEP headers, boost IMMUNIZATION_RECORD
+    if (/RABIES POST-EXPOSURE PROPHYLAXIS|POST-EXPOSURE PROPHYLAXIS CARD|ANIMAL BITE TREATMENT CENTER|\bABTC\b|ANTI-RABIES VACCINE|NATIONAL RABIES PREVENTION/i.test(normalizedText)) {
+      scores['IMMUNIZATION_RECORD'] = (scores['IMMUNIZATION_RECORD'] || 0) + 150;
     }
 
     // 2. Sort categories by score descending

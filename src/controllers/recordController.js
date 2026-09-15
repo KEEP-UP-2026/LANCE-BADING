@@ -356,15 +356,25 @@ const RecordController = {
       const itrData = ocrResult.itr_data || {};
       const pageNum = ocrResult.itr_page_number || 1;
 
+      const isRabies = pageNum === 3 || ocrResult.doc_type === 'RABIES_PEP' || (itrData && (itrData.record_subtype === 'RABIES_PEP' || itrData.rabies_exposure)) || ['RABIES', 'ANTI-RABIES', 'POST-EXPOSURE', 'ANIMAL BITE TREATMENT CENTER', 'ABTC', 'PVRV', 'PCECV', 'SPEEDA'].some(kw => rawText.includes(kw));
+      
       const isP2 = pageNum === 2 || ['philhealth_membership', 'past_medical_history', 'immunizations', 'menstrual_history', 'pregnancy_history'].some(k => k in itrData) || ['PHILHEALTH', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY'].some(kw => rawText.includes(kw));
       
-      const suggestedPage = isP2 ? 2 : 1;
-      const suggestedLabel = suggestedPage === 2 ? 'Individual Treatment Record - Page 2' : 'Individual Treatment Record - Page 1';
+      let suggestedPage = 1;
+      let suggestedLabel = 'Individual Treatment Record - Page 1';
+      if (isRabies) {
+        suggestedPage = 3;
+        suggestedLabel = 'Rabies Post-Exposure Prophylaxis Card (ABTC - Paete RHU)';
+      } else if (isP2) {
+        suggestedPage = 2;
+        suggestedLabel = 'Individual Treatment Record - Page 2';
+      }
 
       return res.status(200).json({
         success: true,
         suggested_page: suggestedPage,
         suggested_label: suggestedLabel,
+        suggested_category: isRabies ? 'IMMUNIZATION_RECORD' : 'PATIENT_INFORMATION_SHEET',
         confidence_score: 0.95,
         confidence_level: 'HIGH CONFIDENCE'
       });
@@ -434,6 +444,12 @@ const RecordController = {
 
       // Classify text based on weighted keyword rules
       const classification = Classifier.classifyText(extractedText);
+      if (itrPageNumber === 3 || (itrData && (itrData.record_subtype === 'RABIES_PEP' || itrData.rabies_exposure))) {
+        classification.suggestedCategory = 'IMMUNIZATION_RECORD';
+        classification.confidence = 0.98;
+        classification.confidenceLevel = 'HIGH';
+        classification.reason = 'Suggested based on document matches for Rabies Post-Exposure Prophylaxis Card (ABTC - Paete RHU).';
+      }
 
       let activeToken = token;
 
@@ -582,20 +598,43 @@ const RecordController = {
         finalFilePath = path.relative(process.cwd(), localDest);
       }
 
+      // Handle Rabies PEP categorization
+      let finalRecordType = record_type;
+      let finalStructured = structured_json || tempUpload.structured_json || null;
+      if (typeof finalStructured === 'string') {
+        try { finalStructured = JSON.parse(finalStructured); } catch (_) {}
+      }
+
+      if (finalRecordType === 'ANTI_RABIES_RECORD' || (finalStructured && (finalStructured.record_subtype === 'RABIES_PEP' || finalStructured.rabies_exposure || finalStructured.itr_page_number === 3))) {
+        finalRecordType = 'IMMUNIZATION_RECORD';
+        if (finalStructured && typeof finalStructured === 'object') {
+          finalStructured.record_subtype = 'RABIES_PEP';
+          finalStructured.itr_page_number = 3;
+          if (!finalStructured.header) finalStructured.header = {};
+          finalStructured.header.record_type = 'IMMUNIZATION_RECORD';
+          finalStructured.header.record_subtype = 'RABIES_PEP';
+        }
+      }
+
       // Save finalized patient record in DB
       const fileUrl = `/api/records/download/${recordId}`;
+      const recordSubtype = (finalStructured && finalStructured.record_subtype)
+        ? finalStructured.record_subtype
+        : (finalRecordType === 'IMMUNIZATION_RECORD' && (finalStructured && (finalStructured.rabies_exposure || finalStructured.itr_page_number === 3)) ? 'RABIES_PEP' : null);
+
       const newRecord = await RecordModel.create({
         id: recordId,
         patient_id: tempUpload.patient_id,
-        record_type,
+        record_type: finalRecordType,
+        record_subtype: recordSubtype,
         file_name: sanitizedName,
         file_url: fileUrl,
         file_path: finalFilePath,
         file_type: tempUpload.file_type,
         extracted_text: extracted_text !== undefined ? extracted_text : tempUpload.extracted_text,
         layout_blocks: tempUpload.layout_blocks || null,
-        structured_json: structured_json || tempUpload.structured_json || null,
-        classification_result: tempUpload.suggested_category,
+        structured_json: finalStructured,
+        classification_result: finalRecordType === 'IMMUNIZATION_RECORD' ? 'IMMUNIZATION_RECORD' : tempUpload.suggested_category,
         uploaded_by: req.user.id
       });
 
@@ -770,6 +809,29 @@ const RecordController = {
         if (provInfo.vaccinator_name) textParts.push(`Vaccinator: ${provInfo.vaccinator_name}`);
         if (provInfo.prc_license_number) textParts.push(`PRC License: ${provInfo.prc_license_number}`);
         if (provInfo.facility_name) textParts.push(`Facility: ${provInfo.facility_name}`);
+
+        // Rabies Post-Exposure Prophylaxis (ABTC) Specific Fields
+        const rabiesExp = structured_json.rabies_exposure || {};
+        if (rabiesExp.date_of_exposure) textParts.push(`Exposure Date: ${rabiesExp.date_of_exposure}`);
+        if (rabiesExp.place_of_exposure) textParts.push(`Exposure Place: ${rabiesExp.place_of_exposure}`);
+        if (rabiesExp.type_of_exposure) textParts.push(`Exposure Type: ${rabiesExp.type_of_exposure}`);
+        if (rabiesExp.source_of_exposure) textParts.push(`Bite Source: ${rabiesExp.source_of_exposure}`);
+        if (rabiesExp.category_of_exposure) textParts.push(`Exposure Category: ${rabiesExp.category_of_exposure}`);
+
+        const rabiesPep = structured_json.post_exposure_prophylaxis || {};
+        if (rabiesPep.washing_of_bite_wound) textParts.push(`Wound Washing: ${rabiesPep.washing_of_bite_wound}`);
+        if (rabiesPep.rig) textParts.push(`RIG: ${rabiesPep.rig}`);
+
+        const rabiesSched = structured_json.pep_schedule || {};
+        Object.entries(rabiesSched).forEach(([doseK, doseObj]) => {
+          if (doseObj && (doseObj.date || doseObj.signature)) {
+            textParts.push(`Rabies PEP ${doseObj.day || doseK}: Date ${doseObj.date || ''} Sig ${doseObj.signature || ''}`);
+          }
+        });
+
+        const rabiesObs = structured_json.animal_observation || {};
+        if (rabiesObs.status_14_days) textParts.push(`Animal Status 14 Days: ${rabiesObs.status_14_days}`);
+        if (rabiesObs.remarks) textParts.push(`Rabies Remarks: ${rabiesObs.remarks}`);
 
         // Medical Certificate Specific Fields
         const medCertFindings = structured_json.clinical_findings || structured_json.clinical_details || {};
@@ -1154,10 +1216,17 @@ const RecordController = {
       const patient = await PatientModel.findById(record.patient_id);
       const previewUrl = record.file_url || `/api/records/download/${record.id}`;
 
+      let sj = record.structured_json;
+      if (typeof sj === 'string') {
+        try { sj = JSON.parse(sj); } catch (_) {}
+      }
+      const recordSubtype = record.record_subtype || (sj && sj.record_subtype) || null;
+
       return res.status(200).json({
         success: true,
         record: {
           ...record,
+          record_subtype: recordSubtype,
           preview_url: previewUrl
         },
         patient: patient || null

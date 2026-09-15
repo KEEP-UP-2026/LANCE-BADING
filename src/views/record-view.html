@@ -1045,140 +1045,344 @@
 
             <!-- IMMUNIZATION & VACCINE RECORD SHEET -->
             <div id="immunization-paper-sheet" class="itr-paper" style="display: none;">
-              <!-- HEADER -->
-              <div class="header">
-                <div class="sub-header">Republic of the Philippines</div>
-                <div class="sub-header">Province of Laguna</div>
-                <div class="sub-header">Municipality of Paete</div>
-                <h2>PAETE RURAL HEALTH UNIT</h2>
-                <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
-                <h3 style="margin-top: 10px; color: #065f46; font-weight: 800; font-size: 17px; text-transform: uppercase;">
-                  Immunization &amp; Vaccine Administration Record
-                </h3>
+
+              <!-- IMMUNIZATION PAPER SUB-TAB SWITCHER -->
+              <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                <button type="button" class="form-subnav-btn active" id="btn-view-imm-rabies" onclick="switchViewImmPaper('rabies')" style="font-weight: 800;">
+                  Rabies PEP Card (ABTC - Paete RHU)
+                </button>
+                <button type="button" class="form-subnav-btn" id="btn-view-imm-routine" onclick="switchViewImmPaper('routine')" style="font-weight: 700;">
+                  Routine Vaccine Administration Record
+                </button>
               </div>
 
-              <!-- PATIENT INFORMATION -->
-              <div class="section-header" style="background: #065f46; color: #ffffff;">=== IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===</div>
-              <table>
-                <tr>
-                  <td style="width: 60%;">
-                    <strong>NAME (Pangalan):</strong><br>
-                    <input type="text" id="view-imm-patient-name" style="width: 95%; font-weight: bold; margin-top: 4px;">
-                  </td>
-                  <td style="width: 40%;">
-                    <strong>PATIENT ID:</strong><br>
-                    <input type="text" id="view-imm-patient-id" style="width: 95%; margin-top: 4px;">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>AGE / SEX (Edad / Kasarian):</strong><br>
-                    <input type="number" id="view-imm-age" style="width: 70px; margin-top: 4px;" placeholder="Age"> yrs /
-                    <input type="text" id="view-imm-sex" style="width: 100px; margin-top: 4px;" placeholder="Sex">
-                  </td>
-                  <td>
-                    <strong>BIRTHDAY (Kaarawan):</strong><br>
-                    <input type="date" id="view-imm-birthday" style="width: 95%; margin-top: 4px;">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>ADDRESS (Tirahan):</strong><br>
-                    <input type="text" id="view-imm-address" style="width: 95%; margin-top: 4px;">
-                  </td>
-                  <td>
-                    <strong>CP NO. (Contact Details):</strong><br>
-                    <input type="text" id="view-imm-cpno" style="width: 95%; margin-top: 4px;">
-                  </td>
-                </tr>
-              </table>
+              <!-- ═══════════════════════════════════════════════════════════════════ -->
+              <!-- RABIES POST-EXPOSURE PROPHYLAXIS CARD (ABTC - PAETE RHU)           -->
+              <!-- ═══════════════════════════════════════════════════════════════════ -->
+              <div id="view-imm-rabies-paper" style="display: block;">
+                <!-- OFFICIAL CARD HEADER -->
+                <div class="header" style="border-bottom: 2px solid #064e3b; padding-bottom: 12px; margin-bottom: 14px;">
+                  <div class="sub-header" style="font-size: 11px; font-weight: 800; color: #475569; letter-spacing: 0.06em; text-transform: uppercase;">
+                    Department of Health — National Rabies Prevention and Control Program
+                  </div>
+                  <h2 style="margin: 4px 0; font-size: 20px; font-weight: 900; color: #064e3b; letter-spacing: -0.01em;">
+                    Rabies Post-Exposure Prophylaxis Card
+                  </h2>
+                  <div style="margin-top: 6px; font-size: 14px; font-weight: 800; color: #1e293b;">
+                    Animal Bite Treatment Center:
+                    <input type="text" id="view-rabies-abtc" value="ABTC - Paete RHU" style="width: 220px; font-weight: 800; color: #064e3b; text-align: center; border: none; border-bottom: 1.5px solid #064e3b;">
+                  </div>
+                  <div style="margin-top: 4px; font-size: 12px; color: #64748b;">
+                    (Address):
+                    <input type="text" id="view-rabies-abtc-address" value="J. Ramos St. B-2 Paete, Lag." style="width: 250px; text-align: center; border: none; border-bottom: 1px dashed #94a3b8; font-size: 12px;">
+                  </div>
+                </div>
 
-              <!-- SECTION 1: DETALYE NG BAKUNA -->
-              <div class="section-header" style="background: #065f46; color: #ffffff;">=== 1. DETALYE NG BAKUNA (VACCINE INFORMATION) ===</div>
-              <table>
-                <tr>
-                  <td style="width: 50%;">
-                    <strong>Pangalan ng Bakuna (Vaccine Name):</strong><br>
-                    <input type="text" id="view-imm-vaccine-name" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="e.g. BCG, MMR, Hepatitis B, Influenza, COVID-19">
-                  </td>
-                  <td style="width: 50%;">
-                    <strong>Uri / Brand at Manufacturer:</strong><br>
-                    <input type="text" id="view-imm-vaccine-brand" style="width: 95%; margin-top: 4px;" placeholder="e.g. Vaxigrip Tetra (Sanofi)">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong style="color: #b91c1c;">* Batch / Lot Number ng Vial:</strong><br>
-                    <input type="text" id="view-imm-lot-number" style="width: 95%; font-weight: 700; margin-top: 4px; border: 1.5px solid #cbd5e1;" placeholder="e.g. LOT-AB12345 (Para sa safety tracing)">
-                  </td>
-                  <td>
-                    <strong>Expiration Date ng Vial:</strong><br>
-                    <input type="date" id="view-imm-exp-date" style="width: 95%; margin-top: 4px;">
-                  </td>
-                </tr>
-              </table>
+                <!-- PATIENT REGISTRATION & DEMOGRAPHICS -->
+                <div class="section-header" style="background: #065f46; color: #ffffff;">=== PATIENT REGISTRATION &amp; DEMOGRAPHICS ===</div>
+                <table>
+                  <tr style="background: #f8fafc;">
+                    <td style="width: 50%;">
+                      <strong>Registration No:</strong><br>
+                      <input type="text" id="view-rabies-reg-no" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="e.g. 2021-0042">
+                    </td>
+                    <td style="width: 50%;">
+                      <strong>Date Registered:</strong><br>
+                      <input type="date" id="view-rabies-reg-date" style="width: 95%; font-weight: 700; margin-top: 4px;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;">
+                        <div>
+                          <strong>Name (Apelyido, Pangalan):</strong><br>
+                          <input type="text" id="view-rabies-name" style="width: 95%; font-weight: bold; margin-top: 4px;" placeholder="Matic, Janeen Arnie">
+                        </div>
+                        <div>
+                          <strong>Age:</strong><br>
+                          <input type="number" id="view-rabies-age" style="width: 80px; margin-top: 4px;" placeholder="16">
+                        </div>
+                        <div>
+                          <strong>Sex:</strong><br>
+                          <input type="text" id="view-rabies-sex" style="width: 80px; margin-top: 4px;" placeholder="F">
+                        </div>
+                      </div>
+                      <div style="margin-top: 8px;">
+                        <strong>Address (Tirahan):</strong><br>
+                        <input type="text" id="view-rabies-address" style="width: 98%; margin-top: 4px;" placeholder="P. Gomez St. Brgy 6 Paete, Lag.">
+                      </div>
+                    </td>
+                  </tr>
+                </table>
 
-              <!-- SECTION 2: DETALYE NG PAGBIBIGAY -->
-              <div class="section-header" style="background: #065f46; color: #ffffff;">=== 2. DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) ===</div>
-              <table>
-                <tr>
-                  <td style="width: 35%;">
-                    <strong>Petsa kung Kailan Ibinigay (Date):</strong><br>
-                    <input type="date" id="view-imm-admin-date" style="width: 95%; margin-top: 4px;">
-                  </td>
-                  <td style="width: 30%;">
-                    <strong>Oras (Time):</strong><br>
-                    <input type="time" id="view-imm-admin-time" style="width: 95%; margin-top: 4px;">
-                  </td>
-                  <td style="width: 35%;">
-                    <strong>Numero ng Dosis (Dose #):</strong><br>
-                    <input type="text" id="view-imm-dose-number" style="width: 95%; margin-top: 4px;" placeholder="e.g. Dose 1, Dose 2, Booster 1">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Saan Itinurok (Injection Site):</strong><br>
-                    <input type="text" id="view-imm-admin-site" style="width: 95%; margin-top: 4px;" placeholder="e.g. Left Deltoid, Right Thigh, Oral">
-                  </td>
-                  <td>
-                    <strong>Paraan ng Pagbibigay (Route):</strong><br>
-                    <input type="text" id="view-imm-admin-route" style="width: 95%; margin-top: 4px;" placeholder="e.g. Intramuscular, Subcutaneous, Oral">
-                  </td>
-                  <td>
-                    <strong>Dami / Dosis (Dosage Volume):</strong><br>
-                    <input type="text" id="view-imm-admin-dosage" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0.5 mL, 2 drops">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Susunod na Balik (Next Due Date):</strong><br>
-                    <input type="date" id="view-imm-next-due-date" style="width: 95%; margin-top: 4px;">
-                  </td>
-                  <td colspan="2">
-                    <strong>Adverse Reactions / Remarks:</strong><br>
-                    <input type="text" id="view-imm-remarks" style="width: 98%; margin-top: 4px;" placeholder="e.g. No adverse reaction noted / Paracetamol advised">
-                  </td>
-                </tr>
-              </table>
+                <!-- HISTORY OF EXPOSURE -->
+                <div class="section-header" style="background: #065f46; color: #ffffff; margin-top: 14px;">=== HISTORY OF EXPOSURE (KASAYSAYAN NG PAGKALANTAD) ===</div>
+                <table>
+                  <tr>
+                    <td style="width: 50%;">
+                      <strong>Date of Exposure:</strong><br>
+                      <input type="date" id="view-rabies-exposure-date" style="width: 95%; margin-top: 4px;">
+                    </td>
+                    <td style="width: 50%;">
+                      <strong>Place of Exposure:</strong><br>
+                      <input type="text" id="view-rabies-exposure-place" style="width: 95%; margin-top: 4px;" placeholder="e.g. Home, Street">
+                    </td>
+                  </tr>
+                  <tr style="background: #f8fafc;">
+                    <td>
+                      <strong>Type of Exposure (B = Bite, NB = Non-bite):</strong><br>
+                      <input type="text" id="view-rabies-exposure-type" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="B">
+                    </td>
+                    <td>
+                      <strong>Source of Exposure (Dog, Cat, etc.):</strong><br>
+                      <input type="text" id="view-rabies-exposure-source" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="Cat">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <strong style="color: #991b1b;">Category of Exposure:</strong><br>
+                      <input type="text" id="view-rabies-category" style="width: 98%; font-weight: 800; color: #991b1b; margin-top: 4px;" placeholder="Category III">
+                    </td>
+                  </tr>
+                </table>
 
-              <!-- SECTION 3: IMPORMASYON NG NAGBAKUNA -->
-              <div class="section-header" style="background: #065f46; color: #ffffff;">=== 3. IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) ===</div>
-              <table>
-                <tr>
-                  <td style="width: 40%;">
-                    <strong>Pangalan ng Nagbakuna (Vaccinator Name / Role):</strong><br>
-                    <input type="text" id="view-imm-provider-name" style="width: 95%; margin-top: 4px;" placeholder="Doctor / Nurse / BHW Name">
-                  </td>
-                  <td style="width: 25%;">
-                    <strong>PRC License Number:</strong><br>
-                    <input type="text" id="view-imm-provider-license" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0123456">
-                  </td>
-                  <td style="width: 35%;">
-                    <strong>Klinika / Health Center / Ospital:</strong><br>
-                    <input type="text" id="view-imm-facility-name" style="width: 95%; margin-top: 4px;" value="PAETE RURAL HEALTH UNIT (Paete, Laguna)">
-                  </td>
-                </tr>
-              </table>
+                <!-- POST EXPOSURE PROPHYLAXIS (WASHING & RIG) -->
+                <div class="section-header" style="background: #065f46; color: #ffffff; margin-top: 14px;">=== POST EXPOSURE PROPHYLAXIS (PANGANGASIWA SA SUGAT) ===</div>
+                <table>
+                  <tr>
+                    <td style="width: 45%;">
+                      <strong>A. Washing of Bite Wound:</strong><br>
+                      <input type="text" id="view-rabies-washing" style="width: 90%; font-weight: 700; margin-top: 4px;" placeholder="Yes">
+                    </td>
+                    <td style="width: 55%;">
+                      <strong>B. RIG (Rabies Immune Globulin):</strong><br>
+                      <input type="text" id="view-rabies-rig" style="width: 95%; margin-top: 4px;" placeholder="Dose, IU/kg, Date given">
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- ANTI-RABIES VACCINE (MULTI-DOSE SCHEDULE) -->
+                <div class="section-header" style="background: #065f46; color: #ffffff; margin-top: 14px;">=== C. ANTI-RABIES VACCINE (BAKUNA AT ISKEDYUL) ===</div>
+                <table>
+                  <tr style="background: #f8fafc;">
+                    <td style="width: 33%;">
+                      <strong>1. Generic name:</strong><br>
+                      <input type="text" id="view-rabies-generic-name" style="width: 90%; font-weight: 700; margin-top: 4px;" placeholder="PVRV">
+                    </td>
+                    <td style="width: 33%;">
+                      <strong>Brand name:</strong><br>
+                      <input type="text" id="view-rabies-brand-name" style="width: 90%; font-weight: 700; margin-top: 4px;" placeholder="Speeda">
+                    </td>
+                    <td style="width: 34%;">
+                      <strong>2. Route:</strong><br>
+                      <input type="text" id="view-rabies-route" style="width: 90%; font-weight: 700; margin-top: 4px;" placeholder="ID">
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- DOSING SCHEDULE TABLE -->
+                <table style="margin-top: 8px;">
+                  <thead>
+                    <tr style="background: #f1f5f9; text-align: left; font-size: 11px; color: #475569; text-transform: uppercase;">
+                      <th style="padding: 6px 10px; width: 25%;">Dose / Day</th>
+                      <th style="padding: 6px 10px; width: 35%;">Date Given</th>
+                      <th style="padding: 6px 10px; width: 40%;">Vaccinator Sign / Initials</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight: 800; color: #065f46;">3. D0 (Day 0)</td>
+                      <td><input type="date" id="view-rabies-d0-date" style="width: 95%;"></td>
+                      <td><input type="text" id="view-rabies-d0-sig" style="width: 95%; font-weight: 600;" placeholder="RDD"></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 800; color: #065f46;">4. D3 (Day 3)</td>
+                      <td><input type="date" id="view-rabies-d3-date" style="width: 95%;"></td>
+                      <td><input type="text" id="view-rabies-d3-sig" style="width: 95%; font-weight: 600;" placeholder="ASD"></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 800; color: #065f46;">5. D7 (Day 7)</td>
+                      <td><input type="date" id="view-rabies-d7-date" style="width: 95%;"></td>
+                      <td><input type="text" id="view-rabies-d7-sig" style="width: 95%; font-weight: 600;" placeholder="PMK"></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight: 800; color: #334155;">D14(IM)</td>
+                      <td><input type="date" id="view-rabies-d14-date" style="width: 95%;"></td>
+                      <td><input type="text" id="view-rabies-d14-sig" style="width: 95%; font-weight: 600;"></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong style="color: #334155;">D28/30</strong><br>
+                        <small style="color: #64748b; font-size: 10px; line-height: 1.2; display: block;">(If dog/cat is not alive after 14 days of observation)</small>
+                      </td>
+                      <td><input type="date" id="view-rabies-d28-date" style="width: 95%;"></td>
+                      <td><input type="text" id="view-rabies-d28-sig" style="width: 95%; font-weight: 600;"></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- OBSERVATION & REMARKS -->
+                <div class="section-header" style="background: #065f46; color: #ffffff; margin-top: 14px;">=== OBSERVATION &amp; REMARKS (OBSERBASYON SA HAYOP) ===</div>
+                <table>
+                  <tr style="background: #fffbeb;">
+                    <td colspan="2" style="font-size: 11.5px; color: #92400e; padding: 8px 12px;">
+                      <strong>Reminders from Card:</strong><br>
+                      1. Observe the responsible animal for 14 days, and report to the veterinarian / RHU any changes noted in the animal during the observation period.<br>
+                      2. Strictly complete your next scheduled doses: D3, D7, D14(IM), D30.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width: 45%;">
+                      <strong>Status of animal 14 days after exposure:</strong><br>
+                      <input type="text" id="view-rabies-animal-status" style="width: 95%; margin-top: 4px;" placeholder="e.g. Alive & Healthy / Dead / Unknown">
+                    </td>
+                    <td style="width: 55%;">
+                      <strong>Remarks:</strong><br>
+                      <input type="text" id="view-rabies-remarks" style="width: 98%; margin-top: 4px;" placeholder="e.g. If animal is dead or not found tab 3/2/21">
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- ═══════════════════════════════════════════════════════════════════ -->
+              <!-- ROUTINE VACCINE ADMINISTRATION RECORD SHEET                        -->
+              <!-- ═══════════════════════════════════════════════════════════════════ -->
+              <div id="view-imm-routine-paper" style="display: none;">
+                <!-- HEADER -->
+                <div class="header">
+                  <div class="sub-header">Republic of the Philippines</div>
+                  <div class="sub-header">Province of Laguna</div>
+                  <div class="sub-header">Municipality of Paete</div>
+                  <h2>PAETE RURAL HEALTH UNIT</h2>
+                  <div class="sub-header">2436 F. Sano Street, Brgy. Mayloong, Paete, Laguna</div>
+                  <h3 style="margin-top: 10px; color: #065f46; font-weight: 800; font-size: 17px; text-transform: uppercase;">
+                    Immunization &amp; Vaccine Administration Record
+                  </h3>
+                </div>
+
+                <!-- PATIENT INFORMATION -->
+                <div class="section-header" style="background: #065f46; color: #ffffff;">=== IMPORMASYON NG PASYENTE (PATIENT INFORMATION) ===</div>
+                <table>
+                  <tr>
+                    <td style="width: 60%;">
+                      <strong>NAME (Pangalan):</strong><br>
+                      <input type="text" id="view-imm-patient-name" style="width: 95%; font-weight: bold; margin-top: 4px;">
+                    </td>
+                    <td style="width: 40%;">
+                      <strong>PATIENT ID:</strong><br>
+                      <input type="text" id="view-imm-patient-id" style="width: 95%; margin-top: 4px;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>AGE / SEX (Edad / Kasarian):</strong><br>
+                      <input type="number" id="view-imm-age" style="width: 70px; margin-top: 4px;" placeholder="Age"> yrs /
+                      <input type="text" id="view-imm-sex" style="width: 100px; margin-top: 4px;" placeholder="Sex">
+                    </td>
+                    <td>
+                      <strong>BIRTHDAY (Kaarawan):</strong><br>
+                      <input type="date" id="view-imm-birthday" style="width: 95%; margin-top: 4px;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>ADDRESS (Tirahan):</strong><br>
+                      <input type="text" id="view-imm-address" style="width: 95%; margin-top: 4px;">
+                    </td>
+                    <td>
+                      <strong>CP NO. (Contact Details):</strong><br>
+                      <input type="text" id="view-imm-cpno" style="width: 95%; margin-top: 4px;">
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- SECTION 1: DETALYE NG BAKUNA -->
+                <div class="section-header" style="background: #065f46; color: #ffffff;">=== 1. DETALYE NG BAKUNA (VACCINE INFORMATION) ===</div>
+                <table>
+                  <tr>
+                    <td style="width: 50%;">
+                      <strong>Pangalan ng Bakuna (Vaccine Name):</strong><br>
+                      <input type="text" id="view-imm-vaccine-name" style="width: 95%; font-weight: 700; margin-top: 4px;" placeholder="e.g. BCG, MMR, Hepatitis B, Influenza, COVID-19">
+                    </td>
+                    <td style="width: 50%;">
+                      <strong>Uri / Brand at Manufacturer:</strong><br>
+                      <input type="text" id="view-imm-vaccine-brand" style="width: 95%; margin-top: 4px;" placeholder="e.g. Vaxigrip Tetra (Sanofi)">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong style="color: #b91c1c;">* Batch / Lot Number ng Vial:</strong><br>
+                      <input type="text" id="view-imm-lot-number" style="width: 95%; font-weight: 700; margin-top: 4px; border: 1.5px solid #cbd5e1;" placeholder="e.g. LOT-AB12345 (Para sa safety tracing)">
+                    </td>
+                    <td>
+                      <strong>Expiration Date ng Vial:</strong><br>
+                      <input type="date" id="view-imm-exp-date" style="width: 95%; margin-top: 4px;">
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- SECTION 2: DETALYE NG PAGBIBIGAY -->
+                <div class="section-header" style="background: #065f46; color: #ffffff;">=== 2. DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) ===</div>
+                <table>
+                  <tr>
+                    <td style="width: 35%;">
+                      <strong>Petsa kung Kailan Ibinigay (Date):</strong><br>
+                      <input type="date" id="view-imm-admin-date" style="width: 95%; margin-top: 4px;">
+                    </td>
+                    <td style="width: 30%;">
+                      <strong>Oras (Time):</strong><br>
+                      <input type="time" id="view-imm-admin-time" style="width: 95%; margin-top: 4px;">
+                    </td>
+                    <td style="width: 35%;">
+                      <strong>Numero ng Dosis (Dose #):</strong><br>
+                      <input type="text" id="view-imm-dose-number" style="width: 95%; margin-top: 4px;" placeholder="e.g. Dose 1, Dose 2, Booster 1">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Saan Itinurok (Injection Site):</strong><br>
+                      <input type="text" id="view-imm-admin-site" style="width: 95%; margin-top: 4px;" placeholder="e.g. Left Deltoid, Right Thigh, Oral">
+                    </td>
+                    <td>
+                      <strong>Paraan ng Pagbibigay (Route):</strong><br>
+                      <input type="text" id="view-imm-admin-route" style="width: 95%; margin-top: 4px;" placeholder="e.g. Intramuscular, Subcutaneous, Oral">
+                    </td>
+                    <td>
+                      <strong>Dami / Dosis (Dosage Volume):</strong><br>
+                      <input type="text" id="view-imm-admin-dosage" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0.5 mL, 2 drops">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Susunod na Balik (Next Due Date):</strong><br>
+                      <input type="date" id="view-imm-next-due-date" style="width: 95%; margin-top: 4px;">
+                    </td>
+                    <td colspan="2">
+                      <strong>Adverse Reactions / Remarks:</strong><br>
+                      <input type="text" id="view-imm-remarks" style="width: 98%; margin-top: 4px;" placeholder="e.g. No adverse reaction noted / Paracetamol advised">
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- SECTION 3: IMPORMASYON NG NAGBAKUNA -->
+                <div class="section-header" style="background: #065f46; color: #ffffff;">=== 3. IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) ===</div>
+                <table>
+                  <tr>
+                    <td style="width: 40%;">
+                      <strong>Pangalan ng Nagbakuna (Vaccinator Name / Role):</strong><br>
+                      <input type="text" id="view-imm-provider-name" style="width: 95%; margin-top: 4px;" placeholder="Doctor / Nurse / BHW Name">
+                    </td>
+                    <td style="width: 25%;">
+                      <strong>PRC License Number:</strong><br>
+                      <input type="text" id="view-imm-provider-license" style="width: 95%; margin-top: 4px;" placeholder="e.g. 0123456">
+                    </td>
+                    <td style="width: 35%;">
+                      <strong>Klinika / Health Center / Ospital:</strong><br>
+                      <input type="text" id="view-imm-facility-name" style="width: 95%; margin-top: 4px;" value="PAETE RURAL HEALTH UNIT (Paete, Laguna)">
+                    </td>
+                  </tr>
+                </table>
+              </div>
 
             </div>
 
@@ -2138,6 +2342,26 @@
       }
     }
 
+    // Switch between Rabies PEP Card and Routine Vaccine sheets in Immunization View
+    window.switchViewImmPaper = function(mode) {
+      const rabiesPaper = document.getElementById('view-imm-rabies-paper');
+      const routinePaper = document.getElementById('view-imm-routine-paper');
+      const btnRabies = document.getElementById('btn-view-imm-rabies');
+      const btnRoutine = document.getElementById('btn-view-imm-routine');
+
+      if (mode === 'rabies') {
+        if (rabiesPaper) rabiesPaper.style.display = 'block';
+        if (routinePaper) routinePaper.style.display = 'none';
+        if (btnRabies) { btnRabies.classList.add('active'); btnRabies.style.background = '#065f46'; btnRabies.style.color = '#ffffff'; }
+        if (btnRoutine) { btnRoutine.classList.remove('active'); btnRoutine.style.background = '#f1f5f9'; btnRoutine.style.color = '#475569'; }
+      } else {
+        if (rabiesPaper) rabiesPaper.style.display = 'none';
+        if (routinePaper) routinePaper.style.display = 'block';
+        if (btnRoutine) { btnRoutine.classList.add('active'); btnRoutine.style.background = '#065f46'; btnRoutine.style.color = '#ffffff'; }
+        if (btnRabies) { btnRabies.classList.remove('active'); btnRabies.style.background = '#f1f5f9'; btnRabies.style.color = '#475569'; }
+      }
+    };
+
     // ITR Paper Page 1 / Page 2 / Consultation / Immunization / MedCert Switcher
     window.switchItrPaperPage = function(page) {
       const p1 = document.getElementById('itr-paper-page1');
@@ -2735,6 +2959,68 @@
       const immList = data.immunization_entries || data.immunizations || [];
       const firstImm = (Array.isArray(immList) && immList[0]) || {};
 
+      const rabiesExp = data.rabies_exposure || {};
+      const rabiesPep = data.post_exposure_prophylaxis || {};
+      const rabiesSched = data.pep_schedule || {};
+      const rabiesObs = data.animal_observation || {};
+      const rabiesReg = data.registration || {};
+
+      const isRabies = !!(data.rabies_exposure || data.pep_schedule || data.record_subtype === 'RABIES_PEP' || (vi.vaccine_name && vi.vaccine_name.toLowerCase().includes('rabies')) || (vi.generic_name && vi.generic_name.toUpperCase().includes('PVRV')));
+
+      if (isRabies) {
+        if (window.switchViewImmPaper) window.switchViewImmPaper('rabies');
+        const immSubTabBtn = document.getElementById('subtab-immunize-sheet');
+        if (immSubTabBtn) immSubTabBtn.textContent = 'Rabies PEP Card (ABTC)';
+
+        setField('view-rabies-abtc', (data.header && data.header.facility) || 'ABTC - Paete RHU');
+        setField('view-rabies-abtc-address', (data.header && data.header.facility_address) || 'J. Ramos St. B-2 Paete, Lag.');
+        setField('view-rabies-reg-no', rabiesReg.registration_no || data.registration_no || '');
+        setField('view-rabies-reg-date', rabiesReg.date_registered || data.date_registered || '');
+
+        setField('view-rabies-name', d.name || data.patient_name || '');
+        setField('view-rabies-age', d.age !== undefined && d.age !== null ? d.age : '');
+        setField('view-rabies-sex', d.gender || d.sex || '');
+        setField('view-rabies-address', d.address || '');
+
+        setField('view-rabies-exposure-date', rabiesExp.date_of_exposure || '');
+        setField('view-rabies-exposure-place', rabiesExp.place_of_exposure || 'Home');
+        setField('view-rabies-exposure-type', rabiesExp.type_of_exposure || 'B');
+        setField('view-rabies-exposure-source', rabiesExp.source_of_exposure || 'Cat');
+        setField('view-rabies-category', rabiesExp.category_of_exposure || 'Category III');
+
+        setField('view-rabies-washing', rabiesPep.washing_of_bite_wound || 'Yes');
+        setField('view-rabies-rig', rabiesPep.rig || '');
+
+        setField('view-rabies-generic-name', vi.generic_name || 'PVRV');
+        setField('view-rabies-brand-name', vi.brand_and_manufacturer || 'Speeda');
+        setField('view-rabies-route', vi.route || ad.route_of_administration || 'ID');
+
+        const d0Obj = rabiesSched.d0 || {};
+        const d3Obj = rabiesSched.d3 || {};
+        const d7Obj = rabiesSched.d7 || {};
+        const d14Obj = rabiesSched.d14 || {};
+        const d28Obj = rabiesSched.d28_30 || rabiesSched.d28 || {};
+
+        setField('view-rabies-d0-date', d0Obj.date || ad.date_administered || '');
+        setField('view-rabies-d0-sig', d0Obj.signature || pi.vaccinator_name || '');
+        setField('view-rabies-d3-date', d3Obj.date || '');
+        setField('view-rabies-d3-sig', d3Obj.signature || '');
+        setField('view-rabies-d7-date', d7Obj.date || '');
+        setField('view-rabies-d7-sig', d7Obj.signature || '');
+        setField('view-rabies-d14-date', d14Obj.date || '');
+        setField('view-rabies-d14-sig', d14Obj.signature || '');
+        setField('view-rabies-d28-date', d28Obj.date || '');
+        setField('view-rabies-d28-sig', d28Obj.signature || '');
+
+        setField('view-rabies-animal-status', rabiesObs.status_14_days || '');
+        setField('view-rabies-remarks', rabiesObs.remarks || ad.remarks_adverse_reactions || '');
+      } else {
+        if (window.switchViewImmPaper) window.switchViewImmPaper('routine');
+        const immSubTabBtn = document.getElementById('subtab-immunize-sheet');
+        if (immSubTabBtn) immSubTabBtn.textContent = 'Immunization & Vaccine Sheet';
+      }
+
+      // Routine fallback fields
       setField('view-imm-patient-name', d.name || data.patient_name || '');
       setField('view-imm-patient-id', d.patient_number || d.patient_id || '');
       setField('view-imm-age', d.age !== undefined && d.age !== null ? d.age : '');
@@ -2830,6 +3116,122 @@
       const isImmunizeCategory = document.getElementById('review-category') && ['IMMUNIZATION_RECORD', 'IMMUNIZATION', 'VACCINATION'].includes(document.getElementById('review-category').value);
 
       if (isImmunizeSheetActive || isImmunizeCategory) {
+        const isRabiesPaperVisible = document.getElementById('view-imm-rabies-paper') && document.getElementById('view-imm-rabies-paper').style.display !== 'none';
+
+        if (isRabiesPaperVisible) {
+          const abtcName = getVal('view-rabies-abtc') || 'ABTC - Paete RHU';
+          const abtcAddr = getVal('view-rabies-abtc-address') || 'J. Ramos St. B-2 Paete, Lag.';
+          const regNo = getVal('view-rabies-reg-no');
+          const regDate = getVal('view-rabies-reg-date');
+
+          const pName = getVal('view-rabies-name') || getVal('itr-field-name');
+          const pAge = getNumVal('view-rabies-age') || getNumVal('itr-field-age');
+          const pSex = getVal('view-rabies-sex');
+          const pAddress = getVal('view-rabies-address') || getVal('itr-field-address');
+
+          const expDate = getVal('view-rabies-exposure-date');
+          const expPlace = getVal('view-rabies-exposure-place');
+          const expType = getVal('view-rabies-exposure-type');
+          const expSource = getVal('view-rabies-exposure-source');
+          const expCategory = getVal('view-rabies-category');
+
+          const washing = getVal('view-rabies-washing');
+          const rig = getVal('view-rabies-rig');
+
+          const genName = getVal('view-rabies-generic-name') || 'PVRV';
+          const brandName = getVal('view-rabies-brand-name') || 'Speeda';
+          const route = getVal('view-rabies-route') || 'ID';
+
+          const d0Date = getVal('view-rabies-d0-date');
+          const d0Sig = getVal('view-rabies-d0-sig');
+          const d3Date = getVal('view-rabies-d3-date');
+          const d3Sig = getVal('view-rabies-d3-sig');
+          const d7Date = getVal('view-rabies-d7-date');
+          const d7Sig = getVal('view-rabies-d7-sig');
+          const d14Date = getVal('view-rabies-d14-date');
+          const d14Sig = getVal('view-rabies-d14-sig');
+          const d28Date = getVal('view-rabies-d28-date');
+          const d28Sig = getVal('view-rabies-d28-sig');
+
+          const animalStatus = getVal('view-rabies-animal-status');
+          const remarks = getVal('view-rabies-remarks');
+
+          const immEntries = [];
+          if (d0Date) immEntries.push({ vaccine: `Anti-Rabies (${genName}) - ${brandName}`, dose: 'Day 0', date: d0Date, route, vaccinator: d0Sig, facility: abtcName });
+          if (d3Date) immEntries.push({ vaccine: `Anti-Rabies (${genName}) - ${brandName}`, dose: 'Day 3', date: d3Date, route, vaccinator: d3Sig, facility: abtcName });
+          if (d7Date) immEntries.push({ vaccine: `Anti-Rabies (${genName}) - ${brandName}`, dose: 'Day 7', date: d7Date, route, vaccinator: d7Sig, facility: abtcName });
+          if (d14Date) immEntries.push({ vaccine: `Anti-Rabies (${genName}) - ${brandName}`, dose: 'Day 14 (IM)', date: d14Date, route: 'IM', vaccinator: d14Sig, facility: abtcName });
+          if (d28Date) immEntries.push({ vaccine: `Anti-Rabies (${genName}) - ${brandName}`, dose: 'Day 28/30', date: d28Date, route, vaccinator: d28Sig, facility: abtcName });
+
+          return {
+            header: {
+              country: 'Republic of the Philippines',
+              department: 'Department of Health',
+              program: 'National Rabies Prevention and Control Program',
+              center: 'Animal Bite Treatment Center',
+              facility: abtcName,
+              facility_address: abtcAddr,
+              form_title: 'Rabies Post-Exposure Prophylaxis Card',
+              record_type: 'IMMUNIZATION_RECORD',
+              record_subtype: 'RABIES_PEP'
+            },
+            registration: {
+              registration_no: regNo,
+              date_registered: regDate
+            },
+            patient_demographics: {
+              name: pName,
+              patient_number: getVal('view-imm-patient-id') || (currentRecord && currentRecord.patient_number),
+              age: pAge,
+              gender: pSex,
+              sex: pSex,
+              address: pAddress,
+              contact_number: getVal('view-imm-cpno') || getVal('itr-field-cpno')
+            },
+            rabies_exposure: {
+              date_of_exposure: expDate,
+              place_of_exposure: expPlace,
+              type_of_exposure: expType,
+              source_of_exposure: expSource,
+              category_of_exposure: expCategory
+            },
+            post_exposure_prophylaxis: {
+              washing_of_bite_wound: washing,
+              rig: rig
+            },
+            vaccine_information: {
+              vaccine_name: `Anti-Rabies Vaccine (${genName})`,
+              generic_name: genName,
+              brand_and_manufacturer: brandName,
+              route: route
+            },
+            administration_details: {
+              date_administered: d0Date,
+              dose_number: 'Day 0',
+              route_of_administration: route,
+              next_due_date: d3Date,
+              remarks_adverse_reactions: remarks
+            },
+            provider_information: {
+              vaccinator_name: d0Sig || 'ABTC Staff',
+              facility_name: abtcName
+            },
+            pep_schedule: {
+              d0: { day: 'D0', date: d0Date, signature: d0Sig },
+              d3: { day: 'D3', date: d3Date, signature: d3Sig },
+              d7: { day: 'D7', date: d7Date, signature: d7Sig },
+              d14: { day: 'D14(IM)', date: d14Date, signature: d14Sig },
+              d28_30: { day: 'D28/30', date: d28Date, signature: d28Sig, note: 'If dog/cat is not alive after 14 days of observation' }
+            },
+            animal_observation: {
+              reminder: 'Observe the responsible animal for 14 days, and report to the veterinarian/RHU any changes noted in the animal during the observation period.',
+              status_14_days: animalStatus,
+              remarks: remarks
+            },
+            immunization_entries: immEntries
+          };
+        }
+
         const vacName = getVal('view-imm-vaccine-name');
         const brand = getVal('view-imm-vaccine-brand');
         const lotNo = getVal('view-imm-lot-number');
@@ -3656,7 +4058,7 @@
 
     // ── Delete Record Permanently ──
     document.getElementById('delete-record-btn').addEventListener('click', async () => {
-      if (!confirm(`⚠️ PERMANENTLY DELETE document "${currentRecord.file_name}"?\n\nThis action CANNOT be undone.`)) {
+      if (!confirm(`PERMANENTLY DELETE document "${currentRecord.file_name}"?\n\nThis action CANNOT be undone.`)) {
         return;
       }
       if (!confirm(`Final confirmation: Are you completely sure you want to erase "${currentRecord.file_name}"?`)) {

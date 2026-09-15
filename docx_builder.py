@@ -125,18 +125,43 @@ def build_docx(ocr_data, output_path, title=None):
     blocks = ocr_data.get("layout_blocks", [])
 
     if not blocks:
-        # Fallback: just dump the plain text
+        # Fallback: format structured plain text nicely into headings and paragraphs
         plain_text = ocr_data.get("text", "")
         if plain_text.strip():
             for line in plain_text.split('\n'):
                 line = line.strip()
-                if line:
-                    doc.add_paragraph(line)
+                if not line:
+                    continue
+                if line.startswith('===') and line.endswith('==='):
+                    h_text = line.replace('=', '').strip()
+                    doc.add_heading(h_text, level=2)
+                elif line.startswith('--') and line.endswith('--'):
+                    h_text = line.replace('-', '').strip()
+                    doc.add_heading(h_text, level=3)
+                elif '|' in line:
+                    para = doc.add_paragraph()
+                    run = para.add_run(line)
+                    run.font.name = 'Courier New'
+                    run.font.size = Pt(9.5)
+                elif ':' in line and len(line.split(':', 1)[0]) < 45:
+                    parts = line.split(':', 1)
+                    para = doc.add_paragraph()
+                    r1 = para.add_run(parts[0] + ':')
+                    r1.bold = True
+                    r1.font.name = 'Calibri'
+                    r1.font.size = Pt(11)
+                    if len(parts) > 1 and parts[1]:
+                        r2 = para.add_run(parts[1])
+                        r2.font.name = 'Calibri'
+                        r2.font.size = Pt(11)
+                else:
+                    para = doc.add_paragraph(line)
+                    para.runs[0].font.name = 'Calibri'
+                    para.runs[0].font.size = Pt(11)
         else:
-            # No content at all — add a placeholder note
             para = doc.add_paragraph("(No text content could be extracted from this document.)")
             para.runs[0].font.color.rgb = RGBColor(0x99, 0x99, 0x99)
-        return doc  # Always return doc object
+        return doc
 
     # Group blocks into logical rows (blocks within ~1.5% of page height of each other = same row)
     page_height = ocr_data.get("page_size", [1, 1000])[1]

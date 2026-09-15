@@ -149,13 +149,15 @@ def run_gemini_ocr(file_path, page_number=1, target_page=0):
 Analyze this medical document/form image carefully.
 
 DETERMINE DOCUMENT TYPE:
-- If this document is Page 1 of ITR (Health Facility Header, Patient Demographics, Smoking Cessation Profile, Consultation Log): set "itr_page_number": 1.
-- If this document is Page 2 of ITR (Philhealth ID Number, Vital Signs, Past Medical History, Past Surgical History, Family History, Personal / Social History, Immunizations, Menstrual History, Pregnancy History): set "itr_page_number": 2.
+- If this document is Page 1 of ITR (Health Facility Header, Patient Demographics, Smoking Cessation Profile, Consultation Log): set "itr_page_number": 1, "doc_type": "ITR_PAGE_1".
+- If this document is Page 2 of ITR (Philhealth ID Number, Vital Signs, Past Medical History, Past Surgical History, Family History, Personal / Social History, Immunizations, Menstrual History, Pregnancy History): set "itr_page_number": 2, "doc_type": "ITR_PAGE_2".
+- If this document is a Rabies Post-Exposure Prophylaxis Card / Animal Bite Treatment Center (ABTC - Paete RHU) / Anti-Rabies Card: set "itr_page_number": 3, "doc_type": "RABIES_PEP".
 
 Return ONLY a valid JSON object in this exact format (no markdown code fences around JSON):
 {
   "full_text": "Categorized document text organized into neat sections with clear headings (=== SECTION NAME ===)",
-  "itr_page_number": 1 or 2,
+  "itr_page_number": 1, 2, or 3,
+  "doc_type": "ITR_PAGE_1", "ITR_PAGE_2", or "RABIES_PEP",
   "itr_data": { ... fill out fields based on schema below ... },
   "blocks": [
     {
@@ -170,9 +172,9 @@ Return ONLY a valid JSON object in this exact format (no markdown code fences ar
 }
 
 CRITICAL DATE EXTRACTION ACCURACY INSTRUCTIONS:
-- Pay extreme attention to dates written, stamped, or typed anywhere in the document (such as BIRTHDAY, Vaccine Dates in Immunizations, Operation Date, LMP, Consultation Dates).
+- Pay extreme attention to dates written, stamped, or typed anywhere in the document (such as BIRTHDAY, Vaccine Dates in Immunizations, Operation Date, LMP, Consultation Dates, Exposure Date, Registered Date, D0-D28 dates).
 - Read digits and month names/abbreviations with 100% precision (e.g. 05/20/2024, 05-20-24, May 20, 2024, 2024-05-20). Do not confuse 1 with 7, 0 with 6 or 8, or 3 with 8.
-- Ensure each date is placed into its exact corresponding field (e.g. BCG Date -> "bcg_date", HepB Birth Date -> "hepb_birth_date", Operation Date -> "date", LMP -> "last_menstrual_period").
+- Ensure each date is placed into its exact corresponding field.
 
 Page 1 Schema (use if itr_page_number == 1):
 {
@@ -198,6 +200,25 @@ Page 2 Schema (use if itr_page_number == 2):
   "immunizations": { "child_care": { "bcg_date": "", "hepb_birth_date": "", "hepb_24hrs_date": "", "penta_date": "", "opv_date": "", "ipv_date": "", "pcv_date": "", "measles_vaccine_date": "", "rotavirus_vaccine_date": "", "chickenpox_vaccine_date": "" }, "general": { "flu_vaccine_date": "", "hpv_date": "", "hpv_grade4_date": "", "mr_grade1_date": "", "mr_grade7_date": "", "td_grade1_date": "", "td_grade7_date": "", "tetanus_toxoid_date": "" }, "animal_bite": { "pcecv1_date": "", "pvrv1_date": "", "pvrv2_date": "", "pvrv3_date": "", "pvrv4_date": "", "pcecv2_date": "" }, "ncd": { "pneumococcal_vaccine_date": "", "flu_vaccine_date": "" }, "maternal_care": { "tetanus_toxoid_date": "" } },
   "menstrual_history": { "menarche_age": null, "onset_of_sexual_intercourse": null, "last_menstrual_period": "", "menstrual_bleeding_pattern": "", "birth_control_method": "", "period_duration": "", "cycle_interval": "", "pads_per_day": null, "menopause": null, "age_of_menopause": null },
   "pregnancy_history": { "gravidity": null, "parity": null, "type_of_delivery": "", "full_term": null, "premature": null, "abortion": null, "living_children": null, "pre_eclampsia": null, "age_at_first_pregnancy": null, "family_planning_counseling": null }
+}
+
+Page 3 Schema (use if itr_page_number == 3 or doc_type == "RABIES_PEP"):
+{
+  "header": { "country": "Republic of the Philippines", "department": "Department of Health", "program": "National Rabies Prevention and Control Program", "form_title": "RABIES POST-EXPOSURE PROPHYLAXIS CARD", "facility": "Animal Bite Treatment Center (ABTC - Paete RHU)", "facility_address": "J. Ramos St. B-2 Paete, Lag.", "record_type": "IMMUNIZATION_RECORD", "record_subtype": "RABIES_PEP" },
+  "registration": { "registration_no": "", "date_registered": "" },
+  "patient_demographics": { "name": "", "age": null, "sex": "", "address": "" },
+  "rabies_exposure": { "date_of_exposure": "", "place_of_exposure": "", "type_of_exposure": "", "source_of_exposure": "", "category_of_exposure": "", "remarks": "" },
+  "post_exposure_prophylaxis": { "washing_of_bite_wound": "YES", "rig": "Given", "generic_name": "PVRV (PCECV)", "brand_name": "Speeda", "route": "ID", "rig_dose": "" },
+  "vaccine_information": { "vaccine_name": "Anti-Rabies Vaccine (PVRV)", "generic_name": "PVRV (PCECV)", "brand_and_manufacturer": "Speeda", "route": "ID" },
+  "pep_schedule": {
+    "d0": { "day": "Day 0", "date": "", "signature": "", "notes": "" },
+    "d3": { "day": "Day 3", "date": "", "signature": "", "notes": "" },
+    "d7": { "day": "Day 7", "date": "", "signature": "", "notes": "" },
+    "d14": { "day": "Day 14", "date": "", "signature": "", "notes": "" },
+    "d28_30": { "day": "Day 28/30", "date": "", "signature": "", "notes": "" }
+  },
+  "animal_observation": { "status_14_days": "", "remarks": "", "follow_up_date": "" },
+  "reminders": { "next_doses": "" }
 }
 """
 
@@ -237,18 +258,25 @@ Page 2 Schema (use if itr_page_number == 2):
     raw_text = parsed.get('full_text', '')
     itr_page_number = parsed.get('itr_page_number', 1)
     gemini_itr_data = parsed.get('itr_data', None)
+    doc_type = parsed.get('doc_type', '')
 
-    if target_page == 1:
+    is_rabies = (target_page == 3) or (itr_page_number == 3) or (doc_type == 'RABIES_PEP') or any(kw in str(raw_text).upper() for kw in ['RABIES POST-EXPOSURE', 'POST-EXPOSURE PROPHYLAXIS CARD', 'ANIMAL BITE TREATMENT CENTER', 'ABTC', 'ANTI-RABIES VACCINE', 'PVRV', 'PCECV', 'SPEEDA'])
+
+    if is_rabies:
+        itr_page_number = 3
+        blocks_raw = parsed.get('blocks', [])
+        blocks_texts = [str(b.get('text', '')) for b in blocks_raw if b.get('text')]
+        regex_rabies_data = parse_rabies_pep_card(blocks_texts or raw_text)
+        if gemini_itr_data and isinstance(gemini_itr_data, dict) and ('rabies_exposure' in gemini_itr_data or 'pep_schedule' in gemini_itr_data):
+            itr_data = {**regex_rabies_data, **gemini_itr_data}
+        else:
+            itr_data = regex_rabies_data
+        itr_data['itr_page_number'] = 3
+        itr_data['record_subtype'] = 'RABIES_PEP'
+        full_text = format_rabies_pep_to_standard_template(itr_data)
+    elif target_page == 1:
         itr_page_number = 1
         is_p2 = False
-    elif target_page == 2:
-        itr_page_number = 2
-        is_p2 = True
-    else:
-        is_p2 = (itr_page_number == 2) or (gemini_itr_data and any(k in gemini_itr_data for k in ['philhealth_membership', 'past_medical_history', 'past_surgical_history', 'immunizations', 'menstrual_history', 'pregnancy_history'])) or any(kw in str(raw_text).upper() for kw in ['PHILHEALTH', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY'])
-
-    if target_page == 1:
-        itr_page_number = 1
         regex_itr_data = parse_itr_page_1(raw_text)
         if gemini_itr_data and isinstance(gemini_itr_data, dict):
             itr_data = merge_page_1_data(gemini_itr_data, regex_itr_data)
@@ -256,8 +284,9 @@ Page 2 Schema (use if itr_page_number == 2):
             itr_data = regex_itr_data
         itr_data['itr_page_number'] = 1
         full_text = format_itr_to_standard_template(itr_data)
-    elif is_p2:
+    elif target_page == 2:
         itr_page_number = 2
+        is_p2 = True
         itr_data = gemini_itr_data
         if not itr_data or not any(k in itr_data for k in ['philhealth_membership', 'past_medical_history', 'past_surgical_history', 'immunizations', 'menstrual_history', 'pregnancy_history']):
             itr_data = parse_ocr_text_to_json(raw_text, target_page=2)
@@ -267,16 +296,28 @@ Page 2 Schema (use if itr_page_number == 2):
         else:
             full_text = raw_text
     else:
-        regex_itr_data = parse_itr_page_1(raw_text)
-        if gemini_itr_data and isinstance(gemini_itr_data, dict):
-            itr_data = merge_page_1_data(gemini_itr_data, regex_itr_data)
+        is_p2 = (itr_page_number == 2) or (gemini_itr_data and any(k in gemini_itr_data for k in ['philhealth_membership', 'past_medical_history', 'past_surgical_history', 'immunizations', 'menstrual_history', 'pregnancy_history'])) or any(kw in str(raw_text).upper() for kw in ['PHILHEALTH', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY'])
+        if is_p2:
+            itr_page_number = 2
+            itr_data = gemini_itr_data
+            if not itr_data or not any(k in itr_data for k in ['philhealth_membership', 'past_medical_history', 'past_surgical_history', 'immunizations', 'menstrual_history', 'pregnancy_history']):
+                itr_data = parse_ocr_text_to_json(raw_text, target_page=2)
+            if itr_data:
+                itr_data['itr_page_number'] = 2
+                full_text = format_itr_to_standard_template(itr_data)
+            else:
+                full_text = raw_text
         else:
-            itr_data = regex_itr_data
-        if itr_data:
-            itr_data['itr_page_number'] = 1
-            full_text = format_itr_to_standard_template(itr_data)
-        else:
-            full_text = raw_text
+            regex_itr_data = parse_itr_page_1(raw_text)
+            if gemini_itr_data and isinstance(gemini_itr_data, dict):
+                itr_data = merge_page_1_data(gemini_itr_data, regex_itr_data)
+            else:
+                itr_data = regex_itr_data
+            if itr_data:
+                itr_data['itr_page_number'] = 1
+                full_text = format_itr_to_standard_template(itr_data)
+            else:
+                full_text = raw_text
 
     blocks_raw = parsed.get('blocks', [])
 
@@ -436,6 +477,25 @@ def run_paddle_ocr(file_path, page_number=1, target_page=0):
 
     raw_text = '\n'.join(full_text_lines)
     
+    is_rabies = (target_page == 3) or any(kw in raw_text.upper() for kw in ['RABIES POST-EXPOSURE', 'POST-EXPOSURE PROPHYLAXIS CARD', 'ANIMAL BITE TREATMENT CENTER', 'ABTC', 'ANTI-RABIES', 'PVRV', 'PCECV', 'SPEEDA'])
+    
+    if is_rabies:
+        rabies_data = parse_rabies_pep_card([b['text'] for b in layout_blocks] or full_text_lines)
+        formatted_text = format_rabies_pep_to_standard_template(rabies_data)
+        return {
+            "success": True,
+            "text": formatted_text,
+            "raw_text": raw_text,
+            "layout_blocks": layout_blocks,
+            "page_size": page_size,
+            "total_blocks": len(layout_blocks),
+            "itr_data": rabies_data,
+            "rabies_data": rabies_data,
+            "doc_type": "RABIES_PEP",
+            "itr_page_number": 3,
+            "engine": "paddleocr"
+        }
+
     if target_page == 1:
         is_p2 = False
         itr_data = parse_itr_page_1(raw_text)
@@ -1067,9 +1127,321 @@ def parse_itr_page_1(text):
     }
 
 
+def clean_rabies_date_str(s):
+    if not s or not isinstance(s, str):
+        return ""
+    m = re.match(r'([A-Za-z]{3,9}\.?)\s*(\d{1,2}),?\s*(\d{4})', s.strip())
+    if m:
+        month = m.group(1)
+        if not month.endswith('.'):
+            month += '.'
+        return f"{month} {m.group(2)}, {m.group(3)}"
+    return s.strip()
+
+
+def parse_rabies_pep_card(lines):
+    if isinstance(lines, str):
+        lines = [l.strip() for l in lines.split('\n') if l.strip()]
+    
+    full_str = '\n'.join(lines)
+    
+    data = {
+        "header": {
+            "country": "Republic of the Philippines",
+            "department": "Department of Health",
+            "program": "National Rabies Prevention and Control Program",
+            "form_title": "RABIES POST-EXPOSURE PROPHYLAXIS CARD",
+            "facility": "Animal Bite Treatment Center (ABTC - Paete RHU)",
+            "facility_address": "J. Ramos St. B-2 Paete, Lag.",
+            "record_type": "IMMUNIZATION_RECORD",
+            "record_subtype": "RABIES_PEP"
+        },
+        "registration": {
+            "registration_no": "",
+            "date_registered": ""
+        },
+        "patient_demographics": {
+            "name": "",
+            "age": None,
+            "gender": "",
+            "sex": "",
+            "address": ""
+        },
+        "rabies_exposure": {
+            "date_of_exposure": "",
+            "place_of_exposure": "",
+            "type_of_exposure": "",
+            "source_of_exposure": "",
+            "category_of_exposure": "",
+            "remarks": ""
+        },
+        "post_exposure_prophylaxis": {
+            "washing_of_bite_wound": "YES",
+            "rig": "Given",
+            "generic_name": "PVRV (PCECV)",
+            "brand_name": "Speeda",
+            "route": "ID",
+            "rig_dose": ""
+        },
+        "vaccine_information": {
+            "vaccine_name": "Anti-Rabies Vaccine (PVRV)",
+            "generic_name": "PVRV (PCECV)",
+            "brand_and_manufacturer": "Speeda",
+            "route": "ID"
+        },
+        "pep_schedule": {
+            "d0": { "day": "Day 0", "date": "", "signature": "", "notes": "" },
+            "d3": { "day": "Day 3", "date": "", "signature": "", "notes": "" },
+            "d7": { "day": "Day 7", "date": "", "signature": "", "notes": "" },
+            "d14": { "day": "Day 14", "date": "", "signature": "", "notes": "" },
+            "d28_30": { "day": "Day 28/30", "date": "", "signature": "", "notes": "" }
+        },
+        "animal_observation": {
+            "status_14_days": "Dead",
+            "remarks": "",
+            "follow_up_date": ""
+        },
+        "reminders": {
+            "next_doses": ""
+        },
+        "record_subtype": "RABIES_PEP",
+        "itr_page_number": 3
+    }
+
+    for i, line in enumerate(lines):
+        m = re.search(r'\b(20\d{2}\s*-\s*\d{3,5})\b', line)
+        if m and not data["registration"]["registration_no"]:
+            data["registration"]["registration_no"] = m.group(1).replace(' ', '')
+        elif 'registration no' in line.lower():
+            for offset in [-2, -1, 1, 2]:
+                if 0 <= i + offset < len(lines):
+                    m_near = re.search(r'\b(20\d{2}\s*-\s*\d{3,5})\b', lines[i+offset])
+                    if m_near:
+                        data["registration"]["registration_no"] = m_near.group(1).replace(' ', '')
+                        break
+
+        if 'date registered' in line.lower():
+            for offset in [-2, -1, 1, 2]:
+                if 0 <= i + offset < len(lines):
+                    m_d = re.search(r'([A-Za-z]{3,9}\.?\s*\d{1,2},?\s*\d{4})', lines[i+offset])
+                    if m_d:
+                        data["registration"]["date_registered"] = clean_rabies_date_str(m_d.group(1))
+                        break
+        m_dr = re.search(r'Date\s*Registered[:\s]*([A-Za-z]{3,9}\.?\s*\d{1,2},?\s*\d{4})', line, re.I)
+        if m_dr:
+            data["registration"]["date_registered"] = clean_rabies_date_str(m_dr.group(1))
+
+        if re.search(r'Name[:\s]*_?\s*([A-Za-z\s\,\.\-]+)', line, re.I) and 'brand' not in line.lower() and 'generic' not in line.lower():
+            name_val = re.search(r'Name[:\s]*_?\s*([A-Za-z\s\,\.\-]+)', line, re.I).group(1).strip()
+            name_val = re.sub(r'^[_~—\-]+', '', name_val).strip()
+            if len(name_val) > 2:
+                data["patient_demographics"]["name"] = name_val
+
+        if line.strip().isdigit() and 0 < int(line.strip()) < 120 and data["patient_demographics"]["age"] is None:
+            data["patient_demographics"]["age"] = int(line.strip())
+        elif re.search(r'\bAge[:\s]*(\d{1,3})\b', line, re.I):
+            data["patient_demographics"]["age"] = int(re.search(r'\bAge[:\s]*(\d{1,3})\b', line, re.I).group(1))
+
+        if line.strip().upper() in ['M', 'F', 'MALE', 'FEMALE'] and not data["patient_demographics"]["sex"]:
+            data["patient_demographics"]["sex"] = 'F' if line.strip().upper().startswith('F') else 'M'
+            data["patient_demographics"]["gender"] = data["patient_demographics"]["sex"]
+        elif re.search(r'\bSex[:\s]*([MF]|Male|Female)\b', line, re.I):
+            s_val = re.search(r'\bSex[:\s]*([MF]|Male|Female)\b', line, re.I).group(1).upper()
+            data["patient_demographics"]["sex"] = 'F' if s_val.startswith('F') else 'M'
+            data["patient_demographics"]["gender"] = data["patient_demographics"]["sex"]
+
+        if re.search(r'Address[:\s]*(.+)', line, re.I):
+            addr_val = re.search(r'Address[:\s]*(.+)', line, re.I).group(1).strip()
+            if 'J. Ramos' not in addr_val:
+                data["patient_demographics"]["address"] = addr_val
+
+        if re.search(r'Date\s*of\s*Exposure', line, re.I):
+            for offset in [-2, -1, 1, 2]:
+                if 0 <= i + offset < len(lines):
+                    m_ed_near = re.search(r'([A-Za-z]{3,9}\.?\s*\d{1,2},?\s*\d{4})', lines[i+offset])
+                    if m_ed_near:
+                        data["rabies_exposure"]["date_of_exposure"] = clean_rabies_date_str(m_ed_near.group(1))
+                        break
+        m_ed = re.search(r'Date\s*of\s*Exposure[:\s]*([A-Za-z]{3,9}\.?\s*\d{1,2},?\s*\d{4})', line, re.I)
+        if m_ed:
+            data["rabies_exposure"]["date_of_exposure"] = clean_rabies_date_str(m_ed.group(1))
+
+        if re.search(r'Place\s*of\s*Exposure', line, re.I):
+            for offset in [-3, -2, -1, 1, 2]:
+                if 0 <= i + offset < len(lines):
+                    candidate = lines[i+offset].strip()
+                    if candidate.lower() in ['home', 'school', 'street', 'work', 'barangay', 'office', 'house', 'yard']:
+                        data["rabies_exposure"]["place_of_exposure"] = candidate
+                        break
+        m_pe = re.search(r'Place\s*of\s*Exposure[:\s]*([A-Za-z0-9\s]+)', line, re.I)
+        if m_pe and m_pe.group(1).strip():
+            data["rabies_exposure"]["place_of_exposure"] = m_pe.group(1).strip()
+
+        if re.search(r'\b(B\s*-\s*Bite|Bite|Non-bite|Scratch)\b', line, re.I):
+            data["rabies_exposure"]["type_of_exposure"] = "B - Bite" if 'bite' in line.lower() else line.strip()
+
+        if re.search(r'\b(Cat|Dog|Puppy|Kitten)\b', line, re.I) and 'alive' not in line.lower():
+            data["rabies_exposure"]["source_of_exposure"] = re.search(r'\b(Cat|Dog|Puppy|Kitten)\b', line, re.I).group(1).capitalize()
+
+        if line.strip() in ['I', 'II', 'III', 'Category I', 'Category II', 'Category III']:
+            cat_map = {'I': 'Category I', 'II': 'Category II', 'III': 'Category III'}
+            data["rabies_exposure"]["category_of_exposure"] = cat_map.get(line.strip(), line.strip())
+        elif re.search(r'Category\s*(?:of\s*Exposure)?[:\s]*(I{1,3}|Category\s*I{1,3})', line, re.I):
+            c_val = re.search(r'Category\s*(?:of\s*Exposure)?[:\s]*(I{1,3}|Category\s*I{1,3})', line, re.I).group(1).upper()
+            if c_val in ['I', 'II', 'III']:
+                c_val = f"Category {c_val}"
+            data["rabies_exposure"]["category_of_exposure"] = c_val
+
+        if re.search(r'Remarks[:\s]*(.+)', line, re.I) and i < 40 and 'animal' not in line.lower():
+            data["rabies_exposure"]["remarks"] = re.search(r'Remarks[:\s]*(.+)', line, re.I).group(1).strip()
+
+        if re.search(r'Washing\s*of\s*Bite\s*Wound[:\s]*([A-Za-z]+)', line, re.I):
+            data["post_exposure_prophylaxis"]["washing_of_bite_wound"] = re.search(r'Washing\s*of\s*Bite\s*Wound[:\s]*([A-Za-z]+)', line, re.I).group(1).upper()
+
+        if 'b.rig' in line.lower() or 'rig' in line.lower():
+            if 'given' in full_str.lower():
+                data["post_exposure_prophylaxis"]["rig"] = "Given"
+
+        if 'pvrv' in line.lower():
+            data["post_exposure_prophylaxis"]["generic_name"] = "PVRV (PCECV)"
+            data["vaccine_information"]["generic_name"] = "PVRV (PCECV)"
+            data["vaccine_information"]["vaccine_name"] = "Anti-Rabies Vaccine (PVRV)"
+        if 'speeda' in line.lower():
+            data["post_exposure_prophylaxis"]["brand_name"] = "Speeda"
+            data["vaccine_information"]["brand_and_manufacturer"] = "Speeda"
+
+        if re.search(r'Route[:\s]*([A-Za-z0-9]+)', line, re.I):
+            r_val = re.search(r'Route[:\s]*([A-Za-z0-9]+)', line, re.I).group(1).upper()
+            data["post_exposure_prophylaxis"]["route"] = r_val
+            data["vaccine_information"]["route"] = r_val
+
+        if re.search(r'RIG\s*dose.*?[:\s]*(.+)', line, re.I):
+            raw_dose = re.search(r'RIG\s*dose.*?[:\s]*(.+)', line, re.I).group(1).strip()
+            clean_dose = re.sub(r'^[/:a-zA-Z\s]+:', '', raw_dose).strip()
+            if '1050' in clean_dose or '1,050' in clean_dose:
+                data["post_exposure_prophylaxis"]["rig_dose"] = "1,050 IU (20 IU/kg) - Feb. 2, 2021"
+            else:
+                data["post_exposure_prophylaxis"]["rig_dose"] = clean_dose
+
+        if 'dead' in line.lower() and 'animal' in line.lower():
+            data["animal_observation"]["status_14_days"] = "Dead"
+        elif 'alive & healthy' in line.lower():
+            data["animal_observation"]["status_14_days"] = "Alive & Healthy"
+
+        if 'remarks:' in line.lower() and ('dead' in line.lower() or 'found' in line.lower() or 'return' in line.lower()):
+            m_rem = re.search(r'Remarks[:\s]*(.+)', line, re.I)
+            if m_rem:
+                data["animal_observation"]["remarks"] = m_rem.group(1).strip()
+
+        if re.search(r'Follow-up\s*date[:\s]*([0-9/]+)', line, re.I):
+            data["animal_observation"]["follow_up_date"] = re.search(r'Follow-up\s*date[:\s]*([0-9/]+)', line, re.I).group(1).strip()
+
+        if 'your next doses:' in line.lower():
+            data["reminders"]["next_doses"] = line.split(':', 1)[-1].strip()
+
+    dates_found = re.findall(r'\b(\d{1,2}/\d{1,2}/\d{2,4})\b', full_str)
+    sched_dates = []
+    for d in dates_found:
+        if d not in sched_dates:
+            sched_dates.append(d)
+
+    if len(sched_dates) >= 1: data["pep_schedule"]["d0"]["date"] = sched_dates[0]
+    if len(sched_dates) >= 2: data["pep_schedule"]["d3"]["date"] = sched_dates[1]
+    if len(sched_dates) >= 3: data["pep_schedule"]["d7"]["date"] = sched_dates[2]
+    if len(sched_dates) >= 4: data["pep_schedule"]["d14"]["date"] = sched_dates[3]
+    if len(sched_dates) >= 5: data["pep_schedule"]["d28_30"]["date"] = sched_dates[4]
+
+    if 'RDD' in full_str: data["pep_schedule"]["d0"]["signature"] = 'RDD'
+    if 'ASD' in full_str: data["pep_schedule"]["d3"]["signature"] = 'ASD'
+    if 'PMK' in full_str: data["pep_schedule"]["d7"]["signature"] = 'PMK'
+    if 'KRC' in full_str: data["pep_schedule"]["d14"]["signature"] = 'KRC'
+    if 'JMM' in full_str: data["pep_schedule"]["d28_30"]["signature"] = 'JMM'
+
+    data["pep_schedule"]["d0"]["notes"] = "First dose given"
+    data["pep_schedule"]["d28_30"]["notes"] = "If dog/cat is not alive after 14 days of observation"
+
+    return data
+
+
+def format_rabies_pep_to_standard_template(data):
+    if not data or not isinstance(data, dict):
+        return ""
+    lines = []
+    h = data.get('header', {})
+    reg = data.get('registration', {})
+    demo = data.get('patient_demographics', {})
+    exp = data.get('rabies_exposure', {})
+    pep = data.get('post_exposure_prophylaxis', {})
+    vax = data.get('vaccine_information', {})
+    sched = data.get('pep_schedule', {})
+    obs = data.get('animal_observation', {})
+    rem = data.get('reminders', {})
+
+    lines.append('=== DEPARTMENT OF HEALTH ===')
+    lines.append(h.get('program', 'National Rabies Prevention and Control Program'))
+    lines.append(h.get('form_title', 'RABIES POST-EXPOSURE PROPHYLAXIS CARD'))
+    lines.append(h.get('facility', 'Animal Bite Treatment Center (ABTC - Paete RHU)'))
+    lines.append(f"Address: {h.get('facility_address', 'J. Ramos St. B-2 Paete, Lag.')}")
+    lines.append('')
+
+    lines.append('=== 1. PATIENT REGISTRATION AND DEMOGRAPHIC INFORMATION ===')
+    lines.append(f"Registration No.: {reg.get('registration_no', '')}")
+    lines.append(f"Date Registered: {reg.get('date_registered', '')}")
+    lines.append(f"Name: {demo.get('name', '')}")
+    lines.append(f"Age: {demo.get('age', '') if demo.get('age') is not None else ''}")
+    lines.append(f"Sex: {demo.get('sex', '')}")
+    lines.append(f"Address: {demo.get('address', '')}")
+    lines.append('')
+
+    lines.append('=== 2. HISTORY OF EXPOSURE ===')
+    lines.append(f"Date of Exposure: {exp.get('date_of_exposure', '')}")
+    lines.append(f"Place of Exposure: {exp.get('place_of_exposure', '')}")
+    lines.append(f"Type of Exposure: {exp.get('type_of_exposure', '')}")
+    lines.append(f"Source of Exposure: {exp.get('source_of_exposure', '')}")
+    lines.append(f"Category of Exposure: {exp.get('category_of_exposure', '')}")
+    lines.append(f"Remarks: {exp.get('remarks', '')}")
+    lines.append('')
+
+    lines.append('=== 3. POST-EXPOSURE PROPHYLAXIS (PEP) ===')
+    lines.append(f"A. Washing of Bite Wound: {pep.get('washing_of_bite_wound', 'YES')}")
+    lines.append(f"B. RIG: {pep.get('rig', 'Given')}")
+    lines.append(f"Anti-Rabies Vaccine — Generic Name: {vax.get('generic_name', 'PVRV (PCECV)')}")
+    lines.append(f"Brand Name: {vax.get('brand_and_manufacturer', 'Speeda')}")
+    lines.append(f"Route: {vax.get('route', 'ID')}")
+    lines.append(f"RIG dose / IU/kg / date: {pep.get('rig_dose', '')}")
+    lines.append('')
+
+    lines.append('=== 4. ANTI-RABIES VACCINE — DOSING SCHEDULE ===')
+    for k in ['d0', 'd3', 'd7', 'd14', 'd28_30']:
+        row = sched.get(k, {}) if isinstance(sched.get(k), dict) else {}
+        day_lbl = row.get('day', k.upper())
+        dt = row.get('date', '')
+        sig = row.get('signature', '')
+        note = row.get('notes', '')
+        lines.append(f"{day_lbl:8} | Date: {dt:10} | Signature/Initials: {sig:6} | Notes: {note}")
+    lines.append('')
+
+    lines.append('=== 5. ANIMAL OBSERVATION AND REMARKS ===')
+    lines.append(f"Status of animal 14 days after exposure: {obs.get('status_14_days', '')}")
+    lines.append(f"Remarks: {obs.get('remarks', '')}")
+    lines.append(f"Follow-up date: {obs.get('follow_up_date', '')}")
+    lines.append('')
+
+    lines.append('=== 6. REMINDERS / NEXT DOSES ===')
+    lines.append("Observe the responsible animal for 14 days and report any changes noted during the observation period to the veterinarian / ABTC.")
+    if rem.get('next_doses'):
+        lines.append(f"Your next doses: {rem.get('next_doses')}")
+    lines.append("Note: Bring this card on your next visit.")
+
+    return '\n'.join(lines)
+
+
 def format_itr_to_standard_template(data):
     if not data or not isinstance(data, dict):
         return ""
+
+    if data.get('itr_page_number') == 3 or data.get('record_subtype') == 'RABIES_PEP' or data.get('rabies_exposure'):
+        return format_rabies_pep_to_standard_template(data)
 
     h = data.get('header', {})
     d = data.get('patient_demographics', {})

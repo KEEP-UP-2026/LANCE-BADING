@@ -1644,151 +1644,417 @@
 
         <div class="itr-paper" style="max-width: 820px; margin: 0 auto; background: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);">
 
-          <!-- SECTION 1: DETALYE NG BAKUNA (VACCINE INFORMATION) -->
-          <div class="section-header" style="margin-top: 0; background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800;">
-            === 1. DETALYE NG BAKUNA (VACCINE INFORMATION) ===
+          <!-- FORM TYPE SUB-NAV SWITCHER -->
+          <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; flex-wrap: wrap;">
+            <button type="button" class="form-subnav-btn active" id="btn-vax-mode-rabies" onclick="switchManualVaxMode('rabies')" style="font-weight: 800;">
+              Rabies Post-Exposure Prophylaxis Card (ABTC - Paete RHU)
+            </button>
+            <button type="button" class="form-subnav-btn" id="btn-vax-mode-routine" onclick="switchManualVaxMode('routine')" style="font-weight: 700;">
+              Routine Child / Adult Immunization
+            </button>
           </div>
-          <table style="width: 100%; margin-bottom: 16px; border-collapse: collapse;">
-            <tr>
-              <td style="width: 50%; padding: 8px;">
-                <strong>Pangalan ng Bakuna (Vaccine Name):</strong>
-                <select id="mi-vaccine-select" class="form-select" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 6px 10px; width: 100%;" onchange="onManualVaccineSelectChange(this.value)">
-                  <option value="">-- Pumili ng Bakuna (Select Vaccine) --</option>
-                  <optgroup label="EPI / Routine Child Care Vaccines">
-                    <option value="BCG (Bacillus Calmette-Guérin)">BCG (Bacillus Calmette-Guérin)</option>
-                    <option value="Hepatitis B (HepB)">Hepatitis B (HepB Birth Dose / Pediatric)</option>
-                    <option value="Pentavalent (DPT-HepB-Hib)">Pentavalent (DPT-HepB-Hib)</option>
-                    <option value="Oral Polio Vaccine (OPV)">Oral Polio Vaccine (OPV)</option>
-                    <option value="Inactivated Polio Vaccine (IPV)">Inactivated Polio Vaccine (IPV)</option>
-                    <option value="Pneumococcal Conjugate Vaccine (PCV)">Pneumococcal Conjugate Vaccine (PCV)</option>
-                    <option value="Measles, Mumps, Rubella (MMR)">Measles, Mumps, Rubella (MMR)</option>
-                    <option value="Rotavirus Vaccine">Rotavirus Vaccine</option>
-                  </optgroup>
-                  <optgroup label="Adult / Maternal / Special Immunizations">
-                    <option value="Tetanus Toxoid / Td / Tdap">Tetanus Toxoid / Td / Tdap</option>
-                    <option value="Inactivated Influenza (Flu Vaccine)">Inactivated Influenza (Flu Vaccine)</option>
-                    <option value="Pneumococcal Polysaccharide (PPV23 / PCV13)">Pneumococcal Vaccine (Adult PPV23/PCV13)</option>
-                    <option value="Anti-Rabies Vaccine (PVRV / PCECV)">Anti-Rabies Vaccine (PVRV / PCECV)</option>
-                    <option value="Rabies Immunoglobulin (RIG / ERIG)">Rabies Immunoglobulin (RIG / ERIG)</option>
-                    <option value="COVID-19 Vaccine">COVID-19 Vaccine</option>
-                    <option value="Human Papillomavirus (HPV)">Human Papillomavirus (HPV)</option>
-                    <option value="Hepatitis A">Hepatitis A</option>
-                    <option value="Varicella (Chickenpox)">Varicella (Chickenpox)</option>
-                    <option value="OTHER">Other / Custom Vaccine...</option>
-                  </optgroup>
-                </select>
-                <input type="text" id="mi-vaccine-custom" class="form-control" placeholder="Ilagay ang partikular na pangalan ng bakuna..." style="display: none; margin-top: 6px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-              <td style="width: 50%; padding: 8px;">
-                <strong>Uri / Brand at Manufacturer:</strong>
-                <input type="text" id="mi-vaccine-brand" class="form-control" placeholder="e.g. Vaxigrip Tetra (Sanofi) / Verorab" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">
-                <strong style="color: #b91c1c;">* Batch / Lot Number ng Vial:</strong>
-                <input type="text" id="mi-lot-number" class="form-control" placeholder="e.g. LOT-AB12345 (Mahalaga para sa batch tracing)" style="margin-top: 4px; font-size: 13px; font-weight: 700; padding: 6px 10px; width: 100%; border: 1.5px solid #cbd5e1;">
-              </td>
-              <td style="padding: 8px;">
-                <strong>Expiration Date ng Vial:</strong>
-                <input type="date" id="mi-exp-date" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-            </tr>
-          </table>
 
-          <!-- SECTION 2: DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) -->
-          <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800;">
-            === 2. DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) ===
-          </div>
-          <table style="width: 100%; margin-bottom: 16px; border-collapse: collapse;">
-            <tr>
-              <td style="width: 35%; padding: 8px;">
-                <strong>Petsa ng Pagbakuna (Date):</strong>
-                <input type="date" id="mi-admin-date" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-              <td style="width: 30%; padding: 8px;">
-                <strong>Oras (Time):</strong>
-                <input type="time" id="mi-admin-time" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-              <td style="width: 35%; padding: 8px;">
-                <strong>Numero ng Dosis (Dose #):</strong>
-                <select id="mi-dose-number" class="form-select" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-                  <option value="Dose 1">Dose 1 (Unang Dosis)</option>
-                  <option value="Dose 2">Dose 2 (Pangalawang Dosis)</option>
-                  <option value="Dose 3">Dose 3 (Pangatlong Dosis)</option>
-                  <option value="Dose 4">Dose 4 (Pang-apat na Dosis)</option>
-                  <option value="Booster 1">Booster 1</option>
-                  <option value="Booster 2">Booster 2</option>
-                  <option value="Annual Dose">Taunang Dosis (Annual Dose)</option>
-                  <option value="Day 0">Day 0 (Anti-Rabies)</option>
-                  <option value="Day 3">Day 3 (Anti-Rabies)</option>
-                  <option value="Day 7">Day 7 (Anti-Rabies)</option>
-                  <option value="Day 14">Day 14 (Anti-Rabies)</option>
-                  <option value="Day 28">Day 28 (Anti-Rabies)</option>
-                  <option value="Single Dose">Single Dose</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">
-                <strong>Saan Itinurok (Injection Site):</strong>
-                <select id="mi-admin-site" class="form-select" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-                  <option value="Left Deltoid (Kaliwang Braso)">Left Deltoid (Kaliwang Braso)</option>
-                  <option value="Right Deltoid (Kanang Braso)">Right Deltoid (Kanang Braso)</option>
-                  <option value="Left Anterolateral Thigh (Kaliwang Hita)">Left Anterolateral Thigh (Kaliwang Hita)</option>
-                  <option value="Right Anterolateral Thigh (Kanang Hita)">Right Anterolateral Thigh (Kanang Hita)</option>
-                  <option value="Oral (Sa Bibig)">Oral (Pumatak sa Bibig)</option>
-                  <option value="Left Gluteal (Kaliwang Puwit)">Left Gluteal</option>
-                  <option value="Right Gluteal (Kanang Puwit)">Right Gluteal</option>
-                  <option value="Other Site">Iba pa (Other Site)</option>
-                </select>
-              </td>
-              <td style="padding: 8px;">
-                <strong>Paraan (Route):</strong>
-                <select id="mi-admin-route" class="form-select" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-                  <option value="Intramuscular (IM)">Intramuscular (IM - Sa Kalamnan)</option>
-                  <option value="Subcutaneous (SC)">Subcutaneous (SC - Sa Ilalim ng Balat)</option>
-                  <option value="Intradermal (ID)">Intradermal (ID - Sa Loob ng Balat)</option>
-                  <option value="Oral (PO)">Oral (PO - Pinatak sa Bibig)</option>
-                </select>
-              </td>
-              <td style="padding: 8px;">
-                <strong>Dami / Dosis (Dosage):</strong>
-                <input type="text" id="mi-admin-dosage" class="form-control" placeholder="e.g. 0.5 mL / 0.1 mL / 2 drops" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 8px;">
-                <strong>Susunod na Balik (Next Due Date):</strong>
-                <input type="date" id="mi-next-due-date" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-              <td colspan="2" style="padding: 8px;">
-                <strong>Adverse Reactions / Remarks:</strong>
-                <input type="text" id="mi-remarks" class="form-control" placeholder="e.g. No immediate adverse reaction noted / Advised Paracetamol for mild fever" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-            </tr>
-          </table>
+          <!-- ═══════════════════════════════════════════════════════════════════════ -->
+          <!-- RABIES POST-EXPOSURE PROPHYLAXIS CARD (ABTC - PAETE RHU)               -->
+          <!-- ═══════════════════════════════════════════════════════════════════════ -->
+          <div id="manual-vax-rabies-section" style="display: block;">
+            
+            <!-- OFFICIAL CARD HEADER -->
+            <div style="text-align: center; border-bottom: 2px solid #064e3b; padding-bottom: 12px; margin-bottom: 16px;">
+              <div style="font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 0.08em; text-transform: uppercase;">
+                Department of Health — National Rabies Prevention and Control Program
+              </div>
+              <h2 style="margin: 4px 0; font-size: 18px; font-weight: 900; color: #064e3b; letter-spacing: -0.01em;">
+                Rabies Post-Exposure Prophylaxis Card
+              </h2>
+              <div style="margin-top: 6px; font-size: 14px; font-weight: 800; color: #1e293b;">
+                Animal Bite Treatment Center: 
+                <input type="text" id="mi-rabies-abtc" value="ABTC - Paete RHU" class="form-control" style="display: inline-block; width: 230px; font-weight: 800; color: #064e3b; padding: 4px 8px; font-size: 13px; text-align: center;">
+              </div>
+              <div style="margin-top: 4px; font-size: 12px; color: #64748b;">
+                (Address): 
+                <input type="text" id="mi-rabies-abtc-address" value="J. Ramos St. B-2 Paete, Lag." class="form-control" style="display: inline-block; width: 260px; padding: 3px 8px; font-size: 12px; text-align: center;">
+              </div>
+            </div>
 
-          <!-- SECTION 3: IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) -->
-          <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800;">
-            === 3. IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) ===
+            <!-- REGISTRATION & PATIENT DEMOGRAPHICS -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-top: 0;">
+              === PATIENT REGISTRATION &amp; DEMOGRAPHICS ===
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; border: 1px solid #cbd5e1;">
+              <tr style="background: #f8fafc;">
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 50%;">
+                  <strong>Registration No:</strong>
+                  <input type="text" id="mi-rabies-reg-no" class="form-control" placeholder="e.g. 2021-0042 / REG-ABTC-01" style="margin-top: 4px; font-weight: 700;">
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 50%;">
+                  <strong>Date Registered:</strong>
+                  <input type="date" id="mi-rabies-reg-date" class="form-control" style="margin-top: 4px; font-weight: 700;">
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding: 8px 12px; border: 1px solid #cbd5e1;">
+                  <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;">
+                    <div>
+                      <strong>Name:</strong>
+                      <input type="text" id="mi-rabies-name" class="form-control" placeholder="Matic, Janeen Arnie" style="margin-top: 4px; font-weight: 700;">
+                    </div>
+                    <div>
+                      <strong>Age:</strong>
+                      <input type="number" id="mi-rabies-age" class="form-control" placeholder="16" style="margin-top: 4px;">
+                    </div>
+                    <div>
+                      <strong>Sex:</strong>
+                      <select id="mi-rabies-sex" class="form-select" style="margin-top: 4px; font-weight: 700;">
+                        <option value="F">F (Female)</option>
+                        <option value="M">M (Male)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="margin-top: 8px;">
+                    <strong>Address:</strong>
+                    <input type="text" id="mi-rabies-address" class="form-control" placeholder="P. Gomez St. Brgy 6 Paete, Lag." style="margin-top: 4px;">
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- HISTORY OF EXPOSURE -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-top: 14px;">
+              === HISTORY OF EXPOSURE (KASAYSAYAN NG PAGKALANTAD) ===
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; border: 1px solid #cbd5e1;">
+              <tr style="background: #ffffff;">
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 50%;">
+                  <strong>Date of Exposure:</strong>
+                  <input type="date" id="mi-rabies-exposure-date" class="form-control" style="margin-top: 4px; font-weight: 700;">
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 50%;">
+                  <strong>Place of Exposure:</strong>
+                  <input type="text" id="mi-rabies-exposure-place" class="form-control" placeholder="e.g. Home, Street, Brgy 6" value="Home" style="margin-top: 4px;">
+                </td>
+              </tr>
+              <tr style="background: #f8fafc;">
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1;">
+                  <strong>Type of Exposure:</strong>
+                  <select id="mi-rabies-exposure-type" class="form-select" style="margin-top: 4px; font-weight: 700;">
+                    <option value="B" selected>B (Bite / Kagat)</option>
+                    <option value="NB">NB (Non-bite / Scratch / Gasgas / Kalmot / Laway)</option>
+                  </select>
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1;">
+                  <strong>Source of Exposure:</strong>
+                  <div style="display: flex; gap: 8px; margin-top: 4px;">
+                    <select id="mi-rabies-exposure-source" class="form-select" style="flex: 1; font-weight: 700;" onchange="onRabiesSourceChange(this.value)">
+                      <option value="Cat" selected>Cat (Pusa)</option>
+                      <option value="Dog">Dog (Aso)</option>
+                      <option value="Stray Dog">Stray Dog (Asong Gala)</option>
+                      <option value="Stray Cat">Stray Cat (Pusang Gala)</option>
+                      <option value="Other">Other...</option>
+                    </select>
+                    <input type="text" id="mi-rabies-source-custom" class="form-control" placeholder="Other source..." style="display: none; width: 130px;">
+                  </div>
+                </td>
+              </tr>
+              <tr style="background: #ffffff;">
+                <td colspan="2" style="padding: 8px 12px; border: 1px solid #cbd5e1;">
+                  <strong style="color: #991b1b;">Category of Exposure:</strong>
+                  <select id="mi-rabies-category" class="form-select" style="margin-top: 4px; font-weight: 800; border-color: #fca5a5; color: #991b1b;">
+                    <option value="Category III" selected>Category III (Single or multiple transdermal bites or scratches, licks on broken skin)</option>
+                    <option value="Category II">Category II (Minor scratches or abrasions without bleeding, nibbling of uncovered skin)</option>
+                    <option value="Category I">Category I (Touching or feeding animals, licks on intact skin)</option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+
+            <!-- POST EXPOSURE PROPHYLAXIS (WASHING & RIG) -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-top: 14px;">
+              === POST EXPOSURE PROPHYLAXIS (PANGANGASIWA SA SUGAT) ===
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; border: 1px solid #cbd5e1;">
+              <tr style="background: #ffffff;">
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 45%;">
+                  <strong>A. Washing of Bite Wound:</strong>
+                  <select id="mi-rabies-washing" class="form-select" style="margin-top: 4px; font-weight: 700;">
+                    <option value="Yes" selected>Yes (Nahugasan ng sabon at tubig ng 10-15 minuto)</option>
+                    <option value="No">No (Hindi nahugasan)</option>
+                  </select>
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 55%;">
+                  <strong>B. RIG (Rabies Immune Globulin):</strong>
+                  <input type="text" id="mi-rabies-rig" class="form-control" placeholder="Dose, IU/kg, Date given, or blank if not indicated" style="margin-top: 4px;">
+                </td>
+              </tr>
+            </table>
+
+            <!-- ANTI-RABIES VACCINE (MULTI-DOSE SCHEDULE) -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+              <span>=== C. ANTI-RABIES VACCINE (BAKUNA AT ISKEDYUL) ===</span>
+              <button type="button" onclick="autoCalculateRabiesSchedule()" style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 4px; font-size: 11px; font-weight: 800; padding: 3px 10px; cursor: pointer;">
+                Auto-fill D3, D7, D14, D28 dates from D0
+              </button>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin-bottom: 6px;">
+              <tr style="background: #f8fafc;">
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 33%;">
+                  <strong>1. Generic name:</strong>
+                  <input type="text" id="mi-rabies-generic-name" class="form-control" value="PVRV" placeholder="e.g. PVRV / PCECV" style="margin-top: 4px; font-weight: 700;">
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 33%;">
+                  <strong>Brand name:</strong>
+                  <input type="text" id="mi-rabies-brand-name" class="form-control" value="Speeda" placeholder="e.g. Speeda / Verorab / Rabipur" style="margin-top: 4px; font-weight: 700;">
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 34%;">
+                  <strong>2. Route:</strong>
+                  <select id="mi-rabies-route" class="form-select" style="margin-top: 4px; font-weight: 700;">
+                    <option value="ID" selected>ID (Intradermal - 0.1 mL 2 sites)</option>
+                    <option value="IM">IM (Intramuscular - 0.5 mL / 1 vial)</option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+
+            <!-- DOSING SCHEDULE GRID -->
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin-bottom: 14px; font-size: 12.5px;">
+              <thead>
+                <tr style="background: #f1f5f9; text-align: left; font-size: 11px; color: #475569; text-transform: uppercase;">
+                  <th style="padding: 6px 12px; border: 1px solid #cbd5e1; width: 25%;">Dose / Day</th>
+                  <th style="padding: 6px 12px; border: 1px solid #cbd5e1; width: 35%;">Date Given</th>
+                  <th style="padding: 6px 12px; border: 1px solid #cbd5e1; width: 40%;">Vaccinator Sign / Initials</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1; font-weight: 800; color: #065f46;">3. D0 (Day 0)</td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="date" id="mi-rabies-d0-date" class="form-control" style="font-size: 12.5px; padding: 5px 8px;" onchange="onRabiesD0Change(this.value)">
+                  </td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="text" id="mi-rabies-d0-sig" class="form-control" placeholder="Initials (e.g. RDD)" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1; font-weight: 800; color: #065f46;">4. D3 (Day 3)</td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="date" id="mi-rabies-d3-date" class="form-control" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="text" id="mi-rabies-d3-sig" class="form-control" placeholder="Initials (e.g. ASD)" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1; font-weight: 800; color: #065f46;">5. D7 (Day 7)</td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="date" id="mi-rabies-d7-date" class="form-control" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="text" id="mi-rabies-d7-sig" class="form-control" placeholder="Initials (e.g. PMK)" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1; font-weight: 800; color: #334155;">D14(IM)</td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="date" id="mi-rabies-d14-date" class="form-control" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="text" id="mi-rabies-d14-sig" class="form-control" placeholder="Initials" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <strong style="color: #334155;">D28/30</strong><br>
+                    <small style="color: #64748b; font-size: 10px; line-height: 1.2; display: block;">(If dog/cat is not alive after 14 days of observation)</small>
+                  </td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="date" id="mi-rabies-d28-date" class="form-control" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                  <td style="padding: 6px 12px; border: 1px solid #cbd5e1;">
+                    <input type="text" id="mi-rabies-d28-sig" class="form-control" placeholder="Initials" style="font-size: 12.5px; padding: 5px 8px;">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- OBSERVATION & REMARKS -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800; margin-top: 14px;">
+              === OBSERVATION &amp; REMARKS (OBSERBASYON SA HAYOP) ===
+            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; border: 1px solid #cbd5e1;">
+              <tr style="background: #fffbeb;">
+                <td colspan="2" style="padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 11.5px; color: #92400e;">
+                  <strong>Reminders from Card:</strong><br>
+                  1. Observe the responsible animal for 14 days, and report to the veterinarian / RHU any changes noted in the animal during the observation period.<br>
+                  2. Your next doses: D3, D7, D14(IM), D30.
+                </td>
+              </tr>
+              <tr style="background: #ffffff;">
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 45%;">
+                  <strong>Status of animal 14 days after exposure:</strong>
+                  <select id="mi-rabies-animal-status" class="form-select" style="margin-top: 4px; font-weight: 600;">
+                    <option value="">-- Under 14-day Observation --</option>
+                    <option value="Alive & Healthy">Alive &amp; Healthy (Buhay at Walang Sintomas)</option>
+                    <option value="Dead">Dead (Namatay sa loob ng 14 araw)</option>
+                    <option value="Killed / Sacrificed">Killed / Sacrificed (Pinatay)</option>
+                    <option value="Lost / Stray / Unknown">Lost / Stray / Unknown (Nawala / Hindi Mahagilap)</option>
+                  </select>
+                </td>
+                <td style="padding: 8px 12px; border: 1px solid #cbd5e1; width: 55%;">
+                  <strong>Remarks:</strong>
+                  <input type="text" id="mi-rabies-remarks" class="form-control" placeholder="e.g. If animal is dead or not found tab 3/2/21" value="If animal is dead or not found tab return on D14/D28" style="margin-top: 4px;">
+                </td>
+              </tr>
+            </table>
+
           </div>
-          <table style="width: 100%; margin-bottom: 6px; border-collapse: collapse;">
-            <tr>
-              <td style="width: 40%; padding: 8px;">
-                <strong>Pangalan ng Nagbakuna (Vaccinator Name / Role):</strong>
-                <input type="text" id="mi-provider-name" class="form-control" placeholder="Nurse / Doctor / BHW Name" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-              <td style="width: 25%; padding: 8px;">
-                <strong>PRC License Number:</strong>
-                <input type="text" id="mi-provider-license" class="form-control" placeholder="e.g. 0123456" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-              <td style="width: 35%; padding: 8px;">
-                <strong>Klinika / Health Center / Ospital:</strong>
-                <input type="text" id="mi-facility-name" class="form-control" value="PAETE RURAL HEALTH UNIT (Paete, Laguna)" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
-              </td>
-            </tr>
-          </table>
+
+          <!-- ═══════════════════════════════════════════════════════════════════════ -->
+          <!-- ROUTINE CHILD & ADULT IMMUNIZATION SECTION                             -->
+          <!-- ═══════════════════════════════════════════════════════════════════════ -->
+          <div id="manual-vax-routine-section" style="display: none;">
+
+            <!-- SECTION 1: DETALYE NG BAKUNA (VACCINE INFORMATION) -->
+            <div class="section-header" style="margin-top: 0; background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800;">
+              === 1. DETALYE NG BAKUNA (VACCINE INFORMATION) ===
+            </div>
+            <table style="width: 100%; margin-bottom: 16px; border-collapse: collapse;">
+              <tr>
+                <td style="width: 50%; padding: 8px;">
+                  <strong>Pangalan ng Bakuna (Vaccine Name):</strong>
+                  <select id="mi-vaccine-select" class="form-select" style="margin-top: 4px; font-size: 13px; font-weight: 600; padding: 6px 10px; width: 100%;" onchange="onManualVaccineSelectChange(this.value)">
+                    <option value="">-- Pumili ng Bakuna (Select Vaccine) --</option>
+                    <optgroup label="EPI / Routine Child Care Vaccines">
+                      <option value="BCG (Bacillus Calmette-Guérin)">BCG (Bacillus Calmette-Guérin)</option>
+                      <option value="Hepatitis B (HepB)">Hepatitis B (HepB Birth Dose / Pediatric)</option>
+                      <option value="Pentavalent (DPT-HepB-Hib)">Pentavalent (DPT-HepB-Hib)</option>
+                      <option value="Oral Polio Vaccine (OPV)">Oral Polio Vaccine (OPV)</option>
+                      <option value="Inactivated Polio Vaccine (IPV)">Inactivated Polio Vaccine (IPV)</option>
+                      <option value="Pneumococcal Conjugate Vaccine (PCV)">Pneumococcal Conjugate Vaccine (PCV)</option>
+                      <option value="Measles, Mumps, Rubella (MMR)">Measles, Mumps, Rubella (MMR)</option>
+                      <option value="Rotavirus Vaccine">Rotavirus Vaccine</option>
+                    </optgroup>
+                    <optgroup label="Adult / Maternal / Special Immunizations">
+                      <option value="Tetanus Toxoid / Td / Tdap">Tetanus Toxoid / Td / Tdap</option>
+                      <option value="Inactivated Influenza (Flu Vaccine)">Inactivated Influenza (Flu Vaccine)</option>
+                      <option value="Pneumococcal Polysaccharide (PPV23 / PCV13)">Pneumococcal Vaccine (Adult PPV23/PCV13)</option>
+                      <option value="Anti-Rabies Vaccine (PVRV / PCECV)">Anti-Rabies Vaccine (PVRV / PCECV)</option>
+                      <option value="Rabies Immunoglobulin (RIG / ERIG)">Rabies Immunoglobulin (RIG / ERIG)</option>
+                      <option value="COVID-19 Vaccine">COVID-19 Vaccine</option>
+                      <option value="Human Papillomavirus (HPV)">Human Papillomavirus (HPV)</option>
+                      <option value="Hepatitis A">Hepatitis A</option>
+                      <option value="Varicella (Chickenpox)">Varicella (Chickenpox)</option>
+                      <option value="OTHER">Other / Custom Vaccine...</option>
+                    </optgroup>
+                  </select>
+                  <input type="text" id="mi-vaccine-custom" class="form-control" placeholder="Ilagay ang partikular na pangalan ng bakuna..." style="display: none; margin-top: 6px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+                <td style="width: 50%; padding: 8px;">
+                  <strong>Uri / Brand at Manufacturer:</strong>
+                  <input type="text" id="mi-vaccine-brand" class="form-control" placeholder="e.g. Vaxigrip Tetra (Sanofi) / Verorab" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px;">
+                  <strong style="color: #b91c1c;">* Batch / Lot Number ng Vial:</strong>
+                  <input type="text" id="mi-lot-number" class="form-control" placeholder="e.g. LOT-AB12345 (Mahalaga para sa batch tracing)" style="margin-top: 4px; font-size: 13px; font-weight: 700; padding: 6px 10px; width: 100%; border: 1.5px solid #cbd5e1;">
+                </td>
+                <td style="padding: 8px;">
+                  <strong>Expiration Date ng Vial:</strong>
+                  <input type="date" id="mi-exp-date" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+              </tr>
+            </table>
+
+            <!-- SECTION 2: DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800;">
+              === 2. DETALYE NG PAGBIBIGAY (ADMINISTRATION DETAILS) ===
+            </div>
+            <table style="width: 100%; margin-bottom: 16px; border-collapse: collapse;">
+              <tr>
+                <td style="width: 35%; padding: 8px;">
+                  <strong>Petsa ng Pagbakuna (Date):</strong>
+                  <input type="date" id="mi-admin-date" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+                <td style="width: 30%; padding: 8px;">
+                  <strong>Oras (Time):</strong>
+                  <input type="time" id="mi-admin-time" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+                <td style="width: 35%; padding: 8px;">
+                  <strong>Numero ng Dosis (Dose #):</strong>
+                  <select id="mi-dose-number" class="form-select" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                    <option value="Dose 1">Dose 1 (Unang Dosis)</option>
+                    <option value="Dose 2">Dose 2 (Pangalawang Dosis)</option>
+                    <option value="Dose 3">Dose 3 (Pangatlong Dosis)</option>
+                    <option value="Dose 4">Dose 4 (Pang-apat na Dosis)</option>
+                    <option value="Booster 1">Booster 1</option>
+                    <option value="Booster 2">Booster 2</option>
+                    <option value="Annual Dose">Taunang Dosis (Annual Dose)</option>
+                    <option value="Single Dose">Single Dose</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px;">
+                  <strong>Saan Itinurok (Injection Site):</strong>
+                  <select id="mi-admin-site" class="form-select" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                    <option value="Left Deltoid (Kaliwang Braso)">Left Deltoid (Kaliwang Braso)</option>
+                    <option value="Right Deltoid (Kanang Braso)">Right Deltoid (Kanang Braso)</option>
+                    <option value="Left Anterolateral Thigh (Kaliwang Hita)">Left Anterolateral Thigh (Kaliwang Hita)</option>
+                    <option value="Right Anterolateral Thigh (Kanang Hita)">Right Anterolateral Thigh (Kanang Hita)</option>
+                    <option value="Oral (Sa Bibig)">Oral (Pumatak sa Bibig)</option>
+                    <option value="Left Gluteal (Kaliwang Puwit)">Left Gluteal</option>
+                    <option value="Right Gluteal (Kanang Puwit)">Right Gluteal</option>
+                    <option value="Other Site">Iba pa (Other Site)</option>
+                  </select>
+                </td>
+                <td style="padding: 8px;">
+                  <strong>Paraan (Route):</strong>
+                  <select id="mi-admin-route" class="form-select" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                    <option value="Intramuscular (IM)">Intramuscular (IM - Sa Kalamnan)</option>
+                    <option value="Subcutaneous (SC)">Subcutaneous (SC - Sa Ilalim ng Balat)</option>
+                    <option value="Intradermal (ID)">Intradermal (ID - Sa Loob ng Balat)</option>
+                    <option value="Oral (PO)">Oral (PO - Pinatak sa Bibig)</option>
+                  </select>
+                </td>
+                <td style="padding: 8px;">
+                  <strong>Dami / Dosis (Dosage):</strong>
+                  <input type="text" id="mi-admin-dosage" class="form-control" placeholder="e.g. 0.5 mL / 0.1 mL / 2 drops" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px;">
+                  <strong>Susunod na Balik (Next Due Date):</strong>
+                  <input type="date" id="mi-next-due-date" class="form-control" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+                <td colspan="2" style="padding: 8px;">
+                  <strong>Adverse Reactions / Remarks:</strong>
+                  <input type="text" id="mi-remarks" class="form-control" placeholder="e.g. No immediate adverse reaction noted / Advised Paracetamol for mild fever" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+              </tr>
+            </table>
+
+            <!-- SECTION 3: IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) -->
+            <div class="section-header" style="background: #065f46; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12.5px; font-weight: 800;">
+              === 3. IMPORMASYON NG NAGBAKUNA (PROVIDER INFORMATION) ===
+            </div>
+            <table style="width: 100%; margin-bottom: 6px; border-collapse: collapse;">
+              <tr>
+                <td style="width: 40%; padding: 8px;">
+                  <strong>Pangalan ng Nagbakuna (Vaccinator Name / Role):</strong>
+                  <input type="text" id="mi-provider-name" class="form-control" placeholder="Nurse / Doctor / BHW Name" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+                <td style="width: 25%; padding: 8px;">
+                  <strong>PRC License Number:</strong>
+                  <input type="text" id="mi-provider-license" class="form-control" placeholder="e.g. 0123456" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+                <td style="width: 35%; padding: 8px;">
+                  <strong>Klinika / Health Center / Ospital:</strong>
+                  <input type="text" id="mi-facility-name" class="form-control" value="PAETE RURAL HEALTH UNIT (Paete, Laguna)" style="margin-top: 4px; font-size: 13px; padding: 6px 10px; width: 100%;">
+                </td>
+              </tr>
+            </table>
+
+          </div>
 
         </div>
 
@@ -3568,6 +3834,75 @@
       }
     }
 
+    let currentManualVaxMode = 'rabies';
+
+    function switchManualVaxMode(mode) {
+      currentManualVaxMode = mode;
+      const rabiesSec = document.getElementById('manual-vax-rabies-section');
+      const routineSec = document.getElementById('manual-vax-routine-section');
+      const btnRabies = document.getElementById('btn-vax-mode-rabies');
+      const btnRoutine = document.getElementById('btn-vax-mode-routine');
+
+      if (mode === 'rabies') {
+        if (rabiesSec) rabiesSec.style.display = 'block';
+        if (routineSec) routineSec.style.display = 'none';
+        if (btnRabies) { btnRabies.classList.add('active'); btnRabies.style.background = '#065f46'; btnRabies.style.color = '#ffffff'; }
+        if (btnRoutine) { btnRoutine.classList.remove('active'); btnRoutine.style.background = '#f1f5f9'; btnRoutine.style.color = '#475569'; }
+      } else {
+        if (rabiesSec) rabiesSec.style.display = 'none';
+        if (routineSec) routineSec.style.display = 'block';
+        if (btnRoutine) { btnRoutine.classList.add('active'); btnRoutine.style.background = '#065f46'; btnRoutine.style.color = '#ffffff'; }
+        if (btnRabies) { btnRabies.classList.remove('active'); btnRabies.style.background = '#f1f5f9'; btnRabies.style.color = '#475569'; }
+      }
+    }
+    window.switchManualVaxMode = switchManualVaxMode;
+
+    function onRabiesSourceChange(val) {
+      const customInput = document.getElementById('mi-rabies-source-custom');
+      if (customInput) {
+        customInput.style.display = (val === 'Other') ? 'inline-block' : 'none';
+        if (val === 'Other') customInput.focus();
+      }
+    }
+    window.onRabiesSourceChange = onRabiesSourceChange;
+
+    function autoCalculateRabiesSchedule() {
+      let d0Input = document.getElementById('mi-rabies-d0-date');
+      let baseDateStr = d0Input && d0Input.value ? d0Input.value : new Date().toISOString().substring(0, 10);
+      if (d0Input && !d0Input.value) d0Input.value = baseDateStr;
+
+      const base = new Date(baseDateStr);
+      if (isNaN(base.getTime())) return;
+
+      const addDays = (d, n) => {
+        const res = new Date(d);
+        res.setDate(res.getDate() + n);
+        return res.toISOString().substring(0, 10);
+      };
+
+      const d3Input = document.getElementById('mi-rabies-d3-date');
+      const d7Input = document.getElementById('mi-rabies-d7-date');
+      const d14Input = document.getElementById('mi-rabies-d14-date');
+      const d28Input = document.getElementById('mi-rabies-d28-date');
+
+      if (d3Input) d3Input.value = addDays(base, 3);
+      if (d7Input) d7Input.value = addDays(base, 7);
+      if (d14Input) d14Input.value = addDays(base, 14);
+      if (d28Input) d28Input.value = addDays(base, 28);
+
+      if (window.showToast) window.showToast('Calculated Day 3, 7, 14, and 28 dates based on Day 0.', 'info');
+    }
+    window.autoCalculateRabiesSchedule = autoCalculateRabiesSchedule;
+
+    function onRabiesD0Change(val) {
+      if (!val) return;
+      const d3Input = document.getElementById('mi-rabies-d3-date');
+      if (d3Input && !d3Input.value) {
+        autoCalculateRabiesSchedule();
+      }
+    }
+    window.onRabiesD0Change = onRabiesD0Change;
+
     function onManualVaccineSelectChange(val) {
       const customInput = document.getElementById('mi-vaccine-custom');
       if (customInput) {
@@ -3586,6 +3921,9 @@
 
       modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
+
+      // Default mode to rabies
+      switchManualVaxMode('rabies');
 
       // Load patients dropdown
       const select = document.getElementById('manual-immunization-patient-select');
@@ -3606,11 +3944,20 @@
         }
       }
 
-      // Default administration date to today and time to now
-      const dateEl = document.getElementById('mi-admin-date');
-      if (dateEl && !dateEl.value) {
-        dateEl.value = new Date().toISOString().substring(0, 10);
-      }
+      // Default dates
+      const todayStr = new Date().toISOString().substring(0, 10);
+      const regDate = document.getElementById('mi-rabies-reg-date');
+      if (regDate && !regDate.value) regDate.value = todayStr;
+
+      const expDate = document.getElementById('mi-rabies-exposure-date');
+      if (expDate && !expDate.value) expDate.value = todayStr;
+
+      const d0Date = document.getElementById('mi-rabies-d0-date');
+      if (d0Date && !d0Date.value) d0Date.value = todayStr;
+
+      const adminDate = document.getElementById('mi-admin-date');
+      if (adminDate && !adminDate.value) adminDate.value = todayStr;
+
       const timeEl = document.getElementById('mi-admin-time');
       if (timeEl && !timeEl.value) {
         const now = new Date();
@@ -3650,6 +3997,22 @@
         document.getElementById('mipi-cpno').textContent = patient.contact_number || patient.cp_no || 'N/A';
         document.getElementById('mipi-address').textContent = patient.address || 'N/A';
       }
+
+      // Prepopulate Rabies PEP demographics
+      const rabiesName = document.getElementById('mi-rabies-name');
+      if (rabiesName) rabiesName.value = fullName;
+
+      const rabiesAge = document.getElementById('mi-rabies-age');
+      if (rabiesAge && patient.age !== undefined && patient.age !== null) rabiesAge.value = patient.age;
+
+      const rabiesSex = document.getElementById('mi-rabies-sex');
+      if (rabiesSex) {
+        const rawSex = String(patient.gender || patient.sex || '').toUpperCase();
+        rabiesSex.value = rawSex.startsWith('M') ? 'M' : 'F';
+      }
+
+      const rabiesAddress = document.getElementById('mi-rabies-address');
+      if (rabiesAddress) rabiesAddress.value = patient.address || '';
     }
 
     function resetManualImmunizationForm() {
@@ -3657,6 +4020,12 @@
       inputs.forEach(i => {
         if (i.type !== 'button' && i.type !== 'submit') {
           if (i.id === 'mi-facility-name') i.value = 'PAETE RURAL HEALTH UNIT (Paete, Laguna)';
+          else if (i.id === 'mi-rabies-abtc') i.value = 'ABTC - Paete RHU';
+          else if (i.id === 'mi-rabies-abtc-address') i.value = 'J. Ramos St. B-2 Paete, Lag.';
+          else if (i.id === 'mi-rabies-generic-name') i.value = 'PVRV';
+          else if (i.id === 'mi-rabies-brand-name') i.value = 'Speeda';
+          else if (i.id === 'mi-rabies-exposure-place') i.value = 'Home';
+          else if (i.id === 'mi-rabies-remarks') i.value = 'If animal is dead or not found tab return on D14/D28';
           else i.value = '';
         }
       });
@@ -3669,6 +4038,9 @@
 
       const customInput = document.getElementById('mi-vaccine-custom');
       if (customInput) customInput.style.display = 'none';
+
+      const customSource = document.getElementById('mi-rabies-source-custom');
+      if (customSource) customSource.style.display = 'none';
 
       const badge = document.getElementById('manual-immunization-patient-badge');
       if (badge) badge.style.display = 'none';
@@ -3690,6 +4062,167 @@
         ? (selectedPatient.full_name || `${selectedPatient.last_name || ''}, ${selectedPatient.first_name || ''} ${selectedPatient.middle_name || ''}`.trim() || selectedPatient.name || '')
         : '';
 
+      if (currentManualVaxMode === 'rabies') {
+        const pName = getVal('mi-rabies-name') || patientFullName;
+        const pAge = getVal('mi-rabies-age') ? parseInt(getVal('mi-rabies-age'), 10) : (selectedPatient ? selectedPatient.age : null);
+        const pSex = getVal('mi-rabies-sex') || (selectedPatient ? (selectedPatient.gender || selectedPatient.sex) : 'F');
+        const pAddr = getVal('mi-rabies-address') || (selectedPatient ? selectedPatient.address : '');
+
+        const abtcName = getVal('mi-rabies-abtc') || 'ABTC - Paete RHU';
+        const abtcAddr = getVal('mi-rabies-abtc-address') || 'J. Ramos St. B-2 Paete, Lag.';
+        const regNo = getVal('mi-rabies-reg-no');
+        const regDate = getVal('mi-rabies-reg-date') || new Date().toISOString().substring(0, 10);
+
+        const expDate = getVal('mi-rabies-exposure-date') || regDate;
+        const expPlace = getVal('mi-rabies-exposure-place') || 'Home';
+        const expType = getVal('mi-rabies-exposure-type') || 'B';
+        const rawSource = getVal('mi-rabies-exposure-source') || 'Cat';
+        const expSource = (rawSource === 'Other') ? (getVal('mi-rabies-source-custom') || 'Other') : rawSource;
+        const expCategory = getVal('mi-rabies-category') || 'Category III';
+
+        const washing = getVal('mi-rabies-washing') || 'Yes';
+        const rig = getVal('mi-rabies-rig');
+
+        const genericName = getVal('mi-rabies-generic-name') || 'PVRV';
+        const brandName = getVal('mi-rabies-brand-name') || 'Speeda';
+        const route = getVal('mi-rabies-route') || 'ID';
+
+        const d0Date = getVal('mi-rabies-d0-date') || regDate;
+        const d0Sig = getVal('mi-rabies-d0-sig');
+        const d3Date = getVal('mi-rabies-d3-date');
+        const d3Sig = getVal('mi-rabies-d3-sig');
+        const d7Date = getVal('mi-rabies-d7-date');
+        const d7Sig = getVal('mi-rabies-d7-sig');
+        const d14Date = getVal('mi-rabies-d14-date');
+        const d14Sig = getVal('mi-rabies-d14-sig');
+        const d28Date = getVal('mi-rabies-d28-date');
+        const d28Sig = getVal('mi-rabies-d28-sig');
+
+        const animalStatus = getVal('mi-rabies-animal-status') || '';
+        const remarks = getVal('mi-rabies-remarks') || 'If animal is dead or not found tab return on D14/D28';
+
+        const immunizationEntries = [];
+        if (d0Date) {
+          immunizationEntries.push({
+            vaccine: `Anti-Rabies (${genericName}) - ${brandName}`,
+            dose: 'Day 0',
+            date: d0Date,
+            route: route,
+            vaccinator: d0Sig,
+            facility: abtcName
+          });
+        }
+        if (d3Date) {
+          immunizationEntries.push({
+            vaccine: `Anti-Rabies (${genericName}) - ${brandName}`,
+            dose: 'Day 3',
+            date: d3Date,
+            route: route,
+            vaccinator: d3Sig,
+            facility: abtcName
+          });
+        }
+        if (d7Date) {
+          immunizationEntries.push({
+            vaccine: `Anti-Rabies (${genericName}) - ${brandName}`,
+            dose: 'Day 7',
+            date: d7Date,
+            route: route,
+            vaccinator: d7Sig,
+            facility: abtcName
+          });
+        }
+        if (d14Date) {
+          immunizationEntries.push({
+            vaccine: `Anti-Rabies (${genericName}) - ${brandName}`,
+            dose: 'Day 14 (IM)',
+            date: d14Date,
+            route: 'IM',
+            vaccinator: d14Sig,
+            facility: abtcName
+          });
+        }
+        if (d28Date) {
+          immunizationEntries.push({
+            vaccine: `Anti-Rabies (${genericName}) - ${brandName}`,
+            dose: 'Day 28/30',
+            date: d28Date,
+            route: route,
+            vaccinator: d28Sig,
+            facility: abtcName
+          });
+        }
+
+        return {
+          header: {
+            country: 'Republic of the Philippines',
+            department: 'Department of Health',
+            program: 'National Rabies Prevention and Control Program',
+            center: 'Animal Bite Treatment Center',
+            facility: abtcName,
+            facility_address: abtcAddr,
+            form_title: 'Rabies Post-Exposure Prophylaxis Card',
+            record_type: 'IMMUNIZATION_RECORD',
+            record_subtype: 'RABIES_PEP'
+          },
+          registration: {
+            registration_no: regNo,
+            date_registered: regDate
+          },
+          patient_demographics: {
+            name: pName,
+            patient_number: selectedPatient ? (selectedPatient.patient_number || '') : '',
+            age: pAge,
+            gender: pSex,
+            sex: pSex,
+            address: pAddr,
+            contact_number: selectedPatient ? (selectedPatient.contact_number || selectedPatient.cp_no || '') : ''
+          },
+          rabies_exposure: {
+            date_of_exposure: expDate,
+            place_of_exposure: expPlace,
+            type_of_exposure: expType,
+            source_of_exposure: expSource,
+            category_of_exposure: expCategory
+          },
+          post_exposure_prophylaxis: {
+            washing_of_bite_wound: washing,
+            rig: rig
+          },
+          vaccine_information: {
+            vaccine_name: `Anti-Rabies Vaccine (${genericName})`,
+            generic_name: genericName,
+            brand_and_manufacturer: brandName,
+            route: route
+          },
+          administration_details: {
+            date_administered: d0Date,
+            dose_number: 'Day 0',
+            route_of_administration: route,
+            next_due_date: d3Date,
+            remarks_adverse_reactions: remarks
+          },
+          provider_information: {
+            vaccinator_name: d0Sig || 'ABTC Staff',
+            facility_name: abtcName
+          },
+          pep_schedule: {
+            d0: { day: 'D0', date: d0Date, signature: d0Sig },
+            d3: { day: 'D3', date: d3Date, signature: d3Sig },
+            d7: { day: 'D7', date: d7Date, signature: d7Sig },
+            d14: { day: 'D14(IM)', date: d14Date, signature: d14Sig },
+            d28_30: { day: 'D28/30', date: d28Date, signature: d28Sig, note: 'If dog/cat is not alive after 14 days of observation' }
+          },
+          animal_observation: {
+            reminder: 'Observe the responsible animal for 14 days, and report to the veterinarian/RHU any changes noted in the animal during the observation period.',
+            status_14_days: animalStatus,
+            remarks: remarks
+          },
+          immunization_entries: immunizationEntries
+        };
+      }
+
+      // Routine Immunization Data Collection
       const vacSelectVal = getVal('mi-vaccine-select');
       const vacCustom = getVal('mi-vaccine-custom');
       const vaccineName = (vacSelectVal === 'OTHER' || !vacSelectVal) ? (vacCustom || vacSelectVal) : vacSelectVal;
@@ -3770,14 +4303,23 @@
         return;
       }
 
-      const vacSelect = document.getElementById('mi-vaccine-select');
-      const vacCustom = document.getElementById('mi-vaccine-custom');
-      const vacName = (vacSelect && vacSelect.value === 'OTHER') ? (vacCustom && vacCustom.value.trim()) : (vacSelect ? vacSelect.value.trim() : '');
+      if (currentManualVaxMode === 'routine') {
+        const vacSelect = document.getElementById('mi-vaccine-select');
+        const vacCustom = document.getElementById('mi-vaccine-custom');
+        const vacName = (vacSelect && vacSelect.value === 'OTHER') ? (vacCustom && vacCustom.value.trim()) : (vacSelect ? vacSelect.value.trim() : '');
 
-      if (!vacName) {
-        if (window.showToast) window.showToast('Please specify the Vaccine Name (Pangalan ng Bakuna).', 'error');
-        else alert('Please specify the Vaccine Name (Pangalan ng Bakuna).');
-        return;
+        if (!vacName) {
+          if (window.showToast) window.showToast('Please specify the Vaccine Name (Pangalan ng Bakuna).', 'error');
+          else alert('Please specify the Vaccine Name (Pangalan ng Bakuna).');
+          return;
+        }
+      } else {
+        const d0 = document.getElementById('mi-rabies-d0-date');
+        const exp = document.getElementById('mi-rabies-exposure-date');
+        if (!d0 || (!d0.value && (!exp || !exp.value))) {
+          if (window.showToast) window.showToast('Please enter Date of Exposure or Day 0 Administration Date.', 'warning');
+          return;
+        }
       }
 
       const saveBtn = document.getElementById('btn-save-manual-immunization');
@@ -3791,7 +4333,8 @@
         const structuredData = collectManualImmunizationData();
         const selectedPatient = allPatientsCache.find(p => p.id === patientId);
         const pNum = selectedPatient && selectedPatient.patient_number ? selectedPatient.patient_number : patientId.substring(0, 8);
-        const fileName = `Immunization_Manual_${pNum}_${Date.now()}.pdf`;
+        const filePrefix = (currentManualVaxMode === 'rabies') ? 'Rabies_PEP_ABTC' : 'Immunization_Manual';
+        const fileName = `${filePrefix}_${pNum}_${Date.now()}.pdf`;
 
         const payload = {
           patient_id: patientId,
@@ -3806,7 +4349,10 @@
         });
 
         if (res && res.success) {
-          if (window.showToast) window.showToast('Immunization Record successfully filed and saved!', 'success');
+          const successMsg = (currentManualVaxMode === 'rabies') 
+            ? 'Rabies Post-Exposure Prophylaxis Card successfully filed and saved!' 
+            : 'Immunization Record successfully filed and saved!';
+          if (window.showToast) window.showToast(successMsg, 'success');
           closeManualImmunizationModal();
           // Reload documents list
           await fetchDocuments();
@@ -4429,6 +4975,10 @@
     window.resetManualImmunizationForm = resetManualImmunizationForm;
     window.collectManualImmunizationData = collectManualImmunizationData;
     window.submitManualImmunization = submitManualImmunization;
+    window.switchManualVaxMode = switchManualVaxMode;
+    window.autoCalculateRabiesSchedule = autoCalculateRabiesSchedule;
+    window.onRabiesD0Change = onRabiesD0Change;
+    window.onRabiesSourceChange = onRabiesSourceChange;
     window.openManualMedCertModal = openManualMedCertModal;
     window.closeManualMedCertModal = closeManualMedCertModal;
     window.onManualMedCertPatientSelected = onManualMedCertPatientSelected;
