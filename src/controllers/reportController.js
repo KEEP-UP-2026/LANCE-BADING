@@ -6,7 +6,7 @@ const { shouldLogOnce, buildReportAccessKey, buildAuditLogsAccessKey } = require
 const { resolveAuditActor } = require('../utils/auditDisplay');
 
 const ALLOWED_REPORT_TYPES = new Set([
-  'overview', 'patients', 'consultations', 'immunizations', 'anti-rabies',
+  'overview', 'patients', 'consultations', 'immunizations',
   'maternal-care', 'duplicates', 'summary', 'stats', 'data'
 ]);
 
@@ -265,7 +265,6 @@ const ReportController = {
 
       const consultations = filteredRecords.filter(r => r.record_type === 'CONSULTATION_RECORD' && r.status === 'ACTIVE').map(mapRecord);
       const immunizations = filteredRecords.filter(r => r.record_type === 'IMMUNIZATION_RECORD' && r.status === 'ACTIVE').map(mapRecord);
-      const antiRabies = filteredRecords.filter(r => r.record_type === 'ANTI_RABIES_RECORD' && r.status === 'ACTIVE').map(mapRecord);
       const maternalCares = filteredRecords.filter(r => r.record_type === 'MATERNAL_CARE_RECORD' && r.status === 'ACTIVE').map(mapRecord);
       const allActiveRecords = filteredRecords.filter(r => r.status === 'ACTIVE').map(mapRecord);
 
@@ -302,7 +301,6 @@ const ReportController = {
           patientSummary,
           consultations,
           immunizations,
-          antiRabies,
           maternalCares,
           allRecords: allActiveRecords,
           duplicateSummary

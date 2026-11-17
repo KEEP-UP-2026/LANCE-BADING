@@ -1,0 +1,114 @@
+INDIVIDUAL TREATMENT RECORD (ITR)
+Title
+- Individual Treatment Record
+- 20 Years old and above
+
+FRONT PAGE
+1. PATIENT INFORMATION:
+- Name:
+- Address:
+- Birthday:
+- Age:
+- Educational Attainment:
+- Philhealth No.:
+- Civil Status:
+- CP No.:
+- BHW:
+
+2. SMOKING CESSATION PROFILE:
+Smokers?
+- Current
+- Passive
+- Never
+- Stopped > a year
+- Stopped < a year
+Smoking Details:
+- Brand of Cigarette?
+- How many stick per day?
+- Age started?
+- No of years smoking?
+- Reason for smoking?
+Smoking-Related Assessment:
+- Have you experienced side effect or illness brought by smoking?
+  - YES
+  - NO
+- If yes What effect?
+- Try quitting before?
+  - YES
+  - NO
+- If yes why were not successful?
+
+3. FAMILY HISTORY:
+Family History: Does pt. have 1st degree relative with
+- Hypertension
+- Stroke
+- Heart Attack
+- DM
+- Asthma
+- Cancer
+- Kidney Disease
+Additional Fields:
+- Co-Morbid:
+- Allergy:
+
+4. ALCOHOL INTAKE:
+- Never Consumed
+- Yes, drinks alcohol
+Excessive Alcohol Intake:
+- In the past mos., had 5 drinks in one occasion
+  - YES
+  - NO
+
+5. PHYSICAL ACTIVITY:
+- Does at least 2 ½ hours a week of moderate intensity physical activity
+  - YES
+  - NO
+
+6. HIGH FAT / HIGH SALT FOOD INTAKE:
+- Eats processed / Fast foods and inihaw weekly
+  - YES
+  - NO
+
+7. DIETARY FIBER INTAKE:
+3 servings of vegetables daily
+- YES
+- NO
+2-3 servings of fruits daily
+- YES
+- NO
+
+8. BODY MEASUREMENTS:
+- BMI:
+- Waistline (cm):
+- HT (cm):
+- WEIGHT (kg):
+
+9. RAISED BP:
+- 1ST READING (mmHg):
+- 2ND READING (mmHg):
+
+10. INDIVIDUAL TREATMENT RECORD:
+Treatment Record Table:
+- Date
+- Subjective Findings
+- Objective Findings
+- Assessment Diagnosis
+- Plan/Treatment Plan
+Objective Findings:
+- Risk Level
+- Percentage of Risk
+Risk Classification:
+- Low
+- Mild
+- Medium
+- High
+- Very High
+Patient Measurements:
+- AGE:
+- WT:
+- HT:
+- BP:
+Plan/Treatment Plan:
+- NCD risk assessment done.
+- Profiling of Smoking Cessation done.
+

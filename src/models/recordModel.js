@@ -68,7 +68,21 @@ const RecordModel = {
 
     if (isSupabase) {
       try {
-        let supabasePayload = { ...newRecord };
+        const VALID_COLUMNS = [
+          'id', 'patient_id', 'record_type', 'file_name', 'file_url',
+          'file_path', 'file_type', 'extracted_text', 'classification_result',
+          'uploaded_by', 'status', 'created_at', 'updated_at',
+          'layout_blocks', 'structured_json'
+        ];
+        let supabasePayload = {};
+        for (const col of VALID_COLUMNS) {
+          if (col in newRecord && newRecord[col] !== undefined) {
+            supabasePayload[col] = newRecord[col];
+          }
+        }
+        if (!supabasePayload.classification_result && newRecord.category) {
+          supabasePayload.classification_result = newRecord.category;
+        }
 
         let { data, error } = await dbClient
           .from('patient_records')

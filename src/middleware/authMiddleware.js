@@ -10,11 +10,11 @@ function getDashboardPath(role) {
     case 'RHU_ADMINISTRATOR':
       return '/dashboard/admin';
     case 'RECORDS_STAFF':
-      return '/dashboard/records';
+      return '/dashboard/patients';
     case 'HEALTHCARE_PERSONNEL':
-      return '/dashboard/healthcare';
+      return '/dashboard/patients';
     case 'ADMINISTRATIVE_STAFF':
-      return '/dashboard/administrative';
+      return '/dashboard/reports';
     default:
       return '/login';
   }

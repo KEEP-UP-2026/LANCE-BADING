@@ -22,6 +22,23 @@ function writeLocalData(data) {
   }
 }
 
+// Helper to detect if Supabase table is missing or network/DNS is offline
+function isFallbackError(err) {
+  if (!err) return false;
+  const msg = (err.message || '').toLowerCase();
+  const details = (err.details || '').toLowerCase();
+  return (
+    err.code === 'PGRST205' ||
+    msg.includes('could not find the table') ||
+    msg.includes('fetch failed') ||
+    msg.includes('enotfound') ||
+    msg.includes('econnrefused') ||
+    msg.includes('etimedout') ||
+    details.includes('fetch failed') ||
+    details.includes('enotfound')
+  );
+}
+
 const TemporaryUploadModel = {
   // Create a temporary upload record
   async create(tempData) {
@@ -39,7 +56,7 @@ const TemporaryUploadModel = {
           .single();
 
         if (error) {
-          if (error.code === 'PGRST205' || (error.message && error.message.includes('Could not find the table'))) {
+          if (isFallbackError(error)) {
             return this.writeLocalTemp(newTemp);
           }
           console.error('Supabase create temporary upload error:', error);
@@ -47,7 +64,7 @@ const TemporaryUploadModel = {
         }
         return data;
       } catch (err) {
-        if (err.code === 'PGRST205' || (err.message && err.message.includes('Could not find the table'))) {
+        if (isFallbackError(err)) {
           return this.writeLocalTemp(newTemp);
         }
         throw err;
@@ -79,7 +96,7 @@ const TemporaryUploadModel = {
           .maybeSingle();
 
         if (error) {
-          if (error.code === 'PGRST205' || (error.message && error.message.includes('Could not find the table'))) {
+          if (isFallbackError(error)) {
             return this.readLocalTempByToken(token);
           }
           console.error('Supabase find temporary upload by token error:', error);
@@ -87,7 +104,7 @@ const TemporaryUploadModel = {
         }
         return data;
       } catch (err) {
-        if (err.code === 'PGRST205' || (err.message && err.message.includes('Could not find the table'))) {
+        if (isFallbackError(err)) {
           return this.readLocalTempByToken(token);
         }
         throw err;
@@ -114,7 +131,7 @@ const TemporaryUploadModel = {
           .select();
 
         if (error) {
-          if (error.code === 'PGRST205' || (error.message && error.message.includes('Could not find the table'))) {
+          if (isFallbackError(error)) {
             return this.updateLocalTempByToken(token, updates);
           }
           console.error('Supabase update temporary upload by token error:', error);
@@ -122,7 +139,7 @@ const TemporaryUploadModel = {
         }
         return data;
       } catch (err) {
-        if (err.code === 'PGRST205' || (err.message && err.message.includes('Could not find the table'))) {
+        if (isFallbackError(err)) {
           return this.updateLocalTempByToken(token, updates);
         }
         throw err;
@@ -156,7 +173,7 @@ const TemporaryUploadModel = {
           .select();
 
         if (error) {
-          if (error.code === 'PGRST205' || (error.message && error.message.includes('Could not find the table'))) {
+          if (isFallbackError(error)) {
             return this.deleteLocalTempByToken(token);
           }
           console.error('Supabase delete temporary upload by token error:', error);
@@ -164,7 +181,7 @@ const TemporaryUploadModel = {
         }
         return data;
       } catch (err) {
-        if (err.code === 'PGRST205' || (err.message && err.message.includes('Could not find the table'))) {
+        if (isFallbackError(err)) {
           return this.deleteLocalTempByToken(token);
         }
         throw err;
@@ -196,7 +213,7 @@ const TemporaryUploadModel = {
           .lt('created_at', threshold);
 
         if (selectError) {
-          if (selectError.code === 'PGRST205' || (selectError.message && selectError.message.includes('Could not find the table'))) {
+          if (isFallbackError(selectError)) {
             return this.deleteLocalTempExpired(threshold);
           }
           console.error('Supabase select expired temporary uploads error:', selectError);
@@ -210,6 +227,9 @@ const TemporaryUploadModel = {
             .lt('created_at', threshold);
 
           if (deleteError) {
+            if (isFallbackError(deleteError)) {
+              return this.deleteLocalTempExpired(threshold);
+            }
             console.error('Supabase delete expired temporary uploads error:', deleteError);
             throw deleteError;
           }
@@ -217,7 +237,7 @@ const TemporaryUploadModel = {
 
         return expiredList || [];
       } catch (err) {
-        if (err.code === 'PGRST205' || (err.message && err.message.includes('Could not find the table'))) {
+        if (isFallbackError(err)) {
           return this.deleteLocalTempExpired(threshold);
         }
         throw err;

@@ -82,13 +82,13 @@ const AuthController = {
           redirectUrl = '/dashboard/admin';
           break;
         case 'RECORDS_STAFF':
-          redirectUrl = '/dashboard/records';
+          redirectUrl = '/dashboard/patients';
           break;
         case 'HEALTHCARE_PERSONNEL':
-          redirectUrl = '/dashboard/healthcare';
+          redirectUrl = '/dashboard/patients';
           break;
         case 'ADMINISTRATIVE_STAFF':
-          redirectUrl = '/dashboard/administrative';
+          redirectUrl = '/dashboard/reports';
           break;
       }
 

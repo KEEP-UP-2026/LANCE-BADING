@@ -282,10 +282,13 @@
       });
 
       // Client-Side Search
-      document.getElementById('search-users').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        filterUsers(query);
-      });
+      const searchUsers = document.getElementById('search-users');
+      if (searchUsers) {
+        searchUsers.addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase().trim();
+          filterUsers(query);
+        });
+      }
     });
 
     // Fetch users and render in table

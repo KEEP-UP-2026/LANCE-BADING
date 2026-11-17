@@ -171,6 +171,184 @@
       font-size: 13px;
       margin: 0;
     }
+
+    /* ── Archives Action Modals (Confirm, Loading, Success) ── */
+    @keyframes modalScaleUp {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .record-modal-overlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(15, 23, 42, 0.65) !important;
+      backdrop-filter: blur(4px) !important;
+      z-index: 99999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 16px !important;
+      box-sizing: border-box !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+
+    .record-modal-overlay.active {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+    }
+
+    .record-modal-overlay[style*="display: none"],
+    .record-modal-overlay.hidden {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .record-modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      box-sizing: border-box;
+      animation: modalScaleUp 0.18s ease-out;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .record-modal-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+    .record-modal-icon-wrap.warning {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    .record-modal-icon-wrap.success {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    .record-modal-icon-wrap.info {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .record-modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .record-modal-desc {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.55;
+      margin: 0 0 20px 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .record-modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .record-modal-btn {
+      flex: 1;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      font-family: inherit;
+      border: none;
+    }
+
+    .record-modal-btn.cancel {
+      background: #ffffff;
+      color: #475569;
+      border: 1.5px solid #cbd5e1;
+    }
+    .record-modal-btn.cancel:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    .record-modal-btn.confirm-danger {
+      background: #dc2626;
+      color: #ffffff;
+      border: 1.5px solid #dc2626;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+    }
+    .record-modal-btn.confirm-danger:hover {
+      background: #b91c1c;
+      border-color: #b91c1c;
+    }
+
+    .record-modal-btn.confirm-primary {
+      background: #16a34a;
+      color: #ffffff;
+      border: 1.5px solid #16a34a;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+    }
+    .record-modal-btn.confirm-primary:hover {
+      background: #15803d;
+      border-color: #15803d;
+    }
+
+    .record-modal-btn.success-ok {
+      background: #16a34a;
+      color: #ffffff;
+      border: 1.5px solid #16a34a;
+      min-width: 140px;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+    }
+    .record-modal-btn.success-ok:hover {
+      background: #15803d;
+      border-color: #15803d;
+    }
+
+    .record-modal-spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #f1f5f9;
+      border-top-color: #dc2626;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 14px auto;
+    }
   </style>
 </head>
 <body>
@@ -323,6 +501,55 @@
           </div>
         </div>
       </div>
+
+      <!-- ── 1. Archives Confirmation Modal ── -->
+      <div id="archives-confirm-modal" class="record-modal-overlay hidden" style="display: none; pointer-events: none;">
+        <div class="record-modal-card">
+          <div id="archives-confirm-icon" class="record-modal-icon-wrap warning">
+            <svg id="archives-confirm-icon-svg" viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: currentColor;">
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+          </div>
+          <h3 id="archives-confirm-title" class="record-modal-title">Confirm Action</h3>
+          <p id="archives-confirm-desc" class="record-modal-desc" style="margin-bottom: 24px;">
+            Are you sure you want to proceed?
+          </p>
+
+          <div class="record-modal-actions">
+            <button type="button" class="record-modal-btn cancel" onclick="closeArchivesConfirmModal()">Cancel</button>
+            <button type="button" class="record-modal-btn confirm-danger" id="archives-confirm-action-btn" onclick="executeArchivesConfirmedAction()">Confirm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 2. Archives Loading Modal ── -->
+      <div id="archives-loading-modal" class="record-modal-overlay hidden" style="display: none; pointer-events: none;">
+        <div class="record-modal-card">
+          <div class="record-modal-spinner" id="archives-loading-spinner"></div>
+          <h3 id="archives-loading-title" class="record-modal-title" style="margin-top: 14px;">Processing...</h3>
+          <p id="archives-loading-desc" class="record-modal-desc" style="margin-bottom: 0;">
+            Please wait while your request is being processed...
+          </p>
+        </div>
+      </div>
+
+      <!-- ── 3. Archives Success Modal ── -->
+      <div id="archives-success-modal" class="record-modal-overlay hidden" style="display: none; pointer-events: none;">
+        <div class="record-modal-card">
+          <div class="record-modal-icon-wrap success">
+            <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: currentColor;">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
+          <h3 id="archives-success-title" class="record-modal-title" style="color: #16a34a;">Success</h3>
+          <p id="archives-success-desc" class="record-modal-desc" style="margin-bottom: 20px;">
+            The action completed successfully.
+          </p>
+          <div class="record-modal-actions" style="justify-content: center;">
+            <button type="button" class="record-modal-btn success-ok" onclick="closeArchivesSuccessModal()">OK</button>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -349,20 +576,59 @@
       await Promise.all([fetchArchivedPatients(), fetchArchivedRecords()]);
 
       // Search listeners
-      document.getElementById('search-archived-patients').addEventListener('input', e => {
-        filterTable('patients', e.target.value.toLowerCase().trim());
-      });
-      document.getElementById('search-archived-records').addEventListener('input', e => {
-        filterTable('records', e.target.value.toLowerCase().trim());
-      });
+      const patInput = document.getElementById('search-archived-patients');
+      if (patInput) {
+        patInput.addEventListener('input', e => {
+          filterTable('patients', e.target.value.toLowerCase().trim());
+        });
+      }
+      const recInput = document.getElementById('search-archived-records');
+      if (recInput) {
+        recInput.addEventListener('input', e => {
+          filterTable('records', e.target.value.toLowerCase().trim());
+        });
+      }
+
+      // Attach direct click listeners to tabs
+      const btnPatients = document.getElementById('tab-btn-patients');
+      if (btnPatients) {
+        btnPatients.addEventListener('click', (e) => {
+          e.preventDefault();
+          switchTab('patients');
+        });
+      }
+      const btnRecords = document.getElementById('tab-btn-records');
+      if (btnRecords) {
+        btnRecords.addEventListener('click', (e) => {
+          e.preventDefault();
+          switchTab('records');
+        });
+      }
     });
 
     function switchTab(tab) {
       activeTab = tab;
       document.querySelectorAll('.archive-tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.getElementById(`tab-btn-${tab}`).classList.add('active');
-      document.getElementById(`panel-${tab}`).classList.add('active');
+      const tabBtn = document.getElementById(`tab-btn-${tab}`);
+      if (tabBtn) tabBtn.classList.add('active');
+      const panel = document.getElementById(`panel-${tab}`);
+      if (panel) panel.classList.add('active');
+    }
+    window.switchTab = switchTab;
+
+    function updatePatientCountBadge(count) {
+      const b = document.getElementById('patients-count-badge');
+      if (b) b.textContent = count;
+      const s = document.getElementById('stat-total-archived-patients');
+      if (s) s.textContent = `${count} archived patient${count !== 1 ? 's' : ''}`;
+    }
+
+    function updateRecordCountBadge(count) {
+      const b = document.getElementById('records-count-badge');
+      if (b) b.textContent = count;
+      const s = document.getElementById('stat-total-archived-records');
+      if (s) s.textContent = `${count} archived document${count !== 1 ? 's' : ''}`;
     }
 
     async function fetchArchivedPatients() {
@@ -371,11 +637,11 @@
         if (res && res.success) {
           allArchivedPatients = res.patients || [];
           renderArchivedPatients(allArchivedPatients);
-          document.getElementById('patients-count-badge').textContent = allArchivedPatients.length;
-          document.getElementById('stat-total-archived-patients').textContent = `${allArchivedPatients.length} archived patient${allArchivedPatients.length !== 1 ? 's' : ''}`;
+          updatePatientCountBadge(allArchivedPatients.length);
         }
       } catch (err) {
-        document.getElementById('archived-patients-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--color-danger);padding:40px;">Failed to load archived patients.</td></tr>`;
+        const tbody = document.getElementById('archived-patients-tbody');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--color-danger);padding:40px;">Failed to load archived patients.</td></tr>`;
       }
     }
 
@@ -385,16 +651,17 @@
         if (res && res.success) {
           allArchivedRecords = res.records || [];
           renderArchivedRecords(allArchivedRecords);
-          document.getElementById('records-count-badge').textContent = allArchivedRecords.length;
-          document.getElementById('stat-total-archived-records').textContent = `${allArchivedRecords.length} archived document${allArchivedRecords.length !== 1 ? 's' : ''}`;
+          updateRecordCountBadge(allArchivedRecords.length);
         }
       } catch (err) {
-        document.getElementById('archived-records-tbody').innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--color-danger);padding:40px;">Failed to load archived documents.</td></tr>`;
+        const tbody = document.getElementById('archived-records-tbody');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--color-danger);padding:40px;">Failed to load archived documents.</td></tr>`;
       }
     }
 
     function renderArchivedPatients(list) {
       const tbody = document.getElementById('archived-patients-tbody');
+      if (!tbody) return;
       if (list.length === 0) {
         tbody.innerHTML = `
           <tr><td colspan="7">
@@ -436,6 +703,7 @@
 
     function renderArchivedRecords(list) {
       const tbody = document.getElementById('archived-records-tbody');
+      if (!tbody) return;
       if (list.length === 0) {
         tbody.innerHTML = `
           <tr><td colspan="6">
@@ -459,10 +727,13 @@
             <td style="color:var(--text-muted);font-size:13px;">${formatDate(r.updated_at || r.created_at)}</td>
             <td>
               <div class="action-icons-group">
-                <button onclick="handleRestoreRecord('${r.id}')" class="action-icon-btn btn-restore" title="Restore Document">
+                <a href="/dashboard/records/view/${r.id}?from=/dashboard/archives" class="action-icon-btn btn-view" title="View Document">
+                  <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                </a>
+                <button onclick="handleRestoreRecord('${r.id}', '${escapeJs(r.file_name || r.original_filename || 'this document')}')" class="action-icon-btn btn-restore" title="Restore Document">
                   <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
                 </button>
-                <button onclick="handleDeleteRecord('${r.id}')" class="action-icon-btn btn-delete" title="Permanently Delete Document">
+                <button onclick="handleDeleteRecord('${r.id}', '${escapeJs(r.file_name || r.original_filename || 'this document')}')" class="action-icon-btn btn-delete" title="Permanently Delete Document">
                   <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                 </button>
               </div>
@@ -491,73 +762,270 @@
       }
     }
 
-    // ===== Patient Actions =====
-    async function handleRestorePatient(id, name) {
-      if (!confirm(`Restore patient "${name}" back to the active directory?`)) return;
-      try {
-        const res = await API.fetchJson(`/api/patients/${id}/restore`, { method: 'PUT' });
-        if (res && res.success) {
-          showToast(res.message || 'Patient restored successfully.', 'success');
-          allArchivedPatients = allArchivedPatients.filter(p => p.id !== id);
-          renderArchivedPatients(allArchivedPatients);
-          document.getElementById('patients-count-badge').textContent = allArchivedPatients.length;
-          document.getElementById('stat-total-archived-patients').textContent = `${allArchivedPatients.length} archived patient${allArchivedPatients.length !== 1 ? 's' : ''}`;
-        }
-      } catch (err) {
-        showToast(err.message || 'Failed to restore patient.', 'error');
+    // ===== Archives Modal Management (No browser alerts) =====
+    let pendingArchivesAction = null;
+
+    function openArchivesConfirmModal({
+      title,
+      desc,
+      iconType, // 'warning' | 'info'
+      iconSvg,
+      confirmBtnText,
+      confirmBtnClass, // 'confirm-danger' | 'confirm-primary'
+      onConfirm
+    }) {
+      pendingArchivesAction = onConfirm;
+      const titleEl = document.getElementById('archives-confirm-title');
+      if (titleEl) titleEl.textContent = title;
+
+      const descEl = document.getElementById('archives-confirm-desc');
+      if (descEl) descEl.innerHTML = desc;
+
+      const iconWrap = document.getElementById('archives-confirm-icon');
+      if (iconWrap) iconWrap.className = 'record-modal-icon-wrap ' + (iconType || 'warning');
+
+      const iconSvgEl = document.getElementById('archives-confirm-icon-svg');
+      if (iconSvgEl) iconSvgEl.innerHTML = iconSvg || '';
+
+      const confirmBtn = document.getElementById('archives-confirm-action-btn');
+      if (confirmBtn) {
+        confirmBtn.textContent = confirmBtnText || 'Confirm';
+        confirmBtn.className = 'record-modal-btn ' + (confirmBtnClass || 'confirm-primary');
+      }
+
+      const modal = document.getElementById('archives-confirm-modal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.classList.remove('hidden');
+        modal.style.removeProperty('display');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
       }
     }
 
-    async function handleDeletePatient(id, name) {
-      if (!confirm(`PERMANENTLY DELETE patient "${name}"?\n\nThis action CANNOT be undone. All patient data will be erased.`)) return;
-      if (!confirm(`Final confirmation: Delete "${name}" permanently?`)) return;
-      try {
-        const res = await API.fetchJson(`/api/patients/${id}`, { method: 'DELETE' });
-        if (res && res.success) {
-          showToast(res.message || 'Patient permanently deleted.', 'success');
-          allArchivedPatients = allArchivedPatients.filter(p => p.id !== id);
-          renderArchivedPatients(allArchivedPatients);
-          document.getElementById('patients-count-badge').textContent = allArchivedPatients.length;
-          document.getElementById('stat-total-archived-patients').textContent = `${allArchivedPatients.length} archived patient${allArchivedPatients.length !== 1 ? 's' : ''}`;
-        }
-      } catch (err) {
-        showToast(err.message || 'Failed to delete patient.', 'error');
+    function closeArchivesConfirmModal() {
+      const modal = document.getElementById('archives-confirm-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
       }
+      pendingArchivesAction = null;
+    }
+
+    async function executeArchivesConfirmedAction() {
+      if (typeof pendingArchivesAction === 'function') {
+        const action = pendingArchivesAction;
+        pendingArchivesAction = null;
+        closeArchivesConfirmModal();
+        await action();
+      }
+    }
+
+    function showArchivesLoadingModal(title, desc) {
+      const titleEl = document.getElementById('archives-loading-title');
+      if (titleEl) titleEl.textContent = title || 'Processing...';
+
+      const descEl = document.getElementById('archives-loading-desc');
+      if (descEl) descEl.textContent = desc || 'Please wait...';
+
+      const modal = document.getElementById('archives-loading-modal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.classList.remove('hidden');
+        modal.style.removeProperty('display');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
+    }
+
+    function hideArchivesLoadingModal() {
+      const modal = document.getElementById('archives-loading-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
+    }
+
+    function showArchivesSuccessModal(title, desc) {
+      const titleEl = document.getElementById('archives-success-title');
+      if (titleEl) titleEl.textContent = title || 'Success';
+
+      const descEl = document.getElementById('archives-success-desc');
+      if (descEl) descEl.textContent = desc || 'Action completed successfully.';
+
+      const modal = document.getElementById('archives-success-modal');
+      if (modal) {
+        modal.classList.add('active');
+        modal.classList.remove('hidden');
+        modal.style.removeProperty('display');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
+    }
+
+    function closeArchivesSuccessModal() {
+      const modal = document.getElementById('archives-success-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
+    }
+
+    // Modal dismiss listeners
+    document.addEventListener('click', (e) => {
+      const confirmModal = document.getElementById('archives-confirm-modal');
+      if (confirmModal && e.target === confirmModal) {
+        closeArchivesConfirmModal();
+      }
+      const successModal = document.getElementById('archives-success-modal');
+      if (successModal && e.target === successModal) {
+        closeArchivesSuccessModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeArchivesConfirmModal();
+        closeArchivesSuccessModal();
+      }
+    });
+
+    // ===== Patient Actions =====
+    function handleRestorePatient(id, name) {
+      openArchivesConfirmModal({
+        title: 'Restore Patient Profile',
+        desc: `Are you sure you want to restore patient <strong>"${escapeHtml(name)}"</strong> back to the active directory?`,
+        iconType: 'info',
+        iconSvg: '<path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>',
+        confirmBtnText: 'Restore to Active',
+        confirmBtnClass: 'confirm-primary',
+        onConfirm: async () => {
+          showArchivesLoadingModal('Restoring Patient...', `Restoring "${name}" to active directory...`);
+          try {
+            const res = await API.fetchJson(`/api/patients/${id}/restore`, { method: 'PUT' });
+            hideArchivesLoadingModal();
+            if (res && res.success) {
+              allArchivedPatients = allArchivedPatients.filter(p => p.id !== id);
+              renderArchivedPatients(allArchivedPatients);
+              updatePatientCountBadge(allArchivedPatients.length);
+              showArchivesSuccessModal('Patient Restored', `Patient <strong>"${escapeHtml(name)}"</strong> has been successfully restored to the active directory.`);
+            } else {
+              throw new Error((res && res.message) || 'Failed to restore patient.');
+            }
+          } catch (err) {
+            hideArchivesLoadingModal();
+            showToast(err.message || 'Failed to restore patient.', 'error');
+          }
+        }
+      });
+    }
+
+    function handleDeletePatient(id, name) {
+      openArchivesConfirmModal({
+        title: 'Permanently Delete Patient',
+        desc: `Are you sure you want to <strong>PERMANENTLY DELETE</strong> patient <strong>"${escapeHtml(name)}"</strong>?<br><br><span style="color: #dc2626; font-weight: 700;">Warning:</span> All patient demographics, clinical history, and attached records will be permanently erased. This action CANNOT be undone.`,
+        iconType: 'warning',
+        iconSvg: '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>',
+        confirmBtnText: 'Permanently Delete',
+        confirmBtnClass: 'confirm-danger',
+        onConfirm: async () => {
+          showArchivesLoadingModal('Deleting Patient...', `Permanently removing "${name}" from system...`);
+          try {
+            const res = await API.fetchJson(`/api/patients/${id}`, { method: 'DELETE' });
+            hideArchivesLoadingModal();
+            if (res && res.success) {
+              allArchivedPatients = allArchivedPatients.filter(p => p.id !== id);
+              renderArchivedPatients(allArchivedPatients);
+              updatePatientCountBadge(allArchivedPatients.length);
+              showArchivesSuccessModal('Patient Deleted', `Patient <strong>"${escapeHtml(name)}"</strong> has been permanently deleted from the system.`);
+            } else {
+              throw new Error((res && res.message) || 'Failed to delete patient.');
+            }
+          } catch (err) {
+            hideArchivesLoadingModal();
+            showToast(err.message || 'Failed to delete patient.', 'error');
+          }
+        }
+      });
     }
 
     // ===== Record Actions =====
-    async function handleRestoreRecord(id) {
-      if (!confirm('Restore this archived document back to the active binder?')) return;
-      try {
-        const res = await API.fetchJson(`/api/records/${id}/restore`, {
-          method: 'PUT'
-        });
-        if (res && res.success) {
-          showToast('Document restored successfully.', 'success');
-          allArchivedRecords = allArchivedRecords.filter(r => r.id !== id);
-          renderArchivedRecords(allArchivedRecords);
-          document.getElementById('records-count-badge').textContent = allArchivedRecords.length;
-          document.getElementById('stat-total-archived-records').textContent = `${allArchivedRecords.length} archived document${allArchivedRecords.length !== 1 ? 's' : ''}`;
+    function handleRestoreRecord(id, filename) {
+      const docName = filename || 'this document';
+      openArchivesConfirmModal({
+        title: 'Restore Medical Document',
+        desc: `Are you sure you want to restore document <strong>"${escapeHtml(docName)}"</strong> back to the active record binder?`,
+        iconType: 'info',
+        iconSvg: '<path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>',
+        confirmBtnText: 'Restore Document',
+        confirmBtnClass: 'confirm-primary',
+        onConfirm: async () => {
+          showArchivesLoadingModal('Restoring Document...', `Restoring "${docName}"...`);
+          try {
+            const res = await API.fetchJson(`/api/records/${id}/restore`, { method: 'PUT' });
+            hideArchivesLoadingModal();
+            if (res && res.success) {
+              allArchivedRecords = allArchivedRecords.filter(r => r.id !== id);
+              renderArchivedRecords(allArchivedRecords);
+              updateRecordCountBadge(allArchivedRecords.length);
+              showArchivesSuccessModal('Document Restored', `Document <strong>"${escapeHtml(docName)}"</strong> has been successfully restored to the active binder.`);
+            } else {
+              throw new Error((res && res.message) || 'Failed to restore document.');
+            }
+          } catch (err) {
+            hideArchivesLoadingModal();
+            showToast(err.message || 'Failed to restore document.', 'error');
+          }
         }
-      } catch (err) {
-        showToast(err.message || 'Failed to restore document.', 'error');
-      }
+      });
     }
 
-    async function handleDeleteRecord(id) {
-      if (!confirm('PERMANENTLY DELETE this document?\n\nThis action cannot be undone.')) return;
-      try {
-        const res = await API.fetchJson(`/api/records/${id}`, { method: 'DELETE' });
-        if (res && res.success) {
-          showToast(res.message || 'Document permanently deleted.', 'success');
-          allArchivedRecords = allArchivedRecords.filter(r => r.id !== id);
-          renderArchivedRecords(allArchivedRecords);
-          document.getElementById('records-count-badge').textContent = allArchivedRecords.length;
-          document.getElementById('stat-total-archived-records').textContent = `${allArchivedRecords.length} archived document${allArchivedRecords.length !== 1 ? 's' : ''}`;
+    function handleDeleteRecord(id, filename) {
+      const docName = filename || 'this document';
+      openArchivesConfirmModal({
+        title: 'Permanently Delete Document',
+        desc: `Are you sure you want to <strong>PERMANENTLY DELETE</strong> document <strong>"${escapeHtml(docName)}"</strong>?<br><br><span style="color: #dc2626; font-weight: 700;">Warning:</span> The file and all extracted clinical data will be permanently destroyed. This action CANNOT be undone.`,
+        iconType: 'warning',
+        iconSvg: '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>',
+        confirmBtnText: 'Permanently Delete',
+        confirmBtnClass: 'confirm-danger',
+        onConfirm: async () => {
+          showArchivesLoadingModal('Deleting Document...', `Permanently removing "${docName}"...`);
+          try {
+            const res = await API.fetchJson(`/api/records/${id}`, { method: 'DELETE' });
+            hideArchivesLoadingModal();
+            if (res && res.success) {
+              allArchivedRecords = allArchivedRecords.filter(r => r.id !== id);
+              renderArchivedRecords(allArchivedRecords);
+              updateRecordCountBadge(allArchivedRecords.length);
+              showArchivesSuccessModal('Document Deleted', `Document <strong>"${escapeHtml(docName)}"</strong> has been permanently deleted from the system.`);
+            } else {
+              throw new Error((res && res.message) || 'Failed to delete document.');
+            }
+          } catch (err) {
+            hideArchivesLoadingModal();
+            showToast(err.message || 'Failed to delete document.', 'error');
+          }
         }
-      } catch (err) {
-        showToast(err.message || 'Failed to delete document.', 'error');
-      }
+      });
     }
 
     function formatRecordType(type) {
@@ -569,7 +1037,7 @@
         'CONSULTATION_RECORD': 'Consultation Record',
         'IMMUNIZATION_RECORD': 'Immunization Record',
         'MATERNAL_CARE_RECORD': 'Maternal Care Record',
-        'ANTI_RABIES_RECORD': 'Anti-Rabies Record',
+        'ANTI_RABIES_RECORD': 'Immunization Record',
       };
       return map[type.toUpperCase()] || type;
     }
@@ -591,7 +1059,19 @@
       return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
 
-
+    // Expose all action and modal handlers on window for SPA and inline onclick access
+    window.handleRestorePatient = handleRestorePatient;
+    window.handleDeletePatient = handleDeletePatient;
+    window.handleRestoreRecord = handleRestoreRecord;
+    window.handleDeleteRecord = handleDeleteRecord;
+    window.openArchivesConfirmModal = openArchivesConfirmModal;
+    window.closeArchivesConfirmModal = closeArchivesConfirmModal;
+    window.executeArchivesConfirmedAction = executeArchivesConfirmedAction;
+    window.showArchivesLoadingModal = showArchivesLoadingModal;
+    window.hideArchivesLoadingModal = hideArchivesLoadingModal;
+    window.showArchivesSuccessModal = showArchivesSuccessModal;
+    window.closeArchivesSuccessModal = closeArchivesSuccessModal;
+    window.switchTab = switchTab;
   </script>
 </body>
 </html>

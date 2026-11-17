@@ -1,7 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const dns = require('dns');
 const bcrypt = require('bcryptjs');
 const { createClient } = require('@supabase/supabase-js');
+
+// Prioritize IPv4 resolution to prevent DNS getaddrinfo ENOTFOUND drops on Windows/Node
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // Load environment variables
 require('dotenv').config();
@@ -18,7 +24,7 @@ const jsonDbPath = path.join(process.cwd(), 'database.json');
 // Default seed accounts
 const seedAccounts = [
   {
-    id: "admin-uuid-1111-2222-333333333333",
+    id: "ea97564d-cafc-4586-9357-a60d3faaf15c",
     full_name: "RHU Administrator",
     email: "admin@keepup.com",
     password: "Admin123!", // Will be hashed below
@@ -28,7 +34,7 @@ const seedAccounts = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "records-uuid-1111-2222-333333333333",
+    id: "fc78a000-5da9-4a96-8a0a-e065dec8ae54",
     full_name: "Records Staff User",
     email: "records@keepup.com",
     password: "Records123!", // Will be hashed below
@@ -38,7 +44,7 @@ const seedAccounts = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "healthcare-uuid-1111-2222-333333333333",
+    id: "234be814-b15b-43b9-b032-8c81fc801a91",
     full_name: "Healthcare Personnel User",
     email: "healthcare@keepup.com",
     password: "Healthcare123!", // Will be hashed below
@@ -48,7 +54,7 @@ const seedAccounts = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "staff-uuid-1111-2222-333333333333",
+    id: "bc9d8ee8-939f-4a90-ae91-4c529f61e42a",
     full_name: "Administrative Staff User",
     email: "staff@keepup.com",
     password: "Staff123!", // Will be hashed below
@@ -58,7 +64,7 @@ const seedAccounts = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "inactive-uuid-1111-2222-333333333333",
+    id: "143538e8-cc40-40ba-9c52-f392215807b2",
     full_name: "Inactive Records Staff",
     email: "inactive@keepup.com",
     password: "Inactive123!", // Will be hashed below
@@ -80,7 +86,7 @@ function initLocalDb() {
         password: bcrypt.hashSync(account.password, salt)
       };
     });
-    fs.writeFileSync(jsonDbPath, JSON.stringify({ users: hashedAccounts, patients: [], patient_records: [], duplicate_flags: [], audit_logs: [], temporary_uploads: [] }, null, 2), 'utf-8');
+    fs.writeFileSync(jsonDbPath, JSON.stringify({ users: hashedAccounts, patients: [], patient_records: [], duplicate_flags: [], audit_logs: [], temporary_uploads: [], batch_jobs: [], batch_items: [] }, null, 2), 'utf-8');
     console.log('Local database seeded with 5 test accounts successfully.');
   } else {
     // If the database exists, make sure it has users, patients, patient_records, duplicate_flags, and audit_logs initialized
@@ -126,6 +132,16 @@ function initLocalDb() {
         modified = true;
       }
 
+      if (!data.batch_jobs) {
+        data.batch_jobs = [];
+        modified = true;
+      }
+
+      if (!data.batch_items) {
+        data.batch_items = [];
+        modified = true;
+      }
+
       if (modified) {
         fs.writeFileSync(jsonDbPath, JSON.stringify(data, null, 2), 'utf-8');
       }
@@ -138,7 +154,7 @@ function initLocalDb() {
           password: bcrypt.hashSync(account.password, salt)
         };
       });
-      fs.writeFileSync(jsonDbPath, JSON.stringify({ users: hashedAccounts, patients: [], patient_records: [], duplicate_flags: [], audit_logs: [], temporary_uploads: [] }, null, 2), 'utf-8');
+      fs.writeFileSync(jsonDbPath, JSON.stringify({ users: hashedAccounts, patients: [], patient_records: [], duplicate_flags: [], audit_logs: [], temporary_uploads: [], batch_jobs: [], batch_items: [] }, null, 2), 'utf-8');
     }
   }
 }

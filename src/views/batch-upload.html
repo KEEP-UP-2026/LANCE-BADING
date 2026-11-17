@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="/images/LOGO.jpg">
+  <link rel="shortcut icon" href="/images/LOGO.jpg">
+  <title>Batch Upload & Text Recognition - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .btn-pill {
+      border-radius: 24px !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      padding: 8px 18px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      border: 1px solid transparent !important;
+    }
+
+    .btn-pill-primary {
+      background: #C62828 !important;
+      color: #ffffff !important;
+      border-color: #C62828 !important;
+      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25) !important;
+    }
+    .btn-pill-primary:hover {
+      background: #b71c1c !important;
+      border-color: #b71c1c !important;
+    }
+
+    .btn-pill-secondary {
+      background: #ffffff !important;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    .btn-pill-secondary:hover {
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+    }
+
+    /* Drag & Drop Area */
+    .dropzone-container {
+      border: 2px dashed #fca5a5;
+      background: #fffafa;
+      border-radius: 16px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .dropzone-container:hover, .dropzone-container.dragover {
+      border-color: #dc2626;
+      background: #fee2e2;
+      transform: translateY(-2px);
+    }
+
+    .file-badge-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.15s ease;
+    }
+    .file-badge-item:hover {
+      border-color: #fca5a5;
+      background: #fff8f8;
+    }
+
+    .problem-alert-box {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav" id="layout-nav-links"></ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <!-- Breadcrumbs & Header -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
+            <a href="/dashboard/records/batch-status" style="color: #64748b; text-decoration: none;">Batch Portal</a> / <span style="color: #dc2626;">Batch Ingestion</span>
+          </div>
+          <h2 style="font-size: 22px; font-weight: 800; color: #1e293b; margin: 0;">Batch Upload Interface</h2>
+          <p style="font-size: 13px; color: #64748b; margin: 2px 0 0;">Upload multiple supported scanned paper forms for automated text recognition (OCR) and AI category extraction.</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="/dashboard/records/batch-status" class="btn-pill btn-pill-secondary">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4h2v4zm0-6h-2V7h2v4z"/></svg>
+            View Batch Status Queue
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Upload Card -->
+      <div class="content-card" style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 28px; margin-bottom: 24px;">
+        <div style="margin-bottom: 20px;">
+          <h4 style="font-size: 15px; font-weight: 800; color: #1e293b; margin: 0 0 4px;">Select or Drop Scanned Health Records</h4>
+          <p style="font-size: 12.5px; color: #64748b; margin: 0;">Supported formats: <strong>PDF, PNG, JPG, JPEG</strong> (Up to 25 files per batch, max 20MB per file).</p>
+        </div>
+
+        <!-- Drag & Drop Area -->
+        <div class="dropzone-container" id="dropzone">
+          <input type="file" id="file-input" multiple accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;">
+            <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: currentColor;">
+              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+            </svg>
+          </div>
+          <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px;">Drag and drop scanned documents here</h4>
+          <p style="font-size: 13px; color: #64748b; margin: 0 0 14px;">or click anywhere to browse from your device</p>
+          <button type="button" class="btn-pill btn-pill-secondary" onclick="document.getElementById('file-input').click();">
+            Browse Files
+          </button>
+        </div>
+
+        <!-- Pre-upload File List Preview -->
+        <div id="file-list-section" style="display: none; margin-top: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h5 style="font-size: 14px; font-weight: 800; color: #1e293b; margin: 0;">
+              Selected Documents (<span id="selected-count">0</span>)
+            </h5>
+            <button type="button" class="btn-pill btn-pill-secondary" style="font-size: 11px !important; padding: 4px 12px !important;" onclick="clearAllFiles()">
+              Clear All
+            </button>
+          </div>
+
+          <div id="file-items-container" style="max-height: 280px; overflow-y: auto; padding-right: 4px;"></div>
+
+          <!-- Problem summary box if any invalid files found -->
+          <div id="problems-container" style="display: none;" class="problem-alert-box">
+            <div style="font-weight: 800; color: #b91c1c; font-size: 13px; margin-bottom: 4px;">Upload Problems Detected:</div>
+            <ul id="problems-list" style="margin: 0; padding-left: 20px; font-size: 12px; color: #991b1b;"></ul>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+            <a href="/dashboard/records/batch-status" class="btn-pill btn-pill-secondary">Cancel</a>
+            <button type="button" id="start-batch-btn" class="btn-pill btn-pill-primary" onclick="submitBatchUpload()">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+              Start Batch OCR &amp; AI Processing
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Guidance Notes -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div class="content-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;">
+          <div style="font-size: 11px; font-weight: 800; color: #dc2626; margin-bottom: 4px;">1. PRE-CHECK VALIDATION</div>
+          <p style="font-size: 12px; color: #64748b; margin: 0;">TALA inspects file headers (magic bytes) to ensure scanned forms are untampered before queuing.</p>
+        </div>
+        <div class="content-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;">
+          <div style="font-size: 11px; font-weight: 800; color: #dc2626; margin-bottom: 4px;">2. BACKGROUND AI EXTRACTION</div>
+          <p style="font-size: 12px; color: #64748b; margin: 0;">Our worker extracts text, classifies forms (ITR, Consult, Vax, Rabies, Maternal), and prepares drafts.</p>
+        </div>
+        <div class="content-card" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;">
+          <div style="font-size: 11px; font-weight: 800; color: #dc2626; margin-bottom: 4px;">3. HUMAN-IN-THE-LOOP</div>
+          <p style="font-size: 12px; color: #64748b; margin: 0;">Staff inspect drafts side-by-side with original scans. Only confirmed drafts become verified patient records.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let selectedFiles = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await loadUserProfile();
+      if (!user) return;
+      if (user.role !== 'RHU_ADMINISTRATOR' && user.role !== 'RECORDS_STAFF' && user.role !== 'ADMINISTRATIVE_STAFF') {
+        window.location.href = '/login';
+        return;
+      }
+      injectSidebarLinks(user.role);
+
+      setupDropzone();
+    });
+
+    function setupDropzone() {
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('file-input');
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+      });
+    }
+
+    function handleFiles(files) {
+      if (!files || files.length === 0) return;
+
+      const allowedExts = ['.pdf', '.png', '.jpg', '.jpeg'];
+      const maxPerFile = 20 * 1024 * 1024;
+      const problems = [];
+
+      Array.from(files).forEach(file => {
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedExts.includes(ext)) {
+          problems.push(`"${file.name}": Unsupported file extension (${ext}). Only PDF, PNG, JPG accepted.`);
+          return;
+        }
+        if (file.size > maxPerFile) {
+          problems.push(`"${file.name}": File size (${(file.size / (1024*1024)).toFixed(1)}MB) exceeds 20MB limit.`);
+          return;
+        }
+
+        // Avoid exact duplicate in current selection list
+        const exists = selectedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) {
+          selectedFiles.push(file);
+        }
+      });
+
+      if (selectedFiles.length > 25) {
+        showToast('Maximum 25 documents permitted per batch. Truncated to 25.', 'warning');
+        selectedFiles = selectedFiles.slice(0, 25);
+      }
+
+      renderSelectedFiles(problems);
+    }
+
+    function renderSelectedFiles(problems = []) {
+      const section = document.getElementById('file-list-section');
+      const container = document.getElementById('file-items-container');
+      const countSpan = document.getElementById('selected-count');
+      const problemsContainer = document.getElementById('problems-container');
+      const problemsList = document.getElementById('problems-list');
+
+      if (selectedFiles.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      countSpan.textContent = selectedFiles.length;
+
+      let html = '';
+      selectedFiles.forEach((file, idx) => {
+        const ext = file.name.split('.').pop().toUpperCase();
+        const sizeKb = (file.size / 1024).toFixed(0);
+        html += `
+          <div class="file-badge-item">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="background: #fee2e2; color: #dc2626; font-size: 10px; font-weight: 900; padding: 3px 6px; border-radius: 4px;">${ext}</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #1e293b;">${escapeHtml(file.name)}</div>
+                <span style="font-size: 11px; color: #64748b;">${sizeKb} KB</span>
+              </div>
+            </div>
+            <button type="button" onclick="removeFile(${idx})" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;" title="Remove file">
+              ✕
+            </button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+
+      if (problems && problems.length > 0) {
+        problemsContainer.style.display = 'block';
+        problemsList.innerHTML = problems.map(p => `<li>${escapeHtml(p)}</li>`).join('');
+      } else {
+        problemsContainer.style.display = 'none';
+      }
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      renderSelectedFiles();
+    }
+
+    function clearAllFiles() {
+      selectedFiles = [];
+      document.getElementById('file-input').value = '';
+      renderSelectedFiles();
+    }
+
+    async function submitBatchUpload() {
+      if (selectedFiles.length === 0) {
+        showToast('Please select at least 1 document to upload.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('start-batch-btn');
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; animation: spin 1s linear infinite;"><path d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"/></svg>
+        Validating & Submitting Batch...
+      `;
+
+      try {
+        const formData = new FormData();
+        selectedFiles.forEach(file => {
+          formData.append('documents', file);
+        });
+
+        const data = await API.postForm('/api/records/batch/upload', formData);
+        if (data && data.success) {
+          showToast(`Batch queued successfully! Reference: ${data.batch_reference}`, 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard/records/batch-status';
+          }, 800);
+        } else {
+          showToast((data && data.message) || 'Batch upload failed.', 'error');
+          if (data && data.problems && data.problems.length > 0) {
+            const problemsContainer = document.getElementById('problems-container');
+            const problemsList = document.getElementById('problems-list');
+            problemsContainer.style.display = 'block';
+            problemsList.innerHTML = data.problems.map(p => `<li><strong>${escapeHtml(p.filename)}:</strong> ${escapeHtml(p.reason)}</li>`).join('');
+          }
+          btn.disabled = false;
+          btn.innerHTML = 'Start Batch OCR & AI Processing';
+        }
+      } catch (err) {
+        console.error('Submit batch error:', err);
+        showToast(err.message || 'An unexpected error occurred during batch submission.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Start Batch OCR & AI Processing';
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
+

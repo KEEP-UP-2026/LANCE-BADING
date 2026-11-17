@@ -162,6 +162,7 @@ const PatientModel = {
   // Create a new patient
   async create(patientData) {
     const newPatient = {
+      id: patientData.id || crypto.randomUUID(),
       ...patientData,
       status: 'ACTIVE',
       created_at: new Date().toISOString(),
@@ -189,6 +190,7 @@ const PatientModel = {
         if (error && error.code === 'PGRST204') {
           console.warn('Supabase missing extended columns, inserting core columns fallback...');
           const corePayload = {
+            id: newPatient.id,
             patient_number: newPatient.patient_number,
             first_name: newPatient.first_name,
             middle_name: newPatient.middle_name,

@@ -438,9 +438,12 @@
       injectSidebarLinks(currentUser.role);
       await loadDuplicateWarnings();
 
-      document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-      document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
-      document.getElementById('modal-confirm-btn').addEventListener('click', executeMerge);
+      const modalClose = document.getElementById('modal-close-btn');
+      if (modalClose) modalClose.addEventListener('click', closeModal);
+      const modalCancel = document.getElementById('modal-cancel-btn');
+      if (modalCancel) modalCancel.addEventListener('click', closeModal);
+      const modalConfirm = document.getElementById('modal-confirm-btn');
+      if (modalConfirm) modalConfirm.addEventListener('click', executeMerge);
     });
 
     async function loadDuplicateWarnings() {

@@ -1,214 +1,170 @@
 // Keep Up System - Explainable Document Classification Utility
-// Rule-based classification utilizing weighted keyword scanning in English and Filipino.
+// Grounded directly on Paete Rural Health Unit (RHU) Centralized Record Binders (reference_documents)
+// Rule-based classification utilizing weighted keyword scanning & structural layout signatures.
 
 const CATEGORY_KEYWORDS = {
+  // Binder 1: Individual Treatment Record (ITR Page 1 & Page 2)
   PATIENT_INFORMATION_SHEET: [
-    { word: "individual treatment record", weight: 12 },
-    { word: "individual treatment", weight: 8 },
-    { word: "20 years old and above", weight: 10 },
-    { word: "paete rural health unit", weight: 8 },
-    { word: "philhealth membership information", weight: 15 },
-    { word: "philhealth id number", weight: 15 },
-    { word: "philhealth no", weight: 10 },
-    { word: "past medical history", weight: 15 },
-    { word: "past surgical history", weight: 15 },
-    { word: "family history", weight: 12 },
-    { word: "personal / social history", weight: 15 },
-    { word: "personal/social history", weight: 15 },
-    { word: "menstrual history", weight: 15 },
-    { word: "pregnancy history", weight: 15 },
-    { word: "child care", weight: 8 },
-    { word: "animal bite", weight: 8 },
-    { word: "ncd", weight: 6 },
-    { word: "pack years", weight: 10 },
-    { word: "bottles/day", weight: 10 },
-    { word: "bottles per day", weight: 10 },
-    { word: "highest bp", weight: 10 },
-    { word: "coronary artery disease", weight: 8 },
-    { word: "cerebrovascular disease", weight: 8 },
-    { word: "epilepsy/seizure disorder", weight: 8 },
-    { word: "peptic ulcer disease", weight: 8 },
-    { word: "pulmonary tuberculosis", weight: 8 },
-    { word: "extrapulmonary tuberculosis", weight: 8 },
-    { word: "smoking cessation profile", weight: 8 },
-    { word: "smokers?", weight: 8 },
-    { word: "alcohol intake", weight: 7 },
-    { word: "excessive alcohol intake", weight: 7 },
-    { word: "high fat / high salt food intake", weight: 7 },
-    { word: "dietary fiber intake", weight: 7 },
-    { word: "physical activity", weight: 6 },
-    { word: "ncd risk assessment done", weight: 10 },
-    { word: "profiling of smoking cessation done", weight: 10 },
-    { word: "educational attainment", weight: 6 },
-    { word: "bhw", weight: 6 },
-    { word: "raised bp", weight: 6 },
-    { word: "itr form", weight: 6 },
-    { word: "itr", weight: 5 },
-    { word: "treatment record", weight: 5 },
-    { word: "information sheet", weight: 4 },
-    { word: "patient information", weight: 4 },
-    { word: "impormasyon", weight: 2 },
-    { word: "personal data", weight: 3 },
-    { word: "personal information", weight: 3 },
-    { word: "civil status", weight: 3 },
-    { word: "katayuan", weight: 2 },
-    { word: "middle name", weight: 1.5 },
-    { word: "religion", weight: 1.5 },
-    { word: "nationality", weight: 1.5 },
-    { word: "lahi", weight: 1.5 },
-    { word: "occupation", weight: 2 },
-    { word: "trabaho", weight: 1.5 },
-    { word: "philhealth", weight: 3 },
-    { word: "contact person", weight: 2 },
-    { word: "emergency contact", weight: 2.5 },
-    { word: "residential address", weight: 2.5 },
-    { word: "tirahan", weight: 2 },
-    { word: "birthday", weight: 2 },
-    { word: "kaarawan", weight: 1.5 },
-    { word: "date of birth", weight: 2 },
-    { word: "age", weight: 1 },
-    { word: "edád", weight: 1 },
-    { word: "marital status", weight: 2 },
-    { word: "spouse", weight: 1.5 },
-    { word: "asawa", weight: 1.5 }
+    { word: "individual treatment record", weight: 35 },
+    { word: "20 years old and above", weight: 25 },
+    { word: "paete rural health unit", weight: 12 },
+    { word: "lifestyle & risk factors", weight: 30 },
+    { word: "smoking cessation profile", weight: 30 },
+    { word: "smokers?", weight: 20 },
+    { word: "philhealth membership information", weight: 35 },
+    { word: "philhealth id number", weight: 30 },
+    { word: "philhealth no", weight: 15 },
+    { word: "individual paying program", weight: 25 },
+    { word: "membership category", weight: 25 },
+    { word: "membership type", weight: 25 },
+    { word: "past medical history", weight: 35 },
+    { word: "past surgical history", weight: 35 },
+    { word: "family history", weight: 15 },
+    { word: "personal / social history", weight: 35 },
+    { word: "personal/social history", weight: 35 },
+    { word: "menstrual history", weight: 35 },
+    { word: "pregnancy history", weight: 35 },
+    { word: "vital signs & physical measurements", weight: 30 },
+    { word: "consultation & clinical findings", weight: 25 },
+    { word: "dietary fiber intake", weight: 25 },
+    { word: "high fat / high salt food intake", weight: 25 },
+    { word: "excessive alcohol intake", weight: 25 },
+    { word: "alcohol intake", weight: 15 },
+    { word: "physical activity", weight: 15 },
+    { word: "educational attainment", weight: 15 },
+    { word: "bhw", weight: 15 },
+    { word: "raised bp", weight: 20 },
+    { word: "highest bp recorded", weight: 25 },
+    { word: "pack years", weight: 20 },
+    { word: "bottles per day", weight: 20 },
+    { word: "coronary artery disease", weight: 15 },
+    { word: "cerebrovascular disease", weight: 15 },
+    { word: "epilepsy/seizure disorder", weight: 15 },
+    { word: "peptic ulcer disease", weight: 15 },
+    { word: "pulmonary tuberculosis", weight: 15 },
+    { word: "extrapulmonary tuberculosis", weight: 15 },
+    { word: "first degree relative", weight: 15 },
+    { word: "itr form", weight: 15 },
+    { word: "civil status", weight: 5 },
+    { word: "residential address", weight: 5 }
   ],
+
+  // Binder 2: Consultation & Outpatient Clinical Records
   CONSULTATION_RECORD: [
-    { word: "consultation", weight: 3 },
-    { word: "konsulta", weight: 3 },
-    { word: "check-up", weight: 2.5 },
-    { word: "checkup", weight: 2.5 },
-    { word: "diagnosis", weight: 3.5 },
-    { word: "lunas", weight: 2 },
-    { word: "prescription", weight: 3 },
-    { word: "reseta", weight: 3 },
-    { word: "vital signs", weight: 2.5 },
-    { word: "blood pressure", weight: 2.5 },
-    { word: "presyon", weight: 2 },
-    { word: "temperature", weight: 1.5 },
-    { word: "chief complaint", weight: 3.5 },
-    { word: "sakit", weight: 1.5 },
-    { word: "symptoms", weight: 2.5 },
-    { word: "sintomas", weight: 2 },
-    { word: "treatment", weight: 2 },
-    { word: "gamot", weight: 2 },
-    { word: "medication", weight: 2.5 },
-    { word: "physician", weight: 2 },
-    { word: "doctor notes", weight: 3.5 },
-    { word: "follow-up", weight: 2 },
-    { word: "laboratory", weight: 2 },
-    { word: "lab result", weight: 2.5 },
-    { word: "x-ray", weight: 2 },
+    { word: "consultation & outpatient clinical record", weight: 40 },
+    { word: "outpatient clinical record", weight: 35 },
+    { word: "clinical findings & diagnosis", weight: 35 },
+    { word: "prescription & treatment plan", weight: 35 },
+    { word: "chief complaint", weight: 30 },
+    { word: "assessment / diagnosis", weight: 30 },
+    { word: "assessment/diagnosis", weight: 30 },
+    { word: "date of consultation", weight: 25 },
+    { word: "subjective findings", weight: 25 },
+    { word: "objective findings", weight: 25 },
+    { word: "reseta", weight: 15 },
+    { word: "konsulta", weight: 15 },
+    { word: "check-up", weight: 10 },
+    { word: "treatment plan", weight: 20 },
+    { word: "attending physician", weight: 20 },
+    { word: "acute upper respiratory tract infection", weight: 25 },
+    { word: "doctor notes", weight: 20 },
+    { word: "reklamo", weight: 15 },
+    { word: "lunas", weight: 10 }
   ],
-  IMMUNIZATION_RECORD: [
-    { word: "rabies post-exposure prophylaxis card", weight: 25 },
-    { word: "rabies post-exposure prophylaxis", weight: 20 },
-    { word: "post-exposure prophylaxis", weight: 15 },
-    { word: "national rabies prevention", weight: 15 },
-    { word: "animal bite treatment center", weight: 15 },
-    { word: "abtc - paete rhu", weight: 15 },
-    { word: "abtc", weight: 12 },
-    { word: "anti-rabies", weight: 15 },
-    { word: "anti rabies", weight: 15 },
-    { word: "rabies vaccine", weight: 14 },
-    { word: "rabies", weight: 12 },
-    { word: "pvrv", weight: 10 },
-    { word: "pcecv", weight: 10 },
-    { word: "speeda", weight: 10 },
-    { word: "washing of bite wound", weight: 12 },
-    { word: "history of exposure", weight: 12 },
-    { word: "category of exposure", weight: 12 },
-    { word: "animal observation", weight: 12 },
-    { word: "dosing schedule", weight: 10 },
-    { word: "immunization", weight: 4 },
-    { word: "vaccination", weight: 3.5 },
-    { word: "vaccine", weight: 3 },
-    { word: "bakuna", weight: 3.5 },
-    { word: "turok", weight: 2.5 },
-    { word: "dose", weight: 2 },
-    { word: "bcg", weight: 3.5 },
-    { word: "dpt", weight: 3.5 },
-    { word: "dpt-hepb-hib", weight: 3.5 },
-    { word: "opv", weight: 3.5 },
-    { word: "ipv", weight: 3.5 },
-    { word: "hepa b", weight: 3.5 },
-    { word: "hepa-b", weight: 3.5 },
-    { word: "hepatitis b", weight: 3.5 },
-    { word: "measles", weight: 3 },
-    { word: "mmr", weight: 3.5 },
-    { word: "tigdas", weight: 3 },
-    { word: "rotavirus", weight: 3 },
-    { word: "pneumococcal", weight: 3.5 },
-    { word: "pcv", weight: 3 },
-    { word: "influenza", weight: 3 },
-    { word: "flu shot", weight: 3 },
-    { word: "trangkaso", weight: 2.5 },
-    { word: "baby book", weight: 3 },
-    { word: "pediatric", weight: 2.5 },
-    { word: "timbang", weight: 1.5 },
-    { word: "antigen", weight: 2.5 },
-    { word: "booster", weight: 2.5 },
-    { word: "childhood immunization", weight: 4 },
-    { word: "routine immunization", weight: 3.5 }
+
+  // Binder 3: Routine Childhood Immunization (Baby Book & reference_documents/3_Immunizations)
+  CHILDHOOD_IMMUNIZATION: [
+    { word: "routine childhood immunization", weight: 50 },
+    { word: "childhood immunization", weight: 45 },
+    { word: "screening / pre-vaccination assessment", weight: 50 },
+    { word: "pre-vaccination assessment", weight: 45 },
+    { word: "immunization details (this visit)", weight: 50 },
+    { word: "immunization details", weight: 40 },
+    { word: "vaccination history", weight: 45 },
+    { word: "next immunization date", weight: 45 },
+    { word: "next schedule", weight: 35 },
+    { word: "vaccine (antigen)", weight: 40 },
+    { word: "batch / lot number", weight: 35 },
+    { word: "with fever today", weight: 35 },
+    { word: "anti-rabies vaccine", weight: 30 },
+    { word: "rabies vaccine", weight: 25 },
+    { word: "animal bite", weight: 20 },
+    { word: "bakuna", weight: 20 },
+    { word: "with acute illness", weight: 35 },
+    { word: "history of allergic reaction to vaccines", weight: 35 },
+    { word: "routine childhood immunization record", weight: 45 },
+    { word: "routine childhood immunization", weight: 40 },
+    { word: "childhood immunization record", weight: 40 },
+    { word: "childhood immunization", weight: 35 },
+    { word: "baby book", weight: 35 },
+    { word: "patient & child demographics", weight: 35 },
+    { word: "vaccination log", weight: 35 },
+    { word: "child name", weight: 30 },
+    { word: "mother name", weight: 20 },
+    { word: "bcg vaccine", weight: 30 },
+    { word: "hepatitis b (birth dose)", weight: 30 },
+    { word: "hepb birth dose", weight: 30 },
+    { word: "penta 1", weight: 30 },
+    { word: "penta 2", weight: 30 },
+    { word: "penta 3", weight: 30 },
+    { word: "dpt-hepb-hib", weight: 30 },
+    { word: "opv 1", weight: 30 },
+    { word: "opv 2", weight: 30 },
+    { word: "pcv 1", weight: 30 },
+    { word: "measles / mmr 1", weight: 30 },
+    { word: "measles / mmr", weight: 25 },
+    { word: "bakuna ng bata", weight: 25 },
+    { word: "bakuna", weight: 15 }
   ],
+
+  // Binder 4: Maternal Care & Prenatal Record Sheet
   MATERNAL_CARE_RECORD: [
-    { word: "maternal", weight: 4.5 },
-    { word: "pregnancy", weight: 4 },
-    { word: "buntis", weight: 4 },
-    { word: "prenatal", weight: 3.5 },
-    { word: "obstetrics", weight: 3.5 },
-    { word: "obgyn", weight: 3.5 },
-    { word: "pregnant", weight: 3.5 },
-    { word: "trimester", weight: 3.5 },
-    { word: "fetal", weight: 3.5 },
-    { word: "delivery", weight: 2.5 },
-    { word: "panganganak", weight: 3 },
-    { word: "lpm", weight: 3.5 },
-    { word: "edc", weight: 3.5 },
-    { word: "aog", weight: 3.5 },
-    { word: "gestational", weight: 3 },
-    { word: "tetanus toxoid", weight: 3.5 },
-    { word: "nagdadalang-tao", weight: 4 },
-    { word: "postpartum", weight: 3.5 },
-    { word: "antenatal", weight: 3.5 },
-    { word: "gravida", weight: 3.5 },
-    { word: "para", weight: 2 },
-    { word: "ultrasound", weight: 2.5 },
-    { word: "fetal heartbeat", weight: 3.5 },
-    { word: "fundal height", weight: 3 },
-    { word: "amniotic", weight: 3 },
-    { word: "labor", weight: 2.5 },
-    { word: "contraction", weight: 2.5 },
-    { word: "iron supplement", weight: 2.5 },
-    { word: "prenatal vitamins", weight: 3 },
-    { word: "cervical", weight: 2 }
+    { word: "maternal care & prenatal record sheet", weight: 45 },
+    { word: "maternal care & prenatal", weight: 40 },
+    { word: "prenatal record sheet", weight: 40 },
+    { word: "prenatal visit log", weight: 40 },
+    { word: "fundal height", weight: 35 },
+    { word: "fetal heartbeat", weight: 35 },
+    { word: "single live intrauterine pregnancy", weight: 40 },
+    { word: "ultrasound report", weight: 30 },
+    { word: "active fetal movement", weight: 30 },
+    { word: "tetanus toxoid vaccine", weight: 30 },
+    { word: "iron & folic acid supplements", weight: 35 },
+    { word: "prenatal checkup", weight: 30 },
+    { word: "nagdadalang-tao", weight: 25 },
+    { word: "buntis", weight: 20 },
+    { word: "panganganak", weight: 20 },
+    { word: "gravida", weight: 20 },
+    { word: "para", weight: 15 },
+    { word: "edc", weight: 20 },
+    { word: "aog", weight: 20 },
+    { word: "gestational age", weight: 20 }
   ],
+
+  // Clinical Auxiliary: Medical Certificates & Fit-to-Work
   MEDICAL_CERTIFICATE: [
-    { word: "medical certificate", weight: 5 },
-    { word: "med cert", weight: 4.5 },
-    { word: "medcert", weight: 4 },
-    { word: "sertipikong medikal", weight: 4.5 },
-    { word: "sertipiko", weight: 3 },
-    { word: "certificate of health", weight: 4.5 },
-    { word: "fit to work", weight: 4 },
-    { word: "fit to school", weight: 4 },
-    { word: "fit to study", weight: 4 },
-    { word: "fit to resume", weight: 4 },
-    { word: "sick leave", weight: 4 },
-    { word: "rest for", weight: 3.5 },
-    { word: "days of rest", weight: 3.5 },
-    { word: "activity restriction", weight: 3.5 },
-    { word: "prc license no", weight: 3.5 },
-    { word: "ptr no", weight: 3.5 },
-    { word: "ptr number", weight: 3.5 },
-    { word: "attending physician", weight: 3 },
-    { word: "physician's signature", weight: 3.5 },
-    { word: "this is to certify", weight: 4.5 },
-    { word: "to whom it may concern", weight: 3.5 }
+    { word: "medical certificate", weight: 45 },
+    { word: "sertipikong medikal", weight: 40 },
+    { word: "fit to work", weight: 35 },
+    { word: "fit to study", weight: 35 },
+    { word: "fit to school", weight: 35 },
+    { word: "fit to resume", weight: 35 },
+    { word: "this is to certify", weight: 30 },
+    { word: "to whom it may concern", weight: 25 },
+    { word: "physician's signature", weight: 30 },
+    { word: "prc license no", weight: 25 },
+    { word: "ptr no", weight: 25 },
+    { word: "days of rest", weight: 25 }
   ]
 };
 
 const Classifier = {
-  classifyText(text) {
+  /**
+   * Classify document text against Paete RHU's Centralized Record Binders.
+   * @param {string} text - Raw or normalized OCR text extracted from document.
+   * @returns {Object} Classification metadata, confidence, matched tokens, and audit justification.
+   */
+  classifyText(text, filename = '') {
     if (!text || typeof text !== 'string') {
       return {
         suggestedCategory: "CONSULTATION_RECORD",
@@ -221,17 +177,19 @@ const Classifier = {
     }
 
     const normalizedText = text.toLowerCase();
+    const filenameLower = (filename || '').toLowerCase();
     const scores = {};
     const matchedTermsMap = {};
 
-    // 1. Calculate scores and gather matched terms
+    // 1. Calculate weighted keyword scores
     for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
       scores[category] = 0;
       matchedTermsMap[category] = [];
 
       for (const kw of keywords) {
-        // Match term in lowercase text
-        const regex = new RegExp(`\\b${kw.word}\\b|${kw.word}`, 'gi');
+        // Safe regex escaping for special characters
+        const escaped = kw.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escaped}\\b|${escaped}`, 'gi');
         const matches = normalizedText.match(regex);
         if (matches) {
           scores[category] += kw.weight * matches.length;
@@ -240,53 +198,100 @@ const Classifier = {
       }
     }
 
-    // Structural override: If text contains ITR section headers, boost PATIENT_INFORMATION_SHEET
-    if (/PHILHEALTH MEMBERSHIP|PHILHEALTH ID|PAST MEDICAL HISTORY|PAST SURGICAL HISTORY|MENSTRUAL HISTORY|PREGNANCY HISTORY|INDIVIDUAL TREATMENT RECORD/i.test(normalizedText)) {
-      scores['PATIENT_INFORMATION_SHEET'] = (scores['PATIENT_INFORMATION_SHEET'] || 0) + 100;
+    // 2. High-Priority Document Header / Title & Filename Signature
+    // Evaluates the top header block (where the official RHU title is printed) and file name
+    const headerBlock = normalizedText.slice(0, 1000);
+
+    const hasMedCertHeader = headerBlock.includes('medical certificate') || headerBlock.includes('sertipikong medikal') || filenameLower.includes('medical certificate') || filenameLower.includes('medcert');
+    const hasItrHeader = headerBlock.includes('individual treatment record') || headerBlock.includes('20 years old and above') || headerBlock.includes('philhealth membership information') || headerBlock.includes('philhealth id number') || filenameLower.includes('treatment record') || filenameLower.includes('itr') || filenameLower.includes('back');
+    const hasConsultHeader = headerBlock.includes('consultation & outpatient') || headerBlock.includes('consultation record') || (headerBlock.includes('consultation') && !hasMedCertHeader && !hasItrHeader) || filenameLower.includes('consultation');
+    const hasChildhoodHeader = headerBlock.includes('routine childhood immunization') || headerBlock.includes('childhood immunization') || headerBlock.includes('child health record') || headerBlock.includes('baby book') || filenameLower.includes('immunization') || filenameLower.includes('vax');
+    const hasMaternalHeader = headerBlock.includes('maternal care & prenatal') || headerBlock.includes('maternal care') || headerBlock.includes('prenatal record') || filenameLower.includes('maternal') || filenameLower.includes('prenatal');
+
+    if (hasMedCertHeader) {
+      scores['MEDICAL_CERTIFICATE'] = (scores['MEDICAL_CERTIFICATE'] || 0) + 5000;
+      matchedTermsMap['MEDICAL_CERTIFICATE'] = matchedTermsMap['MEDICAL_CERTIFICATE'] || [];
+      matchedTermsMap['MEDICAL_CERTIFICATE'].unshift('EXPLICIT HEADER: MEDICAL CERTIFICATE');
+    } else if (hasItrHeader) {
+      scores['PATIENT_INFORMATION_SHEET'] = (scores['PATIENT_INFORMATION_SHEET'] || 0) + 5000;
+      matchedTermsMap['PATIENT_INFORMATION_SHEET'] = matchedTermsMap['PATIENT_INFORMATION_SHEET'] || [];
+      matchedTermsMap['PATIENT_INFORMATION_SHEET'].unshift('EXPLICIT HEADER: INDIVIDUAL TREATMENT RECORD');
+    } else if (hasMaternalHeader) {
+      scores['MATERNAL_CARE_RECORD'] = (scores['MATERNAL_CARE_RECORD'] || 0) + 5000;
+      matchedTermsMap['MATERNAL_CARE_RECORD'] = matchedTermsMap['MATERNAL_CARE_RECORD'] || [];
+      matchedTermsMap['MATERNAL_CARE_RECORD'].unshift('EXPLICIT HEADER: MATERNAL CARE');
+    } else if (hasChildhoodHeader) {
+      scores['CHILDHOOD_IMMUNIZATION'] = (scores['CHILDHOOD_IMMUNIZATION'] || 0) + 5000;
+      matchedTermsMap['CHILDHOOD_IMMUNIZATION'] = matchedTermsMap['CHILDHOOD_IMMUNIZATION'] || [];
+      matchedTermsMap['CHILDHOOD_IMMUNIZATION'].unshift('EXPLICIT HEADER: CHILDHOOD IMMUNIZATION');
+    } else if (hasConsultHeader) {
+      scores['CONSULTATION_RECORD'] = (scores['CONSULTATION_RECORD'] || 0) + 5000;
+      matchedTermsMap['CONSULTATION_RECORD'] = matchedTermsMap['CONSULTATION_RECORD'] || [];
+      matchedTermsMap['CONSULTATION_RECORD'].unshift('EXPLICIT HEADER: CONSULTATION');
     }
 
-    // Structural override: If text contains Rabies PEP headers, boost IMMUNIZATION_RECORD
-    if (/RABIES POST-EXPOSURE PROPHYLAXIS|POST-EXPOSURE PROPHYLAXIS CARD|ANIMAL BITE TREATMENT CENTER|\bABTC\b|ANTI-RABIES VACCINE|NATIONAL RABIES PREVENTION/i.test(normalizedText)) {
-      scores['IMMUNIZATION_RECORD'] = (scores['IMMUNIZATION_RECORD'] || 0) + 150;
+    // 3. High-Precision Structural Body Signatures from reference_documents/
+    const isITR = /philhealth membership information|lifestyle & risk factors|smoking cessation profile|past medical history|past surgical history|menstrual history|pregnancy history|20 years old and above/i.test(normalizedText);
+    const isMaternal = /maternal care & prenatal|prenatal record sheet|prenatal visit log|fundal height|fetal heartbeat|single live intrauterine pregnancy/i.test(normalizedText);
+    const isChildhood = /routine childhood immunization|childhood immunization|baby book|vaccination log|bcg vaccine|hepb birth dose|penta 1|oral polio|immunization details/i.test(normalizedText);
+    const isConsult = /consultation & outpatient clinical record|clinical findings & diagnosis|prescription & treatment plan/i.test(normalizedText);
+    const isMedCert = /medical certificate|sertipikong medikal|fit to work|fit to study|certificate of health|this is to certify/i.test(normalizedText);
+
+    // Apply secondary structural boosts
+    if (isITR) {
+      scores['PATIENT_INFORMATION_SHEET'] = (scores['PATIENT_INFORMATION_SHEET'] || 0) + 600;
+    } else if (isMaternal) {
+      scores['MATERNAL_CARE_RECORD'] = (scores['MATERNAL_CARE_RECORD'] || 0) + 600;
+    } else if (isChildhood) {
+      scores['CHILDHOOD_IMMUNIZATION'] = (scores['CHILDHOOD_IMMUNIZATION'] || 0) + 600;
+    } else if (isConsult) {
+      scores['CONSULTATION_RECORD'] = (scores['CONSULTATION_RECORD'] || 0) + 600;
+    } else if (isMedCert) {
+      scores['MEDICAL_CERTIFICATE'] = (scores['MEDICAL_CERTIFICATE'] || 0) + 600;
     }
 
-    // 2. Sort categories by score descending
-    const sortedCategories = Object.entries(scores)
-      .sort((a, b) => b[1] - a[1]);
-
+    // 3. Sort categories by score descending
+    const sortedCategories = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const bestCategory = sortedCategories[0][0];
     const bestScore = sortedCategories[0][1];
     
     const alternativeCategory = sortedCategories[1] ? sortedCategories[1][0] : null;
     const alternativeScore = sortedCategories[1] ? sortedCategories[1][1] : 0;
 
-    // 3. Compute confidence score
+    // 4. Compute confidence score with dampened alternative drag
     let confidence = 0.0;
     if (bestScore > 0) {
-      const ratio = bestScore / (bestScore + alternativeScore);
-      // Reduce confidence for single weak keyword matches
-      const magnitudeFactor = Math.min(1.0, bestScore / 6.0); 
-      confidence = parseFloat((ratio * magnitudeFactor).toFixed(2));
+      const ratio = bestScore / (bestScore + (alternativeScore * 0.25));
+      const magnitudeFactor = Math.min(1.0, bestScore / 8.0); 
+      confidence = Math.min(0.99, parseFloat((ratio * magnitudeFactor).toFixed(2)));
     }
 
     // Determine confidence level
     let confidenceLevel = "LOW";
-    if (confidence >= 0.80) {
+    if (confidence >= 0.85) {
       confidenceLevel = "HIGH";
     } else if (confidence >= 0.50) {
       confidenceLevel = "MEDIUM";
     }
 
-    // 4. Formulate explainable matched terms list and explanation reason
+    // 5. Grounded Human-Readable Justification referencing Paete RHU Reference Taxonomy
     const matchedTerms = matchedTermsMap[bestCategory] || [];
-    
+    const binderMap = {
+      'PATIENT_INFORMATION_SHEET': 'RHU Centralized Binder 1: Individual Treatment Record (ITR)',
+      'CONSULTATION_RECORD': 'RHU Centralized Binder 2: Consultation & Outpatient Clinical Record',
+      'CHILDHOOD_IMMUNIZATION': 'RHU Centralized Binder 3: Routine Childhood Immunization (Baby Book)',
+      'MATERNAL_CARE_RECORD': 'RHU Centralized Binder 4: Maternal Care & Prenatal Record Sheet',
+      'MEDICAL_CERTIFICATE': 'RHU Clinical Auxiliary: Medical Certificate'
+    };
+
     let reason = "";
     if (bestScore === 0) {
-      reason = "No specific clinical keywords matched. System defaulted to Consultation Record.";
+      reason = "No specific clinical keywords matched. Defaulted to Consultation Record.";
     } else {
-      const uniqueTermsStr = matchedTerms.slice(0, 4).join(", ");
-      reason = `Suggested based on document matches for key terms: [${uniqueTermsStr}].`;
-      if (alternativeScore > 0) {
+      const uniqueTerms = Array.from(new Set(matchedTerms)).slice(0, 4);
+      const binderLabel = binderMap[bestCategory] || bestCategory.replace(/_/g, ' ');
+      reason = `Classified as [${binderLabel}] based on matched reference terms: [${uniqueTerms.join(', ')}].`;
+      if (alternativeScore > 50 && alternativeCategory) {
         reason += ` Alternative matches found in ${alternativeCategory.replace(/_/g, ' ')}.`;
       }
     }
@@ -295,8 +300,8 @@ const Classifier = {
       suggestedCategory: bestCategory,
       confidence,
       confidenceLevel,
-      matchedTerms,
-      alternativeCategory: alternativeScore > 0 ? alternativeCategory : null,
+      matchedTerms: Array.from(new Set(matchedTerms)),
+      alternativeCategory: alternativeScore > 50 ? alternativeCategory : null,
       reason
     };
   }

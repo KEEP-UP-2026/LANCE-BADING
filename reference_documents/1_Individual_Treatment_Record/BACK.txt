@@ -1,0 +1,167 @@
+INDIVIDUAL TREATMENT RECORD (ITR)
+BACK PAGE
+
+11. PHILHEALTH INFORMATION:
+- Philhealth ID Number:
+
+Membership Type:
+- Member
+- Dependent
+- Non-Member
+
+Membership Category:
+- Sponsored
+  - NHTS
+  - LGU
+  - NGA
+  - Private
+- Individually Paying Program (IPP)
+  - Organized Group
+  - OFW
+- Employed
+  - Government
+  - Private
+- Lifetime
+
+12. VITAL SIGNS:
+- BP:
+- HR:
+- RR:
+- PR:
+- Temp:
+- Blood Oxygen (SpO2):
+- Height (cm):
+- Weight (kg):
+- Waist circumference (cm):
+- Hip circumference (cm):
+
+13. PAST MEDICAL HISTORY:
+- Allergy, specify:
+- Asthma
+- Cancer, specify organ:
+- Cerebrovascular disease
+- Coronary artery disease
+- Diabetes mellitus
+- Emphysema
+- Epilepsy/Seizure disorder:
+- Hepatitis, specify type:
+- Hyperlipidemia
+- Hypertension, highest BP:
+- Peptic ulcer disease
+- Pneumonia
+- Thyroid disease
+- Tuberculosis, specify organ:
+  - If PTB, what category?
+- Urinary tract infection
+- Others:
+
+14. PAST SURGICAL HISTORY:
+- Operation:
+- Date:
+
+15. FAMILY HISTORY:
+- Allergy, specify:
+- Asthma
+- Cancer, specify organ:
+- Cerebrovascular disease
+- Coronary artery disease
+- Diabetes mellitus
+- Emphysema
+- Epilepsy/Seizure disorder:
+- Hepatitis, specify type:
+- Hyperlipidemia
+- Hypertension, highest BP:
+- Peptic ulcer disease
+- Pneumonia
+- Thyroid disease
+- Pulmonary Tuberculosis
+- Extrapulmonary Tuberculosis
+- Urinary tract infection
+- Mental Illness
+- Others:
+
+16. PERSONAL / SOCIAL HISTORY:
+Smoking:
+- Yes
+- No
+- Quit
+- No. of pack years?
+Alcohol:
+- Yes
+- No
+- Quit
+- No. of bottles/day?
+Illicit drugs:
+- Yes
+- No
+- Quit
+Sexually Active:
+- Yes
+- No
+
+17. IMMUNIZATIONS:
+Child Care:
+- BCG (Date: )
+- Hepa at Birth (HEPB) (Date: )
+- HepB after 24hrs (HEPBV) (Date: )
+- DPT-Hib-HepB Vaccine (PENTA) (Date: )
+- Oral Poliovirus Vaccine (OPV) (Date: )
+- Inactivated Polio Vaccine (IPV) (Date: )
+- Pneumococcal Conjugate Antigen (PCV) (Date: )
+- Measles Vaccine (MCV) (Date: )
+- Rotavirus Vaccine (ROTA) (Date: )
+- Varicella (Chickenpox) Vaccine (CPV) (Date: )
+
+General:
+- Flu Vaccine (FLU) (Date: )
+- Human Papilloma Virus Vaccine (HPV) (Date: )
+- Human Papilloma Virus Vaccine Grade 4 (HPVGR4)
+- Measles Rubella Grade 1 (MRGR1) (Date: )
+- Measles Rubella Grade 7 (MRGR7) (Date: )
+- Tetanus Diphtheria Grade 1 (TDGR1) (Date: )
+- Tetanus Diphtheria Grade 7 (TDGR7) (Date: )
+- Tetanus Toxoid (TT) (Date: )
+
+Animal Bite:
+- Vaxirab-N (PCECV1) (Date: )
+- Speeda (PVRV1) (Date: )
+- Abhayrab (PVRV2) (Date: )
+- Verorab (PVRV3) (Date: )
+- Indirab (PVRV4) (Date: )
+- Rabipur (PCECV2) (Date: )
+
+NCD:
+- Pneumococcal Vaccine (Date: )
+- Flu vaccine (Date: )
+
+Maternal Care:
+- Tetanus toxoid (Date: )
+
+18. MENSTRUAL HISTORY: (For Women)
+- Menarche:
+- Onset of sexual intercourse:
+- Last Menstrual Period:
+- Menstrual Bleeding Pattern:
+- Birth control method:
+- Period Duration:
+- Interval/Cycle:
+- No. of pads/day during menstruation:
+- Menopause?
+  - Yes
+  - No
+- If yes, at what age:
+
+19. PREGNANCY HISTORY: (For Women)
+- Gravity (no. of pregnancy):
+- Parity (no. of delivery):
+- Type of Delivery:
+- of Full term:
+- of Premature:
+- of Abortion:
+- of Living Children:
+- Pregnancy-induced hypertension (Pre-eclampsia)
+- Age of 1st full Pregnancy:
+- Access to Family Planning counselling:
+  - Yes
+  - No
+

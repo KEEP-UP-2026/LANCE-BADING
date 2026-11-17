@@ -2,7 +2,13 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
+const dns = require('dns');
 require('dotenv').config();
+
+// Prioritize IPv4 resolution to prevent DNS getaddrinfo ENOTFOUND drops on Windows/Node
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 const { validateJwtSecret } = require('./src/config/jwtConfig');
 validateJwtSecret();
@@ -15,6 +21,7 @@ const duplicateRoutes = require('./src/routes/duplicateRoutes');
 const searchRoutes = require('./src/routes/searchRoutes');
 const reportRoutes = require('./src/routes/reportRoutes');
 const dashboardRoutes = require('./src/routes/dashboardRoutes');
+const BatchController = require('./src/controllers/batchController');
 const AuthMiddleware = require('./src/middleware/authMiddleware');
 const CsrfMiddleware = require('./src/middleware/csrfMiddleware');
 
@@ -22,8 +29,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 app.use(CsrfMiddleware.validate.bind(CsrfMiddleware));
 app.use(express.static(path.join(__dirname, 'src/views/public')));
@@ -106,11 +113,11 @@ function getDashboardPath(role) {
     case 'RHU_ADMINISTRATOR':
       return '/dashboard/admin';
     case 'RECORDS_STAFF':
-      return '/dashboard/records';
+      return '/dashboard/patients';
     case 'HEALTHCARE_PERSONNEL':
-      return '/dashboard/healthcare';
+      return '/dashboard/patients';
     case 'ADMINISTRATIVE_STAFF':
-      return '/dashboard/administrative';
+      return '/dashboard/reports';
     default:
       return '/login';
   }
@@ -152,10 +159,37 @@ app.use((req, res) => {
   res.redirect('/');
 });
 
+// Global Express error handler (prevents unhandled errors from dropping TCP socket / ERR_CONNECTION_RESET)
+app.use((err, req, res, next) => {
+  console.error('[EXPRESS ERROR HANDLER]:', err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  return res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal server error occurred.'
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[UNCAUGHT EXCEPTION]:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[UNHANDLED REJECTION]:', reason);
+});
+
 app.listen(PORT, () => {
   console.log(`========================================`);
   console.log(`  KEEP UP SYSTEM - Objectives 1-5 Active`);
   console.log(`  Server listening on port: ${PORT}     `);
   console.log(`  Local URL: http://localhost:${PORT}   `);
   console.log(`========================================`);
+
+  // Auto-resume any interrupted or waiting batch processing jobs
+  setTimeout(() => {
+    BatchController.resumeUnfinishedBatches().catch(err => {
+      console.error('[SERVER STARTUP] Batch recovery check error:', err);
+    });
+  }, 2000);
 });

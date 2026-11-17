@@ -192,17 +192,22 @@
       injectSidebarLinks(user.role);
 
       // 3. Fetch system users, role distributions, and audit logs
+      const setElText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
       try {
         const data = await API.getUsers();
         if (data && data.success) {
           const users = data.users || [];
-          document.getElementById('stat-total-users').textContent = users.length;
+          setElText('stat-total-users', users.length);
           
           const active = users.filter(u => u.status === 'ACTIVE').length;
-          document.getElementById('stat-active-users').textContent = active;
+          setElText('stat-active-users', active);
           
           const inactive = users.filter(u => u.status === 'INACTIVE').length;
-          document.getElementById('stat-inactive-users').textContent = inactive;
+          setElText('stat-inactive-users', inactive);
 
           // Role Breakdown
           const adminStaffCount = users.filter(u => u.role === 'ADMINISTRATIVE_STAFF').length;
@@ -210,17 +215,17 @@
           const healthcareCount = users.filter(u => u.role === 'HEALTHCARE_PERSONNEL').length;
           const adminCount = users.filter(u => u.role === 'RHU_ADMINISTRATOR').length;
 
-          document.getElementById('role-count-admin-staff').textContent = adminStaffCount;
-          document.getElementById('role-count-records').textContent = recordsCount;
-          document.getElementById('role-count-healthcare').textContent = healthcareCount;
-          document.getElementById('role-count-admin').textContent = adminCount;
+          setElText('role-count-admin-staff', adminStaffCount);
+          setElText('role-count-records', recordsCount);
+          setElText('role-count-healthcare', healthcareCount);
+          setElText('role-count-admin', adminCount);
         }
 
         // Fetch audit logs
         const auditRes = await API.fetchJson('/api/reports/audit-logs');
         if (auditRes && auditRes.success) {
           const logs = auditRes.logs || [];
-          document.getElementById('stat-total-audits').textContent = logs.length;
+          setElText('stat-total-audits', logs.length);
           const logsContainer = document.getElementById('admin-audit-logs');
           if (logs.length === 0) {
             logsContainer.innerHTML = `

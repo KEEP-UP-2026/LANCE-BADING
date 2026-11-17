@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KEEP UP — System User Process Flows & Flowcharts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0f3b57;
+      --primary-hover: #164e63;
+      --accent: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1560px;
+      margin: 0 auto;
+    }
+
+    /* Top Nav Mode Switcher */
+    .mode-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: #e2e8f0;
+      padding: 6px;
+      border-radius: 10px;
+      width: fit-content;
+    }
+
+    .mode-btn {
+      padding: 9px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: #475569;
+      transition: all 0.15s ease;
+    }
+
+    .mode-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 28px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .header-info h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-info p {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      margin-top: 3px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: #0f3b57;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #164e63;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      background: #f1f5f9;
+      border: 1px solid transparent;
+      color: #475569;
+    }
+    .tab-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .tab-btn.active {
+      background: #0f3b57;
+      color: #ffffff;
+    }
+
+    .format-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .toggle-group {
+      display: inline-flex;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .toggle-btn {
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+    }
+    .toggle-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    /* Main Grid Layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+    }
+
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Preview Card */
+    .preview-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .preview-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .preview-dimensions {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .preview-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+      overflow: auto;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      height: auto;
+      background: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      border-radius: 2px;
+    }
+
+    /* Sidebar Details */
+    .sidebar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      height: fit-content;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .sidebar-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .page-list-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin: 12px 0 6px 0;
+    }
+
+    .page-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .page-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .page-item .icon {
+      font-size: 14px;
+    }
+
+    .thesis-tip {
+      margin-top: 18px;
+      padding: 12px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: #166534;
+    }
+
+    .thesis-tip strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Diagram Type Mode Switcher -->
+    <div class="mode-bar">
+      <button id="btnModeProcess" class="mode-btn active" onclick="switchMode('process')">📊 Process Flow (5-Column)</button>
+      <button id="btnModeFlowchart" class="mode-btn" onclick="switchMode('flowchart')">📄 Flowchart (2-Column)</button>
+      <a href="/data-dictionary.html" class="mode-btn" style="text-decoration:none; display:inline-flex; align-items:center;">📑 Data Dictionary</a>
+      <a href="/use-case.html" class="mode-btn" style="text-decoration:none; display:inline-flex; align-items:center;">🎯 Use Case Diagram</a>
+      <a href="/hipo-model.html" class="mode-btn" style="text-decoration:none; display:inline-flex; align-items:center;">🌲 HIPO Model</a>
+      <a href="/context-dfd.html" class="mode-btn" style="text-decoration:none; display:inline-flex; align-items:center;">🔄 Context & Data Flow Diagram</a>
+      <a href="/gantt-chart.html" class="mode-btn" style="text-decoration:none; display:inline-flex; align-items:center;">📅 Gantt Chart</a>
+    </div>
+
+    <!-- Header -->
+    <header>
+      <div class="header-info">
+        <h1 id="mainHeading">KEEP UP — System User Process Flows</h1>
+        <p id="mainSubheading">5-Column Process Flow with Decision Diamonds & Connectors (A, B, C, D) tailored to KEEP-UP 2026</p>
+      </div>
+      <div class="btn-group">
+        <button id="downloadCurrentBtn" class="btn btn-primary" onclick="downloadCurrent()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button id="downloadAllBtn" class="btn btn-outline" onclick="downloadAll()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Download All Roles
+        </button>
+      </div>
+    </header>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchRole('records_staff', this)">Records Staff</button>
+        <button class="tab-btn" onclick="switchRole('administrative_staff', this)">Administrative Staff</button>
+        <button class="tab-btn" onclick="switchRole('healthcare_personnel', this)">Healthcare Personnel</button>
+        <button class="tab-btn" onclick="switchRole('admin', this)">Administrator</button>
+      </div>
+
+      <div class="format-selector">
+        <span id="themeToggleLabel">Theme:</span>
+        <div class="toggle-group" id="themeToggleGroup">
+          <button id="btnThemeColor" class="toggle-btn active" onclick="switchTheme('color')">Full Color</button>
+          <button id="btnThemeBW" class="toggle-btn" onclick="switchTheme('bw')">Black & White</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Image Preview -->
+      <div class="preview-card">
+        <div class="preview-header">
+          <span class="preview-title" id="currentRoleTitle">RECORDS STAFF PROCESS FLOW</span>
+          <span class="preview-dimensions" id="currentDimensions">1560 × 940 px (Landscape)</span>
+        </div>
+        <div class="preview-container">
+          <img id="diagramImg" class="preview-img" src="/flowcharts/RECORDS_STAFF_Process_Flow.png" alt="Diagram Preview">
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-card">
+        <h3 id="sidebarRoleName">Records Staff Overview</h3>
+        <p id="sidebarRoleDesc">Manages patient directories, document digitization, OCR classification, and archives retention.</p>
+
+        <div class="page-list-title">Associated System Pages & Modules:</div>
+        <ul class="page-list" id="sidebarPagesList"></ul>
+
+        <div class="thesis-tip">
+          <strong>💡 Documentation Tip:</strong>
+          This diagram uses industry-standard flowchart notations (Ovals for Start/End, Connectors A–D for cross-column pagination, Diamonds for logical branch criteria, and Rectangles for process execution).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'process'; // 'process' or 'flowchart'
+    let currentRoleId = 'records_staff';
+    let currentTheme = 'color'; // 'color' or 'bw'
+    let currentFormat = 'fitted'; // for flowchart mode: 'fitted' or 'page'
+
+    const roleData = {
+      records_staff: {
+        title: 'RECORDS STAFF',
+        desc: 'Manages patient onboarding, physical document digitization, automated OCR text extraction, duplicate alerts, and medical record archival.',
+        pages: [
+          'Patient Directory (/dashboard/patients)',
+          'Document Binders: ITR (/dashboard/documents/itr)',
+          'Document Binders: Consultations (/dashboard/documents/consultations)',
+          'Document Binders: Immunizations (/dashboard/documents/immunizations)',
+          'Document Binders: Medical Certificates (/dashboard/documents/medcert)',
+          'Document Binders: Maternal Records (/dashboard/documents/maternal)',
+          'Unified Search Tool (/dashboard/search)',
+          'Duplicate Warnings (/dashboard/duplicates)',
+          'Archives Directory (/dashboard/archives)'
+        ],
+        files: {
+          process_color: '/flowcharts/RECORDS_STAFF_Process_Flow.png',
+          process_bw: '/flowcharts/RECORDS_STAFF_Process_Flow_BW.png',
+          flowchart_fitted: '/flowcharts/RECORDS_STAFF_Flowchart_Fitted.png',
+          flowchart_page: '/flowcharts/RECORDS_STAFF_Flowchart.png'
+        }
+      },
+      administrative_staff: {
+        title: 'ADMINISTRATIVE STAFF',
+        desc: 'Statistical reporting, patient census generation, health indicator analysis, binder monitoring, and PDF/CSV compliance exports.',
+        pages: [
+          'Analytics & Reports (/dashboard/reports)',
+          'Dashboard Overview (/dashboard/records)',
+          'Patient Directory (/dashboard/patients)',
+          'Document Binders: ITR (/dashboard/documents/itr)',
+          'Document Binders: Consultations (/dashboard/documents/consultations)',
+          'Document Binders: Immunizations (/dashboard/documents/immunizations)',
+          'Document Binders: Medical Certificates (/dashboard/documents/medcert)',
+          'Document Binders: Maternal Records (/dashboard/documents/maternal)',
+          'Unified Search Tool (/dashboard/search)',
+          'Duplicate Warnings (/dashboard/duplicates)',
+          'Archives Directory (/dashboard/archives)'
+        ],
+        files: {
+          process_color: '/flowcharts/ADMINISTRATIVE_STAFF_Process_Flow.png',
+          process_bw: '/flowcharts/ADMINISTRATIVE_STAFF_Process_Flow_BW.png',
+          flowchart_fitted: '/flowcharts/ADMINISTRATIVE_STAFF_Flowchart_Fitted.png',
+          flowchart_page: '/flowcharts/ADMINISTRATIVE_STAFF_Flowchart.png'
+        }
+      },
+      healthcare_personnel: {
+        title: 'HEALTHCARE PERSONNEL',
+        desc: 'Clinical evaluation, medical history review, and read-only inspection of digitized health records.',
+        pages: [
+          'Search & Retrieve Records (/dashboard/search)',
+          'Permitted Patient Info: Patient Directory (/dashboard/patients)',
+          'Clinical Binders: Individual Treatment Record (/dashboard/documents/itr)',
+          'Clinical Binders: Consultation Records (/dashboard/documents/consultations)',
+          'Clinical Binders: Immunizations (/dashboard/documents/immunizations)',
+          'Clinical Binders: Medical Certificates (/dashboard/documents/medcert)',
+          'Clinical Binders: Maternal Records (/dashboard/documents/maternal)'
+        ],
+        files: {
+          process_color: '/flowcharts/HEALTHCARE_PERSONNEL_Process_Flow.png',
+          process_bw: '/flowcharts/HEALTHCARE_PERSONNEL_Process_Flow_BW.png',
+          flowchart_fitted: '/flowcharts/HEALTHCARE_PERSONNEL_Flowchart_Fitted.png',
+          flowchart_page: '/flowcharts/HEALTHCARE_PERSONNEL_Flowchart.png'
+        }
+      },
+      admin: {
+        title: 'ADMINISTRATOR',
+        desc: 'System health monitoring, user account provisioning, role-based access control, security audit logging, and verified backups.',
+        pages: [
+          'System Monitoring Dashboard (/dashboard/admin)',
+          'User Accounts Management (/dashboard/admin/users)',
+          'Audit Log Review & Trails (/dashboard/admin/audit)'
+        ],
+        files: {
+          process_color: '/flowcharts/ADMINISTRATOR_Process_Flow.png',
+          process_bw: '/flowcharts/ADMINISTRATOR_Process_Flow_BW.png',
+          flowchart_fitted: '/flowcharts/RHU_ADMINISTRATOR_Flowchart_Fitted.png',
+          flowchart_page: '/flowcharts/RHU_ADMINISTRATOR_Flowchart.png'
+        }
+      }
+    };
+
+    function updateView() {
+      const role = roleData[currentRoleId];
+      const isProcess = currentMode === 'process';
+
+      document.getElementById('currentRoleTitle').innerText = `${role.title} ${isProcess ? 'PROCESS FLOW' : 'FLOWCHART'}`;
+      document.getElementById('sidebarRoleName').innerText = `${role.title} Overview`;
+      document.getElementById('sidebarRoleDesc').innerText = role.desc;
+
+      let src = '';
+      let dim = '';
+      if (isProcess) {
+        src = currentTheme === 'color' ? role.files.process_color : role.files.process_bw;
+        dim = '1560 × 940 px (Landscape)';
+      } else {
+        src = currentFormat === 'fitted' ? role.files.flowchart_fitted : role.files.flowchart_page;
+        dim = currentFormat === 'fitted' ? '920 × 790 px (Fitted)' : '920 × 1160 px (Page)';
+      }
+
+      document.getElementById('diagramImg').src = src;
+      document.getElementById('currentDimensions').innerText = dim;
+
+      // Update sidebar pages
+      const list = document.getElementById('sidebarPagesList');
+      list.innerHTML = '';
+      role.pages.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'page-item';
+        li.innerHTML = `<span class="icon">📁</span><span>${p}</span>`;
+        list.appendChild(li);
+      });
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnModeProcess').classList.toggle('active', mode === 'process');
+      document.getElementById('btnModeFlowchart').classList.toggle('active', mode === 'flowchart');
+
+      const isProcess = mode === 'process';
+      document.getElementById('mainHeading').innerText = isProcess ? 'KEEP UP — System User Process Flows' : 'KEEP UP — System User Flowcharts';
+      document.getElementById('mainSubheading').innerText = isProcess ? '5-Column Process Flow with Decision Diamonds & Connectors (A, B, C, D)' : '2-Column Serpentine Flowchart for Standard Documentation';
+
+      const toggleLabel = document.getElementById('themeToggleLabel');
+      const toggleGroup = document.getElementById('themeToggleGroup');
+
+      if (isProcess) {
+        toggleLabel.innerText = 'Theme:';
+        toggleGroup.innerHTML = `
+          <button id="btnThemeColor" class="toggle-btn ${currentTheme === 'color' ? 'active' : ''}" onclick="switchTheme('color')">Full Color</button>
+          <button id="btnThemeBW" class="toggle-btn ${currentTheme === 'bw' ? 'active' : ''}" onclick="switchTheme('bw')">Black & White</button>
+        `;
+      } else {
+        toggleLabel.innerText = 'Frame:';
+        toggleGroup.innerHTML = `
+          <button id="btnFitted" class="toggle-btn ${currentFormat === 'fitted' ? 'active' : ''}" onclick="switchFormat('fitted')">Fitted Frame</button>
+          <button id="btnPage" class="toggle-btn ${currentFormat === 'page' ? 'active' : ''}" onclick="switchFormat('page')">Page Frame</button>
+        `;
+      }
+
+      updateView();
+    }
+
+    function switchRole(roleId, btn) {
+      currentRoleId = roleId;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateView();
+    }
+
+    function switchTheme(theme) {
+      currentTheme = theme;
+      document.getElementById('btnThemeColor').classList.toggle('active', theme === 'color');
+      document.getElementById('btnThemeBW').classList.toggle('active', theme === 'bw');
+      updateView();
+    }
+
+    function switchFormat(format) {
+      currentFormat = format;
+      document.getElementById('btnFitted').classList.toggle('active', format === 'fitted');
+      document.getElementById('btnPage').classList.toggle('active', format === 'page');
+      updateView();
+    }
+
+    function downloadCurrent() {
+      const role = roleData[currentRoleId];
+      let src = '';
+      let filename = '';
+
+      if (currentMode === 'process') {
+        src = currentTheme === 'color' ? role.files.process_color : role.files.process_bw;
+        filename = `${role.title.replace(/\s+/g, '_')}_Process_Flow_${currentTheme.toUpperCase()}.png`;
+      } else {
+        src = currentFormat === 'fitted' ? role.files.flowchart_fitted : role.files.flowchart_page;
+        filename = `${role.title.replace(/\s+/g, '_')}_Flowchart_${currentFormat.toUpperCase()}.png`;
+      }
+
+      const a = document.createElement('a');
+      a.href = src;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function downloadAll() {
+      const keys = Object.keys(roleData);
+      keys.forEach((key, index) => {
+        setTimeout(() => {
+          const role = roleData[key];
+          let src = '';
+          let filename = '';
+
+          if (currentMode === 'process') {
+            src = currentTheme === 'color' ? role.files.process_color : role.files.process_bw;
+            filename = `${role.title.replace(/\s+/g, '_')}_Process_Flow_${currentTheme.toUpperCase()}.png`;
+          } else {
+            src = currentFormat === 'fitted' ? role.files.flowchart_fitted : role.files.flowchart_page;
+            filename = `${role.title.replace(/\s+/g, '_')}_Flowchart_${currentFormat.toUpperCase()}.png`;
+          }
+
+          const a = document.createElement('a');
+          a.href = src;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, index * 300);
+      });
+    }
+
+    // Initialize
+    updateView();
+  </script>
+</body>
+</html>

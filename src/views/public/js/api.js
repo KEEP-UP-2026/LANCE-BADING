@@ -39,6 +39,11 @@ async function ensureCsrfToken(forceRefresh = false) {
   throw new Error('Failed to obtain CSRF token.');
 }
 
+function getCsrfToken() {
+  return csrfTokenCache || getCsrfFromCookie() || '';
+}
+window.getCsrfToken = getCsrfToken;
+
 function buildHeaders(options = {}, includeJson = true) {
   const headers = { ...(options.headers || {}) };
   if (includeJson && !headers['Content-Type']) {
@@ -105,6 +110,13 @@ const API = {
 
       return data;
     } catch (error) {
+      const retryCount = options._netRetry || 0;
+      if (error && (error.name === 'TypeError' || (error.message && error.message.includes('Failed to fetch'))) && retryCount < 2) {
+        const delay = (retryCount + 1) * 900;
+        console.warn(`Network glitch / server restart detected, retrying request in ${delay}ms... (attempt ${retryCount + 1})`, url);
+        await new Promise(res => setTimeout(res, delay));
+        return this.fetchJson(url, { ...options, _netRetry: retryCount + 1 });
+      }
       console.error('Fetch error:', error);
       throw error;
     }
@@ -283,6 +295,7 @@ async function loadUserProfile(forceRefresh = false) {
     window.location.href = '/login';
   }
 }
+window.loadUserProfile = loadUserProfile;
 
 function formatRole(role) {
   switch (role) {
@@ -358,8 +371,8 @@ function injectSidebarLinks(role) {
     ];
   } else if (role === 'RECORDS_STAFF') {
     links = [
-      { href: '/dashboard/records', label: 'Dashboard Overview', icon: '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>' },
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/records/batch-status', label: 'Batch Status', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4h2v4zm0-6h-2V7h2v4z"/>' },
       { section: 'Document Binders' },
       { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>', badge: 'ITR' },
       { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>', badge: 'Consult' },
@@ -373,23 +386,21 @@ function injectSidebarLinks(role) {
     ];
   } else if (role === 'HEALTHCARE_PERSONNEL') {
     links = [
-      { href: '/dashboard/healthcare', label: 'Healthcare Overview', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>' },
+      { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
       { section: 'Search & Retrieval' },
       { href: '/dashboard/search', label: 'Search & Retrieve Records', icon: '<path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>' },
-      { section: 'Permitted Patient Info' },
-      { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { section: 'Permitted Clinical Binders' },
-      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>' },
-      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
-      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>' },
-      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>' },
-      { href: '/dashboard/documents/maternal', label: 'Maternal Records', icon: '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>' }
+      { section: 'Clinical Binders' },
+      { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>', badge: 'ITR' },
+      { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>', badge: 'Consult' },
+      { href: '/dashboard/documents/immunizations', label: 'Immunizations', icon: '<path d="M19 3h-4V1h-2v2H9V1H7v2H3v18h16V3zm-2 16H5V8h12v11z"/>', badge: 'Vax' },
+      { href: '/dashboard/documents/medcert', label: 'Medical Certificates', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2V9h2v2zm0 4h-2v-2h2v2zm3-6V3.5L18.5 9H16z"/>', badge: 'MedCert' },
+      { href: '/dashboard/documents/maternal', label: 'Maternal Records', icon: '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>', badge: 'Maternal' }
     ];
   } else if (role === 'ADMINISTRATIVE_STAFF') {
     links = [
       { href: '/dashboard/reports', label: 'Analytics & Reports', icon: '<path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8zM4 21h16v-2H4v2z"/>' },
-      { href: '/dashboard/records', label: 'Dashboard Overview', icon: '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>' },
       { href: '/dashboard/patients', label: 'Patient Directory', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>' },
+      { href: '/dashboard/records/batch-status', label: 'Batch Status', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-4h2v4zm0-6h-2V7h2v4z"/>' },
       { section: 'Document Binders' },
       { href: '/dashboard/documents/itr', label: 'Individual Treatment Record', icon: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>', badge: 'ITR' },
       { href: '/dashboard/documents/consultations', label: 'Consultation Records', icon: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>', badge: 'Consult' },
@@ -577,8 +588,20 @@ const SpaRouter = {
       return;
     }
 
-    // Do not intercept external, api, or auth endpoints
-    if (targetUrl.origin !== window.location.origin || targetPath.startsWith('/api/') || targetPath === '/login' || targetPath === '/api/auth/logout') {
+    // Record source page before navigating so detail views can accurately return
+    if (pushState && !currentPath.includes('/records/view') && !currentPath.includes('/batch-review')) {
+      try { sessionStorage.setItem('lastDashboardSource', window.location.href); } catch(_) {}
+    }
+
+    // Do not intercept external, api, auth, or standalone review workspace endpoints
+    if (
+      targetUrl.origin !== window.location.origin ||
+      targetPath.startsWith('/api/') ||
+      targetPath === '/login' ||
+      targetPath === '/api/auth/logout' ||
+      targetPath.includes('/batch-review') ||
+      currentPath.includes('/batch-review')
+    ) {
       window.location.href = url;
       return;
     }
@@ -611,6 +634,14 @@ const SpaRouter = {
       const currentMain = document.querySelector('.main-content');
 
       if (!newMain || !currentMain) {
+        window.location.href = targetUrl.href;
+        return;
+      }
+
+      // Check if sidebar structure matches: if one page has sidebar and the other doesn't, do full browser navigation
+      const newHasSidebar = !!newDoc.querySelector('.sidebar, #sidebar');
+      const currentHasSidebar = !!document.querySelector('.sidebar, #sidebar');
+      if (newHasSidebar !== currentHasSidebar) {
         window.location.href = targetUrl.href;
         return;
       }
@@ -655,12 +686,12 @@ const SpaRouter = {
 
       // 4. Swap page-level modals located outside .main-content
       document.querySelectorAll('[data-spa-modal="true"]').forEach(el => el.remove());
-      document.querySelectorAll('.app-container > .modal-overlay, .app-container > .modal-backdrop, body > .modal-overlay, body > .modal-backdrop').forEach(el => {
+      document.querySelectorAll('.app-container > .modal-overlay, .app-container > .modal-backdrop, .app-container > .record-modal-overlay, body > .modal-overlay, body > .modal-backdrop, body > .record-modal-overlay').forEach(el => {
         if (!currentMain.contains(el)) el.remove();
       });
 
       const targetAppContainer = document.querySelector('.app-container') || document.body;
-      newDoc.querySelectorAll('.modal-overlay, .modal-backdrop').forEach(modal => {
+      newDoc.querySelectorAll('.modal-overlay, .modal-backdrop, .record-modal-overlay, [id$="-modal"]').forEach(modal => {
         if (!newMain.contains(modal)) {
           const clonedModal = modal.cloneNode(true);
           clonedModal.setAttribute('data-spa-modal', 'true');
@@ -689,6 +720,14 @@ const SpaRouter = {
 
       // 9. Execute new scripts
       await this.executeScripts(newDoc);
+
+      if (targetPath === '/dashboard/records/batch-status' && targetUrl.searchParams.get('openUpload') === 'true') {
+        setTimeout(() => {
+          if (typeof window.openBatchUploadModal === 'function') {
+            window.openBatchUploadModal();
+          }
+        }, 50);
+      }
 
       this.setProgressBar(100);
       setTimeout(() => this.setProgressBar(0), 300);
@@ -754,7 +793,20 @@ const SpaRouter = {
       if (anchor) {
         const href = anchor.getAttribute('href');
         if (href && (href.startsWith('/dashboard') || href.startsWith('/records') || href.startsWith('/patients') || href.startsWith('/search') || href.startsWith('/archives') || href.startsWith('/duplicates') || href.startsWith('/reports'))) {
-          if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && anchor.target !== '_blank' && !anchor.hasAttribute('download') && !anchor.hasAttribute('data-no-spa')) {
+          // If already on batch-status and clicking batch-upload or batch-status?openUpload=true, directly open modal
+          if (href.includes('/records/batch-upload') || href.includes('/records/batch-status?openUpload=true')) {
+            if (window.location.pathname === '/dashboard/records/batch-status' && typeof window.openBatchUploadModal === 'function') {
+              e.preventDefault();
+              window.openBatchUploadModal();
+              return;
+            }
+          }
+          try {
+            if (!window.location.pathname.includes('/records/view') && !window.location.pathname.includes('/batch-review')) {
+              sessionStorage.setItem('lastDashboardSource', window.location.href);
+            }
+          } catch(_) {}
+          if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && anchor.target !== '_blank' && !anchor.hasAttribute('download') && !anchor.hasAttribute('data-no-spa') && !href.includes('/batch-review') && !window.location.pathname.includes('/batch-review')) {
             e.preventDefault();
             this.navigate(anchor.href, true);
             return;
@@ -798,6 +850,13 @@ window.navigateTo = function(url) {
 
 document.addEventListener('DOMContentLoaded', () => {
   SpaRouter.init();
+
+  try {
+    const curPath = window.location.pathname;
+    if (curPath.startsWith('/dashboard') && !curPath.includes('/records/view') && !curPath.includes('/batch-review')) {
+      sessionStorage.setItem('lastDashboardSource', window.location.href);
+    }
+  } catch(_) {}
 
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');

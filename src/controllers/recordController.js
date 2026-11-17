@@ -356,25 +356,20 @@ const RecordController = {
       const itrData = ocrResult.itr_data || {};
       const pageNum = ocrResult.itr_page_number || 1;
 
-      const isRabies = pageNum === 3 || ocrResult.doc_type === 'RABIES_PEP' || (itrData && (itrData.record_subtype === 'RABIES_PEP' || itrData.rabies_exposure)) || ['RABIES', 'ANTI-RABIES', 'POST-EXPOSURE', 'ANIMAL BITE TREATMENT CENTER', 'ABTC', 'PVRV', 'PCECV', 'SPEEDA'].some(kw => rawText.includes(kw));
-      
       const isP2 = pageNum === 2 || ['philhealth_membership', 'past_medical_history', 'immunizations', 'menstrual_history', 'pregnancy_history'].some(k => k in itrData) || ['PHILHEALTH', 'PAST MEDICAL HISTORY', 'PAST SURGICAL HISTORY', 'IMMUNIZATIONS', 'MENSTRUAL HISTORY', 'PREGNANCY HISTORY'].some(kw => rawText.includes(kw));
       
       let suggestedPage = 1;
-      let suggestedLabel = 'Individual Treatment Record - Page 1';
-      if (isRabies) {
-        suggestedPage = 3;
-        suggestedLabel = 'Rabies Post-Exposure Prophylaxis Card (ABTC - Paete RHU)';
-      } else if (isP2) {
+      let suggestedLabel = 'Individual Treatment Record - Page 1 (Front)';
+      if (isP2) {
         suggestedPage = 2;
-        suggestedLabel = 'Individual Treatment Record - Page 2';
+        suggestedLabel = 'Individual Treatment Record - Page 2 (Back)';
       }
 
       return res.status(200).json({
         success: true,
         suggested_page: suggestedPage,
         suggested_label: suggestedLabel,
-        suggested_category: isRabies ? 'IMMUNIZATION_RECORD' : 'PATIENT_INFORMATION_SHEET',
+        suggested_category: 'PATIENT_INFORMATION_SHEET',
         confidence_score: 0.95,
         confidence_level: 'HIGH CONFIDENCE'
       });
@@ -442,14 +437,29 @@ const RecordController = {
         extractedText = '';
       }
 
-      // Classify text based on weighted keyword rules
-      const classification = Classifier.classifyText(extractedText);
+      // Classify text based on weighted keyword rules (including header title & filename)
+      const classification = Classifier.classifyText(extractedText, file ? (file.originalname || file.filename || '') : '');
       if (itrPageNumber === 3 || (itrData && (itrData.record_subtype === 'RABIES_PEP' || itrData.rabies_exposure))) {
         classification.suggestedCategory = 'IMMUNIZATION_RECORD';
         classification.confidence = 0.98;
         classification.confidenceLevel = 'HIGH';
         classification.reason = 'Suggested based on document matches for Rabies Post-Exposure Prophylaxis Card (ABTC - Paete RHU).';
       }
+
+      // [DEBUG LOGGING] Prominent console output of extracted OCR text & classification
+      console.log('\n' + '='.repeat(70));
+      console.log(`📄 [OCR & CLASSIFICATION DEBUG] Uploaded: ${file ? file.originalname : targetPath}`);
+      console.log(`🔧 Text Length: ${extractedText.length} characters | Blocks: ${layoutBlocks.length} | Target Page: ${itrPageNumber}`);
+      console.log('-'.repeat(70));
+      console.log('📝 EXTRACTED OCR RAW TEXT:');
+      console.log(extractedText || '[NO TEXT EXTRACTED]');
+      console.log('-'.repeat(70));
+      console.log('🏷️ CLASSIFICATION RESULT:');
+      console.log(`  Suggested Category: ${classification.suggestedCategory}`);
+      console.log(`  Confidence: ${classification.confidence} (${classification.confidenceLevel})`);
+      console.log(`  Matched Terms: [${(classification.matchedTerms || []).join(', ')}]`);
+      console.log(`  Reason: ${classification.reason || 'N/A'}`);
+      console.log('='.repeat(70) + '\n');
 
       let activeToken = token;
 
@@ -598,29 +608,19 @@ const RecordController = {
         finalFilePath = path.relative(process.cwd(), localDest);
       }
 
-      // Handle Rabies PEP categorization
+      // Normalize record type
       let finalRecordType = record_type;
+      if (finalRecordType === 'ANTI_RABIES_RECORD' || finalRecordType === 'ANTI_RABIES') {
+        finalRecordType = 'IMMUNIZATION_RECORD';
+      }
       let finalStructured = structured_json || tempUpload.structured_json || null;
       if (typeof finalStructured === 'string') {
         try { finalStructured = JSON.parse(finalStructured); } catch (_) {}
       }
 
-      if (finalRecordType === 'ANTI_RABIES_RECORD' || (finalStructured && (finalStructured.record_subtype === 'RABIES_PEP' || finalStructured.rabies_exposure || finalStructured.itr_page_number === 3))) {
-        finalRecordType = 'IMMUNIZATION_RECORD';
-        if (finalStructured && typeof finalStructured === 'object') {
-          finalStructured.record_subtype = 'RABIES_PEP';
-          finalStructured.itr_page_number = 3;
-          if (!finalStructured.header) finalStructured.header = {};
-          finalStructured.header.record_type = 'IMMUNIZATION_RECORD';
-          finalStructured.header.record_subtype = 'RABIES_PEP';
-        }
-      }
-
       // Save finalized patient record in DB
       const fileUrl = `/api/records/download/${recordId}`;
-      const recordSubtype = (finalStructured && finalStructured.record_subtype)
-        ? finalStructured.record_subtype
-        : (finalRecordType === 'IMMUNIZATION_RECORD' && (finalStructured && (finalStructured.rabies_exposure || finalStructured.itr_page_number === 3)) ? 'RABIES_PEP' : null);
+      const recordSubtype = (finalStructured && finalStructured.record_subtype) ? finalStructured.record_subtype : null;
 
       const newRecord = await RecordModel.create({
         id: recordId,
@@ -1033,11 +1033,11 @@ const RecordController = {
       const normalizeCategoryKey = (cat) => {
         if (!cat) return 'ALL';
         const c = String(cat).toUpperCase().trim();
-        if (['PATIENT_INFORMATION_SHEET', 'INDIVIDUAL_TREATMENT_RECORD', 'ITR', 'TREATMENT'].includes(c)) return 'PATIENT_INFORMATION_SHEET';
-        if (['CONSULTATION_RECORD', 'CONSULTATION', 'CONSULTATIONS'].includes(c)) return 'CONSULTATION_RECORD';
-        if (['IMMUNIZATION_RECORD', 'IMMUNIZATION', 'IMMUNIZATIONS', 'VACCINE', 'VACCINATION', 'ANTI_RABIES_RECORD'].includes(c)) return 'IMMUNIZATION_RECORD';
+        if (['PATIENT_INFORMATION_SHEET', 'INDIVIDUAL_TREATMENT_RECORD', 'ITR', 'TREATMENT', 'PATIENT_RECORD'].includes(c)) return 'PATIENT_INFORMATION_SHEET';
+        if (['CONSULTATION_RECORD', 'CONSULTATION', 'CONSULTATIONS', 'CONSULT'].includes(c)) return 'CONSULTATION_RECORD';
+        if (['IMMUNIZATION_RECORD', 'IMMUNIZATION', 'IMMUNIZATIONS', 'CHILDHOOD_IMMUNIZATION', 'CHILD_IMMUNIZATION', 'ANTI_RABIES', 'ANTI_RABIES_RECORD', 'VACCINE', 'VACCINATION', 'VAX'].includes(c)) return 'IMMUNIZATION_RECORD';
         if (['MEDICAL_CERTIFICATE', 'MEDCERT', 'MED_CERT', 'MEDICAL_CERT', 'CERTIFICATE'].includes(c)) return 'MEDICAL_CERTIFICATE';
-        if (['MATERNAL_CARE_RECORD', 'MATERNAL', 'MATERNAL_CARE', 'PRENATAL'].includes(c)) return 'MATERNAL_CARE_RECORD';
+        if (['MATERNAL_CARE_RECORD', 'MATERNAL', 'MATERNAL_CARE', 'PRENATAL', 'PRENATAL_RECORD', 'MATERNAL_RECORD'].includes(c)) return 'MATERNAL_CARE_RECORD';
         return c;
       };
 
@@ -1053,18 +1053,55 @@ const RecordController = {
         }
       };
 
+      const resolveRecordCategoryKey = (rec) => {
+        const c1 = normalizeCategoryKey(rec.category);
+        const c2 = normalizeCategoryKey(rec.record_type);
+        const c3 = normalizeCategoryKey(rec.classification_result);
+
+        for (const c of [c1, c2, c3]) {
+          if (c && c !== 'ALL' && c !== 'PATIENT_INFORMATION_SHEET') {
+            return c;
+          }
+        }
+        return c2 || c1 || c3 || 'PATIENT_INFORMATION_SHEET';
+      };
+
       const targetCategory = normalizeCategoryKey(category);
+      const BatchModel = require('../models/batchModel');
       const allRecords = await RecordModel.findAllActive();
+      const allBatchItems = await BatchModel.findAllItems();
       const patients = await PatientModel.findAllActive();
       const patientMap = new Map(patients.map(p => [p.id, p]));
 
-      // Enrich active records with patient details
+      const batchItemByConfirmedRecordId = new Map();
+      const batchItemByFilename = new Map();
+      for (const item of allBatchItems) {
+        if (item.confirmed_record_id) {
+          batchItemByConfirmedRecordId.set(item.confirmed_record_id, item);
+        }
+        if (item.original_filename) {
+          const cleanOrig = item.original_filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+          batchItemByFilename.set(cleanOrig, item);
+          batchItemByFilename.set(item.original_filename, item);
+        }
+      }
+
+      const representedBatchItemIds = new Set();
+
+      // Enrich active records with patient details (including unlinked records)
       const enrichedRecords = [];
       for (const rec of allRecords) {
-        const patient = patientMap.get(rec.patient_id);
-        if (!patient) continue; // Skip orphaned records
+        const patient = rec.patient_id ? patientMap.get(rec.patient_id) : null;
+        let matchedBatchItem = batchItemByConfirmedRecordId.get(rec.id) || null;
+        if (!matchedBatchItem && rec.file_name) {
+          const strippedName = rec.file_name.replace(/^rec_\d+_/, '');
+          matchedBatchItem = batchItemByFilename.get(strippedName) || batchItemByFilename.get(rec.file_name) || null;
+        }
+        if (matchedBatchItem) {
+          representedBatchItemIds.add(matchedBatchItem.id);
+        }
 
-        const recCategoryKey = normalizeCategoryKey(rec.record_type);
+        const recCategoryKey = resolveRecordCategoryKey(rec);
         const matchesCat = (targetCategory === 'ALL' || recCategoryKey === targetCategory);
 
         if (matchesCat) {
@@ -1079,35 +1116,129 @@ const RecordController = {
             if (rec.extracted_text.length > 180) snippet += '...';
           }
 
-          const patientFullName = `${patient.first_name} ${patient.middle_name ? patient.middle_name + ' ' : ''}${patient.last_name}`.trim();
+          let structuredJson = rec.structured_json;
+          if (typeof structuredJson === 'string') {
+            try { structuredJson = JSON.parse(structuredJson); } catch (_) { structuredJson = null; }
+          }
+
+          const isUnlinked = !patient;
+          const patientFullName = patient
+            ? `${patient.first_name} ${patient.middle_name ? patient.middle_name + ' ' : ''}${patient.last_name}`.trim()
+            : null;
 
           enrichedRecords.push({
             id: rec.id,
-            patient_id: patient.id,
+            batch_item_id: matchedBatchItem ? matchedBatchItem.id : null,
+            is_unlinked: isUnlinked,
+            patient_id: patient ? patient.id : null,
             patient_name: patientFullName,
-            patient_number: patient.patient_number,
-            patient_birth_date: patient.birth_date,
-            patient_sex: patient.sex,
-            patient_address: patient.address || patient.barangay || 'Paete, Laguna',
-            patient_photo_url: patient.photo_url || null,
+            patient_number: patient ? patient.patient_number : null,
+            patient_birth_date: patient ? patient.birth_date : null,
+            patient_sex: patient ? patient.sex : null,
+            patient_address: patient ? (patient.address || patient.barangay || 'Paete, Laguna') : null,
+            patient_photo_url: patient ? (patient.photo_url || null) : null,
             file_name: rec.file_name,
             file_url: rec.file_url || `/api/records/download/${rec.id}`,
             file_type: rec.file_type,
-            record_type: rec.record_type,
+            record_type: recCategoryKey,
             record_type_normalized: recCategoryKey,
-            record_type_label: getCategoryLabel(rec.record_type),
+            record_type_label: getCategoryLabel(recCategoryKey),
             classification_result: rec.classification_result,
             extracted_text_preview: snippet,
-            structured_json: rec.structured_json || null,
+            structured_json: structuredJson || null,
             created_at: rec.created_at,
             updated_at: rec.updated_at
           });
         }
       }
 
+      // Also check archived records so no archived documents ever resurrect in the active list
+      const allRecordsIncludingArchived = await RecordModel.findAll(true);
+      const archivedRecordIds = new Set(
+        (allRecordsIncludingArchived || []).filter(r => r.status === 'ARCHIVED').map(r => r.id)
+      );
+      const archivedFilenames = new Set(
+        (allRecordsIncludingArchived || []).filter(r => r.status === 'ARCHIVED').map(r => r.file_name)
+      );
+
+      // Include confirmed batch items that do not yet have a patient_record row and are not archived
+      for (const item of allBatchItems) {
+        if (item.status !== 'CONFIRMED') continue;
+        if (representedBatchItemIds.has(item.id)) continue;
+        // If this item was confirmed into a record, it was either active (handled above) or archived - never surface here
+        if (item.confirmed_record_id) continue;
+        if (item.status === 'ARCHIVED' || item.status === 'REJECTED') continue;
+
+        // Skip if filename matches any archived record
+        if (item.original_filename) {
+          const cleanOrig = item.original_filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+          let isArchivedFile = false;
+          for (const af of archivedFilenames) {
+            if (af && (af.includes(cleanOrig) || af.includes(item.original_filename))) {
+              isArchivedFile = true;
+              break;
+            }
+          }
+          if (isArchivedFile) continue;
+        }
+
+        let structuredData = item.extracted_data;
+        if (typeof structuredData === 'string') {
+          try { structuredData = JSON.parse(structuredData); } catch (_) { structuredData = null; }
+        }
+
+        const itemCategoryKey = resolveRecordCategoryKey({
+          record_type: item.suggested_category,
+          classification_result: item.suggested_category,
+          structured_json: structuredData
+        });
+        const matchesCat = (targetCategory === 'ALL' || itemCategoryKey === targetCategory);
+        if (!matchesCat) continue;
+
+        let snippet = '';
+        if (item.raw_ocr_text) {
+          snippet = item.raw_ocr_text
+            .replace(/===\s*[^=]+\s*===/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .substring(0, 180);
+          if (item.raw_ocr_text.length > 180) snippet += '...';
+        }
+
+        const linkedPatient = item.target_patient_id ? patientMap.get(item.target_patient_id) : null;
+        const isUnlinked = !linkedPatient;
+        const patientFullName = linkedPatient
+          ? `${linkedPatient.first_name} ${linkedPatient.middle_name ? linkedPatient.middle_name + ' ' : ''}${linkedPatient.last_name}`.trim()
+          : null;
+
+        enrichedRecords.push({
+          id: item.id,
+          batch_item_id: item.id,
+          is_unlinked: isUnlinked,
+          patient_id: linkedPatient ? linkedPatient.id : null,
+          patient_name: patientFullName,
+          patient_number: linkedPatient ? linkedPatient.patient_number : null,
+          patient_birth_date: linkedPatient ? linkedPatient.birth_date : null,
+          patient_sex: linkedPatient ? linkedPatient.sex : null,
+          patient_address: linkedPatient ? (linkedPatient.address || linkedPatient.barangay || 'Paete, Laguna') : null,
+          patient_photo_url: linkedPatient ? (linkedPatient.photo_url || null) : null,
+          file_name: item.original_filename,
+          file_url: `/api/records/batch/file/${item.id}`,
+          file_type: item.mime_type || 'image/png',
+          record_type: itemCategoryKey,
+          record_type_normalized: itemCategoryKey,
+          record_type_label: getCategoryLabel(itemCategoryKey),
+          classification_result: item.suggested_category,
+          extracted_text_preview: snippet,
+          structured_json: structuredData || null,
+          created_at: item.created_at,
+          updated_at: item.updated_at || item.created_at
+        });
+      }
+
       // Compute category summary metrics before textual search filters
       const totalCategoryCount = enrichedRecords.length;
-      const uniquePatients = new Set(enrichedRecords.map(r => r.patient_id));
+      const uniquePatients = new Set(enrichedRecords.filter(r => !r.is_unlinked && r.patient_id).map(r => r.patient_id));
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
       const recent30DaysCount = enrichedRecords.filter(r => new Date(r.created_at) >= thirtyDaysAgo).length;
@@ -1121,7 +1252,8 @@ const RecordController = {
           const numMatch = (r.patient_number || '').toLowerCase().includes(q);
           const fileMatch = (r.file_name || '').toLowerCase().includes(q);
           const textMatch = (r.extracted_text_preview || '').toLowerCase().includes(q);
-          return nameMatch || numMatch || fileMatch || textMatch;
+          const unlinkedMatch = r.is_unlinked && 'unlinked'.includes(q);
+          return nameMatch || numMatch || fileMatch || textMatch || unlinkedMatch;
         });
       }
 
@@ -1207,25 +1339,70 @@ const RecordController = {
   async getRecordById(req, res) {
     try {
       const { id } = req.params;
-      const record = await RecordModel.findById(id);
+      let record = await RecordModel.findById(id);
+
+      // Fallback: If not in patient_records, check batch_items
+      if (!record) {
+        const BatchModel = require('../models/batchModel');
+        const bItem = await BatchModel.findItemById(id);
+        if (bItem) {
+          let structuredData = bItem.extracted_data;
+          if (typeof structuredData === 'string') {
+            try { structuredData = JSON.parse(structuredData); } catch (_) { structuredData = {}; }
+          }
+          record = {
+            id: bItem.id,
+            patient_id: bItem.target_patient_id || null,
+            file_name: bItem.original_filename,
+            file_url: `/api/records/batch/file/${bItem.id}`,
+            file_type: bItem.mime_type || 'image/png',
+            record_type: bItem.suggested_category || 'PATIENT_INFORMATION_SHEET',
+            classification_result: bItem.suggested_category,
+            extracted_text: bItem.raw_ocr_text || '',
+            structured_json: structuredData || {},
+            created_at: bItem.created_at,
+            updated_at: bItem.updated_at
+          };
+        }
+      }
+
       if (!record) {
         return res.status(404).json({ success: false, message: 'Record not found.' });
       }
 
       const PatientModel = require('../models/patientModel');
-      const patient = await PatientModel.findById(record.patient_id);
+      const patient = record.patient_id ? await PatientModel.findById(record.patient_id) : null;
       const previewUrl = record.file_url || `/api/records/download/${record.id}`;
 
       let sj = record.structured_json;
       if (typeof sj === 'string') {
         try { sj = JSON.parse(sj); } catch (_) {}
       }
+
+      // Fallback: If structured_json is missing or empty, attempt lookup from confirmed batch_items
+      if (!sj || Object.keys(sj).length === 0) {
+        try {
+          const dbConfig = require('../config/db');
+          if (fs.existsSync(dbConfig.jsonDbPath)) {
+            const raw = JSON.parse(fs.readFileSync(dbConfig.jsonDbPath, 'utf-8'));
+            const matched = (raw.batch_items || []).find(b => 
+              b.confirmed_record_id === record.id ||
+              (b.file_path && record.file_name && b.file_path.includes(record.file_name))
+            );
+            if (matched && matched.extracted_data && Object.keys(matched.extracted_data).length > 0) {
+              sj = matched.extracted_data;
+            }
+          }
+        } catch (_) {}
+      }
+
       const recordSubtype = record.record_subtype || (sj && sj.record_subtype) || null;
 
       return res.status(200).json({
         success: true,
         record: {
           ...record,
+          structured_json: sj || {},
           record_subtype: recordSubtype,
           preview_url: previewUrl
         },
@@ -1244,14 +1421,55 @@ const RecordController = {
   async archiveRecord(req, res) {
     try {
       const { id } = req.params;
-      const record = await RecordModel.findById(id);
+      const BatchModel = require('../models/batchModel');
+      let record = await RecordModel.findById(id);
+
+      let targetBatchItem = null;
       if (!record) {
+        // Fallback: check batch_items
+        targetBatchItem = await BatchModel.findItemById(id);
+        if (targetBatchItem && targetBatchItem.confirmed_record_id) {
+          record = await RecordModel.findById(targetBatchItem.confirmed_record_id);
+        }
+      }
+
+      if (!record && !targetBatchItem) {
         return res.status(404).json({ success: false, message: 'Record not found.' });
       }
 
-      const archivedRecord = await RecordModel.archive(id);
+      // If we have a patient_records row, archive it
+      let archivedRecord = null;
+      if (record) {
+        archivedRecord = await RecordModel.archive(record.id);
+      }
 
-      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_ARCHIVED', `Archived document: ${record.file_name} (Record ID: ${record.id})`, req);
+      // Also find and archive ANY linked batch_items so they don't linger as zombie confirmed items
+      try {
+        const allItems = await BatchModel.findAllItems(1000);
+        const linkedItems = (allItems || []).filter(item => {
+          if (targetBatchItem && item.id === targetBatchItem.id) return true;
+          if (record && item.confirmed_record_id === record.id) return true;
+          if (record && record.file_name && item.original_filename) {
+            const cleanOrig = item.original_filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+            return record.file_name.includes(cleanOrig) || record.file_name.includes(item.original_filename);
+          }
+          return false;
+        });
+
+        for (const li of linkedItems) {
+          await BatchModel.updateItem(li.id, { status: 'ARCHIVED' });
+          if (li.batch_id) {
+            try { await BatchModel.recountBatchStats(li.batch_id); } catch (_) {}
+          }
+        }
+      } catch (syncErr) {
+        console.warn('Could not sync batch item archive status:', syncErr.message);
+      }
+
+      const docName = record ? record.file_name : (targetBatchItem ? targetBatchItem.original_filename : 'Document');
+      const docId = record ? record.id : (targetBatchItem ? targetBatchItem.id : id);
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_ARCHIVED', `Archived document: ${docName} (ID: ${docId})`, req);
 
       return res.status(200).json({
         success: true,
@@ -1271,9 +1489,63 @@ const RecordController = {
   async deleteRecord(req, res) {
     try {
       const { id } = req.params;
-      const record = await RecordModel.findById(id);
+      let record = await RecordModel.findById(id);
+      const BatchModel = require('../models/batchModel');
+
       if (!record) {
-        return res.status(404).json({ success: false, message: 'Record not found.' });
+        // Fallback: Check if this is a batch item ID (e.g. viewed directly from document binders)
+        const bItem = await BatchModel.findItemById(id);
+        if (!bItem) {
+          return res.status(404).json({ success: false, message: 'Record not found.' });
+        }
+
+        // Delete physical file if exists
+        if (bItem.file_path && fs.existsSync(bItem.file_path)) {
+          try { fs.unlinkSync(bItem.file_path); } catch (_) {}
+        }
+
+        // If this batch item had a confirmed record in patient_records, delete it as well
+        if (bItem.confirmed_record_id) {
+          try { await RecordModel.delete(bItem.confirmed_record_id); } catch (_) {}
+        }
+
+        // Permanently delete the batch item row
+        await BatchModel.deleteItem(bItem.id);
+
+        if (bItem.batch_id) {
+          try { await BatchModel.recountBatchStats(bItem.batch_id); } catch (_) {}
+        }
+
+        await AuditMiddleware.logActivity(
+          req.user.id,
+          req.user.email,
+          'RECORD_DELETED',
+          `Permanently deleted document: ${bItem.original_filename} (Batch Item ID: ${bItem.id})`,
+          req
+        );
+
+        return res.status(200).json({
+          success: true,
+          message: 'Record deleted permanently.'
+        });
+      }
+
+      // If record is found in patient_records:
+      // Permanently delete any linked batch item so it does not linger as a zombie confirmed record
+      try {
+        const allItems = await BatchModel.findAllItems();
+        const linkedBatchItems = allItems.filter(b => b.confirmed_record_id === id);
+        for (const lb of linkedBatchItems) {
+          if (lb.file_path && fs.existsSync(lb.file_path)) {
+            try { fs.unlinkSync(lb.file_path); } catch (_) {}
+          }
+          await BatchModel.deleteItem(lb.id);
+          if (lb.batch_id) {
+            try { await BatchModel.recountBatchStats(lb.batch_id); } catch (_) {}
+          }
+        }
+      } catch (unlinkErr) {
+        console.warn('Batch item cleanup warning on record delete:', unlinkErr.message);
       }
 
       await RecordModel.delete(id);
@@ -1283,7 +1555,13 @@ const RecordController = {
         try { fs.unlinkSync(record.file_path); } catch (_) {}
       }
 
-      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_DELETED', `Permanently deleted document: ${record.file_name} (Record ID: ${record.id})`, req);
+      await AuditMiddleware.logActivity(
+        req.user.id,
+        req.user.email,
+        'RECORD_DELETED',
+        `Permanently deleted document: ${record.file_name} (Record ID: ${record.id})`,
+        req
+      );
 
       return res.status(200).json({
         success: true,
@@ -1436,14 +1714,54 @@ const RecordController = {
   async restoreRecord(req, res) {
     try {
       const { id } = req.params;
-      const record = await RecordModel.findById(id);
+      const BatchModel = require('../models/batchModel');
+      let record = await RecordModel.findById(id);
+
+      let targetBatchItem = null;
       if (!record) {
+        targetBatchItem = await BatchModel.findItemById(id);
+        if (targetBatchItem && targetBatchItem.confirmed_record_id) {
+          record = await RecordModel.findById(targetBatchItem.confirmed_record_id);
+        }
+      }
+
+      if (!record && !targetBatchItem) {
         return res.status(404).json({ success: false, message: 'Record not found.' });
       }
 
-      const restoredRecord = await RecordModel.update(id, { status: 'ACTIVE' });
+      let restoredRecord = null;
+      if (record) {
+        restoredRecord = await RecordModel.update(record.id, { status: 'ACTIVE' });
+      }
 
-      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_RESTORED', `Restored document: ${record.file_name} (Record ID: ${record.id})`, req);
+      // Also restore any linked batch items
+      try {
+        const allItems = await BatchModel.findAllItems(1000);
+        const linkedItems = (allItems || []).filter(item => {
+          if (targetBatchItem && item.id === targetBatchItem.id) return true;
+          if (record && item.confirmed_record_id === record.id) return true;
+          if (record && record.file_name && item.original_filename) {
+            const cleanOrig = item.original_filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+            return record.file_name.includes(cleanOrig) || record.file_name.includes(item.original_filename);
+          }
+          return false;
+        });
+
+        for (const li of linkedItems) {
+          const newStatus = (record || li.confirmed_record_id) ? 'CONFIRMED' : 'READY_FOR_REVIEW';
+          await BatchModel.updateItem(li.id, { status: newStatus });
+          if (li.batch_id) {
+            try { await BatchModel.recountBatchStats(li.batch_id); } catch (_) {}
+          }
+        }
+      } catch (syncErr) {
+        console.warn('Could not sync batch item restore status:', syncErr.message);
+      }
+
+      const docName = record ? record.file_name : (targetBatchItem ? targetBatchItem.original_filename : 'Document');
+      const docId = record ? record.id : (targetBatchItem ? targetBatchItem.id : id);
+
+      await AuditMiddleware.logActivity(req.user.id, req.user.email, 'RECORD_RESTORED', `Restored document: ${docName} (ID: ${docId})`, req);
 
       return res.status(200).json({
         success: true,
@@ -1751,9 +2069,31 @@ const RecordController = {
     try {
       const allRecords = await RecordModel.findAll(true); // includeArchived = true
       const archivedRecords = allRecords.filter(r => r.status === 'ARCHIVED');
+      const archivedRecordIds = new Set(archivedRecords.map(r => r.id));
+      const archivedFilenames = new Set(archivedRecords.map(r => r.file_name));
 
-      // Enrich with patient name where possible
-      const enriched = await Promise.all(archivedRecords.map(async (rec) => {
+      // Also check archived batch items (exclude ones already represented by archived patient_records)
+      const BatchModel = require('../models/batchModel');
+      let archivedBatchItems = [];
+      try {
+        const allBatchItems = await BatchModel.findAllItems(500);
+        archivedBatchItems = (allBatchItems || []).filter(item => {
+          if (item.status !== 'ARCHIVED') return false;
+          if (item.confirmed_record_id && archivedRecordIds.has(item.confirmed_record_id)) return false;
+          if (item.original_filename) {
+            const cleanOrig = item.original_filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+            for (const af of archivedFilenames) {
+              if (af && (af.includes(cleanOrig) || af.includes(item.original_filename))) {
+                return false;
+              }
+            }
+          }
+          return true;
+        });
+      } catch (_) {}
+
+      // Enrich patient_records
+      const enrichedRecords = await Promise.all(archivedRecords.map(async (rec) => {
         try {
           const patient = await PatientModel.findById(rec.patient_id);
           return {
@@ -1766,7 +2106,37 @@ const RecordController = {
         }
       }));
 
-      return res.status(200).json({ success: true, records: enriched });
+      // Enrich batch_items
+      const enrichedBatchItems = await Promise.all(archivedBatchItems.map(async (bItem) => {
+        try {
+          const patient = bItem.target_patient_id ? await PatientModel.findById(bItem.target_patient_id) : null;
+          return {
+            id: bItem.id,
+            patient_id: bItem.target_patient_id,
+            file_name: bItem.original_filename,
+            record_type: bItem.suggested_category || 'DRAFT_DOCUMENT',
+            created_at: bItem.created_at,
+            updated_at: bItem.updated_at,
+            status: 'ARCHIVED',
+            patient_name: patient ? `${patient.first_name} ${patient.middle_name ? patient.middle_name + ' ' : ''}${patient.last_name}` : 'Unassigned Patient',
+            patient_number: patient ? patient.patient_number : '-'
+          };
+        } catch (_) {
+          return {
+            id: bItem.id,
+            patient_id: bItem.target_patient_id,
+            file_name: bItem.original_filename,
+            record_type: bItem.suggested_category || 'DRAFT_DOCUMENT',
+            created_at: bItem.created_at,
+            updated_at: bItem.updated_at,
+            status: 'ARCHIVED',
+            patient_name: 'Unassigned Patient',
+            patient_number: '-'
+          };
+        }
+      }));
+
+      return res.status(200).json({ success: true, records: [...enrichedRecords, ...enrichedBatchItems] });
     } catch (error) {
       console.error('List archived records error:', error);
       return res.status(500).json({

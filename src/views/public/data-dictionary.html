@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KEEP UP — System Data Dictionary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 30px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .header-info h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-info p {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      margin-top: 4px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: #000000;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #27272a;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Tabs Bar */
+    .controls-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      background: #f1f5f9;
+      border: 1px solid transparent;
+      color: #475569;
+    }
+    .tab-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .tab-btn.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* Image Card */
+    .image-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .image-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .image-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .image-tables-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: #475569;
+    }
+
+    .image-preview-wrapper {
+      width: 100%;
+      background: #f1f5f9;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .image-preview-wrapper img {
+      max-width: 100%;
+      height: auto;
+      background: #ffffff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .tip-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 13.5px;
+      color: #166534;
+      margin-bottom: 24px;
+    }
+    .tip-box strong {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Nav Mode Bar -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; background: #e2e8f0; padding: 6px; border-radius: 10px; width: fit-content; flex-wrap: wrap;">
+      <a href="/flowcharts.html" style="padding: 8px 18px; font-size: 13.5px; font-weight: 600; border-radius: 8px; text-decoration: none; color: #475569; display: inline-flex; align-items: center; gap: 6px;">📊 Process Flows & Flowcharts</a>
+      <a href="/data-dictionary.html" style="padding: 8px 18px; font-size: 13.5px; font-weight: 600; border-radius: 8px; text-decoration: none; background: #ffffff; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 6px;">📑 Data Dictionary</a>
+      <a href="/use-case.html" style="padding: 8px 18px; font-size: 13.5px; font-weight: 600; border-radius: 8px; text-decoration: none; color: #475569; display: inline-flex; align-items: center; gap: 6px;">🎯 Use Case Diagram</a>
+      <a href="/hipo-model.html" style="padding: 8px 18px; font-size: 13.5px; font-weight: 600; border-radius: 8px; text-decoration: none; color: #475569; display: inline-flex; align-items: center; gap: 6px;">🌲 HIPO Model</a>
+      <a href="/context-dfd.html" style="padding: 8px 18px; font-size: 13.5px; font-weight: 600; border-radius: 8px; text-decoration: none; color: #475569; display: inline-flex; align-items: center; gap: 6px;">🔄 Context & Data Flow Diagram</a>
+      <a href="/gantt-chart.html" style="padding: 8px 18px; font-size: 13.5px; font-weight: 600; border-radius: 8px; text-decoration: none; color: #475569; display: inline-flex; align-items: center; gap: 6px;">📅 Gantt Chart</a>
+    </div>
+
+    <!-- Header -->
+    <header>
+      <div class="header-info">
+        <h1>KEEP UP — System Data Dictionary</h1>
+        <p>Complete Database Data Dictionary (3 Tables per Image) formatted for Capstone & Thesis Documentation</p>
+      </div>
+      <div class="btn-group">
+        <a href="/flowcharts.html" class="btn btn-outline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Process Flows
+        </a>
+        <button class="btn btn-primary" onclick="downloadAll()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Both Images (PNG)
+        </button>
+      </div>
+    </header>
+
+    <div class="tip-box">
+      <strong>📑 Thesis / Capstone Data Dictionary Guidelines:</strong>
+      Naka-grupo ang lahat ng 6 database tables ng KEEP-UP sa tig-tatlong (3) table kada imahe tulad ng hiniling. Sinusunod nito ang opisyal na 7 haligi:
+      <code>FIELD NAME</code> | <code>DATA TYPE</code> | <code>DATA FORMAT</code> | <code>FIELD SIZE</code> | <code>DESCRIPTION</code> | <code>EXAMPLE</code> | <code>RELATIONSHIP</code>.
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('all', this)">View All Batches</button>
+        <button class="tab-btn" onclick="showTab('part1', this)">Part 1: Core Tables (users, patients, patient_records)</button>
+        <button class="tab-btn" onclick="showTab('part2', this)">Part 2: Operational Tables (duplicate_flags, temporary_uploads, audit_logs)</button>
+      </div>
+    </div>
+
+    <!-- Part 1 Card -->
+    <div class="image-card" id="cardPart1">
+      <div class="image-header">
+        <div>
+          <span class="image-title">Data Dictionary — Part 1 of 2</span>
+          <span class="image-tables-tag">Tables: users, patients, patient_records</span>
+        </div>
+        <button class="btn btn-outline" onclick="downloadImage('/flowcharts/Data_Dictionary_Part_1.png', 'KEEP_UP_Data_Dictionary_Part_1.png')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Part 1 (PNG)
+        </button>
+      </div>
+      <div class="image-preview-wrapper">
+        <img src="/flowcharts/Data_Dictionary_Part_1.png" alt="Data Dictionary Part 1">
+      </div>
+    </div>
+
+    <!-- Part 2 Card -->
+    <div class="image-card" id="cardPart2">
+      <div class="image-header">
+        <div>
+          <span class="image-title">Data Dictionary — Part 2 of 2</span>
+          <span class="image-tables-tag">Tables: duplicate_flags, temporary_uploads, audit_logs</span>
+        </div>
+        <button class="btn btn-outline" onclick="downloadImage('/flowcharts/Data_Dictionary_Part_2.png', 'KEEP_UP_Data_Dictionary_Part_2.png')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Part 2 (PNG)
+        </button>
+      </div>
+      <div class="image-preview-wrapper">
+        <img src="/flowcharts/Data_Dictionary_Part_2.png" alt="Data Dictionary Part 2">
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const card1 = document.getElementById('cardPart1');
+      const card2 = document.getElementById('cardPart2');
+
+      if (tab === 'all') {
+        card1.style.display = 'block';
+        card2.style.display = 'block';
+      } else if (tab === 'part1') {
+        card1.style.display = 'block';
+        card2.style.display = 'none';
+      } else if (tab === 'part2') {
+        card1.style.display = 'none';
+        card2.style.display = 'block';
+      }
+    }
+
+    function downloadImage(url, filename) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function downloadAll() {
+      downloadImage('/flowcharts/Data_Dictionary_Part_1.png', 'KEEP_UP_Data_Dictionary_Part_1.png');
+      setTimeout(() => {
+        downloadImage('/flowcharts/Data_Dictionary_Part_2.png', 'KEEP_UP_Data_Dictionary_Part_2.png');
+      }, 400);
+    }
+  </script>
+</body>
+</html>

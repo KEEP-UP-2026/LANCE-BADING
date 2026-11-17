@@ -1,0 +1,51 @@
+IMMUNIZATION
+Title
+- IMMUNIZATION
+1. PATIENT INFORMATION:
+- Name (Last, First, Middle):
+- Date:
+- Age:
+- Sex:
+  - Male
+  - Female
+- Civil Status:
+- Address:
+- Contact No.:
+- Occupation:
+2. SCREENING / PRE-VACCINATION ASSESSMENT:
+- With fever today?
+  - Yes
+  - No
+- With acute illness?
+  - Yes
+  - No
+- History of allergic reaction to vaccines?
+  - Yes
+  - No
+- Currently taking medication or under treatment?
+  - Yes
+  - No
+- Pregnant? (if applicable)
+  - Yes
+  - No
+- Any other condition that may affect vaccination?
+  - Yes
+  - No
+- Specify / Remarks:
+3. VACCINATION HISTORY:
+- Vaccine (Antigen)
+- Date Given
+- Dose
+- Remarks
+4. IMMUNIZATION DETAILS (THIS VISIT):
+- Vaccine Name / Antigen
+- Dose
+- Date Given
+- Batch / Lot Number
+- Route
+- Site
+5. NEXT SCHEDULE:
+- Next Immunization Date:
+- Vaccine/s Due:
+6. REMARKS / NOTES:
+- Remarks / Notes

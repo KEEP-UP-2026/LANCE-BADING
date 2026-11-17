@@ -1401,6 +1401,14 @@
     };
 
     document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof loadUserProfile !== 'function') {
+        await new Promise(r => setTimeout(r, 400));
+        if (typeof loadUserProfile !== 'function') {
+          console.warn('loadUserProfile not ready, reloading page...');
+          window.location.reload();
+          return;
+        }
+      }
       currentUser = await loadUserProfile();
       if (!currentUser) return;
 

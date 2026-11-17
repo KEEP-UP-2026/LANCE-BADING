@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TALA — Hierarchical Input Process Output (HIPO) Model</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0f3b57;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* Top Nav Mode Bar */
+    .mode-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: #e2e8f0;
+      padding: 6px;
+      border-radius: 10px;
+      width: fit-content;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: #475569;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .mode-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 30px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .header-info h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-info p {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      margin-top: 4px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 9px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: #0f3b57;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #164e63;
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .theme-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .toggle-group {
+      display: inline-flex;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .toggle-btn {
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+    }
+    .toggle-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    /* Preview Card */
+    .preview-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .dimensions-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: #475569;
+    }
+
+    .preview-container {
+      width: 100%;
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      height: auto;
+      background: #ffffff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .tip-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 13.5px;
+      color: #166534;
+      margin-bottom: 24px;
+    }
+
+    /* Modules Summary Grid */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+    }
+
+    .module-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .module-card h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0f3b57;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 8px;
+    }
+
+    .submodule-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .submodule-item {
+      font-size: 12.5px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+
+    .submodule-item strong {
+      display: block;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .ipo-detail {
+      font-size: 11.5px;
+      color: #475569;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Nav Mode Bar -->
+    <div class="mode-bar">
+      <a href="/flowcharts.html" class="mode-btn">📊 Process Flows & Flowcharts</a>
+      <a href="/data-dictionary.html" class="mode-btn">📑 Data Dictionary</a>
+      <a href="/use-case.html" class="mode-btn">🎯 Use Case Diagram</a>
+      <a href="/hipo-model.html" class="mode-btn active">🌲 HIPO Model</a>
+      <a href="/context-dfd.html" class="mode-btn">🔄 Context & Data Flow Diagram</a>
+      <a href="/gantt-chart.html" class="mode-btn">📅 Gantt Chart</a>
+    </div>
+
+    <!-- Header -->
+    <header>
+      <div class="header-info">
+        <h1>TALA — Hierarchical Input Process Output (HIPO) Model</h1>
+        <p>A Web-Based Patient Record Management System with Batch Migration for the Rural Health Unit of Paete, Laguna</p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="downloadCurrent()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+    </header>
+
+    <div class="tip-box">
+      <strong>🌲 HIPO Model Architecture:</strong>
+      Naka-istruktura ang buong sistema sa ilalim ng anim (6) na core modules: <strong>User Authentication</strong>, <strong>Patient Registration</strong>, <strong>Batch Migration</strong> (pangunahing pokus ng pag-aaral), <strong>Document Digitization & OCR</strong>, <strong>Clinical Retrieval</strong>, at <strong>Statistical Reporting & Governance</strong>. Bawat sub-module ay may kumpletong breakdown ng <strong>INPUT</strong>, <strong>PROCESS</strong>, at <strong>OUTPUT</strong>.
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div class="theme-selector">
+        <span>Visual Theme:</span>
+        <div class="toggle-group">
+          <button id="btnColor" class="toggle-btn active" onclick="switchTheme('color')">Full Color (Presentation)</button>
+          <button id="btnBW" class="toggle-btn" onclick="switchTheme('bw')">Black & White (Thesis Book)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <span class="preview-title" id="currentTitle">TALA HIPO MODEL (FULL COLOR)</span>
+        <span class="dimensions-tag">2360 × 1040 px (Ultra-High Resolution)</span>
+      </div>
+      <div class="preview-container">
+        <img id="hipoImg" class="preview-img" src="/flowcharts/TALA_HIPO_Model.png" alt="TALA HIPO Model Preview">
+      </div>
+    </div>
+
+    <!-- Modules Summary Grid -->
+    <div class="modules-grid">
+      <div class="module-card">
+        <h3>1.0 User Authentication & Access Control</h3>
+        <ul class="submodule-list">
+          <li class="submodule-item">
+            <strong>1.1 Login & Session Handling</strong>
+            <div class="ipo-detail">• <em>Input:</em> Staff credentials, CSRF token</div>
+            <div class="ipo-detail">• <em>Process:</em> Bcrypt compare, JWT token signing</div>
+            <div class="ipo-detail">• <em>Output:</em> Active session, role dashboard access</div>
+          </li>
+          <li class="submodule-item">
+            <strong>1.2 Staff Account Provisioning</strong>
+            <div class="ipo-detail">• <em>Input:</em> Full name, email, role, status</div>
+            <div class="ipo-detail">• <em>Process:</em> Unique email check, password hashing</div>
+            <div class="ipo-detail">• <em>Output:</em> Staff user record, active privileges</div>
+          </li>
+          <li class="submodule-item">
+            <strong>1.3 Role Permissions & Profile</strong>
+            <div class="ipo-detail">• <em>Input:</em> User ID, profile update, reset request</div>
+            <div class="ipo-detail">• <em>Process:</em> RBAC verification, DB update</div>
+            <div class="ipo-detail">• <em>Output:</em> Updated profile, route access policy</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <h3>2.0 Patient Registration & Profiling</h3>
+        <ul class="submodule-list">
+          <li class="submodule-item">
+            <strong>2.1 Patient Registration</strong>
+            <div class="ipo-detail">• <em>Input:</em> Demographics, PhilHealth, 4Ps</div>
+            <div class="ipo-detail">• <em>Process:</em> Validation, generate unique PAT ID</div>
+            <div class="ipo-detail">• <em>Output:</em> Registered patient master record</div>
+          </li>
+          <li class="submodule-item">
+            <strong>2.2 Demographic Update & Archive</strong>
+            <div class="ipo-detail">• <em>Input:</em> Patient ID, contact update, archive flag</div>
+            <div class="ipo-detail">• <em>Process:</em> Authorization check, status cascade</div>
+            <div class="ipo-detail">• <em>Output:</em> Updated patient profile, active/archived state</div>
+          </li>
+          <li class="submodule-item">
+            <strong>2.3 Duplicate Screening & Merge</strong>
+            <div class="ipo-detail">• <em>Input:</em> Name, birthdate, threshold</div>
+            <div class="ipo-detail">• <em>Process:</em> Fuzzy algorithm matching, record merge</div>
+            <div class="ipo-detail">• <em>Output:</em> Duplicate warning flag, consolidated master</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <h3>3.0 Batch Migration & Data Ingestion</h3>
+        <ul class="submodule-list">
+          <li class="submodule-item">
+            <strong>3.1 Batch Document Archive Ingestion</strong>
+            <div class="ipo-detail">• <em>Input:</em> Legacy archive package (ZIP/Folder, CSV)</div>
+            <div class="ipo-detail">• <em>Process:</em> Format validation, staging in upload queue</div>
+            <div class="ipo-detail">• <em>Output:</em> Staged migration queue, validation summary</div>
+          </li>
+          <li class="submodule-item">
+            <strong>3.2 Automated Patient Record Linking</strong>
+            <div class="ipo-detail">• <em>Input:</em> Staged legacy documents, ID matching rules</div>
+            <div class="ipo-detail">• <em>Process:</em> ID matching, auto-link to master profile</div>
+            <div class="ipo-detail">• <em>Output:</em> Linked health documents, migration progress log</div>
+          </li>
+          <li class="submodule-item">
+            <strong>3.3 Migration Error Handling & Audit</strong>
+            <div class="ipo-detail">• <em>Input:</em> Unmatched files, SHA-256 hashes</div>
+            <div class="ipo-detail">• <em>Process:</em> Flag unmapped files, preservation checksums</div>
+            <div class="ipo-detail">• <em>Output:</em> Discrepancy report, verified DB integrity</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <h3>4.0 Document Digitization & OCR Engine</h3>
+        <ul class="submodule-list">
+          <li class="submodule-item">
+            <strong>4.1 Document Upload & Security Check</strong>
+            <div class="ipo-detail">• <em>Input:</em> Scanned paper records (PDF, PNG, JPG)</div>
+            <div class="ipo-detail">• <em>Process:</em> Size check (<10MB), MIME check, storage</div>
+            <div class="ipo-detail">• <em>Output:</em> Stored path, temporary staging token</div>
+          </li>
+          <li class="submodule-item">
+            <strong>4.2 Automated OCR Text Extraction</strong>
+            <div class="ipo-detail">• <em>Input:</em> Staged file, OCR configuration parameters</div>
+            <div class="ipo-detail">• <em>Process:</em> Tesseract.js engine, extract bounding blocks</div>
+            <div class="ipo-detail">• <em>Output:</em> Extracted text content, indexed search text</div>
+          </li>
+          <li class="submodule-item">
+            <strong>4.3 Health Binder Auto-Classification</strong>
+            <div class="ipo-detail">• <em>Input:</em> OCR text, medical keyword dictionary</div>
+            <div class="ipo-detail">• <em>Process:</em> Keyword matching to 5 binder categories</div>
+            <div class="ipo-detail">• <em>Output:</em> Auto-classified binder record, metadata</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <h3>5.0 Clinical Retrieval & Unified Search</h3>
+        <ul class="submodule-list">
+          <li class="submodule-item">
+            <strong>5.1 Unified Full-Text & OCR Search</strong>
+            <div class="ipo-detail">• <em>Input:</em> Keywords, patient name, number, date filters</div>
+            <div class="ipo-detail">• <em>Process:</em> Query DB and OCR index, apply role filter</div>
+            <div class="ipo-detail">• <em>Output:</em> Matching patient records, highlighted snippets</div>
+          </li>
+          <li class="submodule-item">
+            <strong>5.2 Clinical Binder Inspection</strong>
+            <div class="ipo-detail">• <em>Input:</em> Patient ID, category (ITR, Consult, Vax, etc.)</div>
+            <div class="ipo-detail">• <em>Process:</em> Retrieve binder list, signed download URLs</div>
+            <div class="ipo-detail">• <em>Output:</em> Interactive viewer, chronological health timeline</div>
+          </li>
+          <li class="submodule-item">
+            <strong>5.3 Read-Only Healthcare Review</strong>
+            <div class="ipo-detail">• <em>Input:</em> Healthcare personnel consultation query</div>
+            <div class="ipo-detail">• <em>Process:</em> Read-only clinical access, fetch history</div>
+            <div class="ipo-detail">• <em>Output:</em> Complete health profile, consultation summary</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <h3>6.0 Statistical Reporting & Governance</h3>
+        <ul class="submodule-list">
+          <li class="submodule-item">
+            <strong>6.1 Demographic & Census Aggregation</strong>
+            <div class="ipo-detail">• <em>Input:</em> Date range, barangay, PhilHealth, 4Ps filter</div>
+            <div class="ipo-detail">• <em>Process:</em> Count aggregation, morbidity statistics</div>
+            <div class="ipo-detail">• <em>Output:</em> RHU Paete census report, summary tables</div>
+          </li>
+          <li class="submodule-item">
+            <strong>6.2 Compliance Report Export (PDF/CSV)</strong>
+            <div class="ipo-detail">• <em>Input:</em> Report dataset, format selection (PDF/CSV)</div>
+            <div class="ipo-detail">• <em>Process:</em> Formatted PDF with RHU header, CSV compile</div>
+            <div class="ipo-detail">• <em>Output:</em> Downloadable PDF report, structured CSV</div>
+          </li>
+          <li class="submodule-item">
+            <strong>6.3 System Audit Logging & Preservation</strong>
+            <div class="ipo-detail">• <em>Input:</em> Transaction events (Create, Upload, Export)</div>
+            <div class="ipo-detail">• <em>Process:</em> Snapshot capture, trigger verified DB backup</div>
+            <div class="ipo-detail">• <em>Output:</em> Immutable audit trail log, verified DB backup</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentTheme = 'color';
+
+    function switchTheme(theme) {
+      currentTheme = theme;
+      document.getElementById('btnColor').classList.toggle('active', theme === 'color');
+      document.getElementById('btnBW').classList.toggle('active', theme === 'bw');
+
+      const img = document.getElementById('hipoImg');
+      const title = document.getElementById('currentTitle');
+
+      if (theme === 'color') {
+        img.src = '/flowcharts/TALA_HIPO_Model.png';
+        title.innerText = 'TALA HIPO MODEL (FULL COLOR)';
+      } else {
+        img.src = '/flowcharts/TALA_HIPO_Model_BW.png';
+        title.innerText = 'TALA HIPO MODEL (BLACK & WHITE)';
+      }
+    }
+
+    function downloadCurrent() {
+      const filename = currentTheme === 'color' ? 'TALA_HIPO_Model_COLOR.png' : 'TALA_HIPO_Model_BW.png';
+      const src = currentTheme === 'color' ? '/flowcharts/TALA_HIPO_Model.png' : '/flowcharts/TALA_HIPO_Model_BW.png';
+
+      const a = document.createElement('a');
+      a.href = src;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>

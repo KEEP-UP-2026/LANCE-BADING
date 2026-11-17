@@ -1,0 +1,56 @@
+MATERNAL RECORD
+Title
+- MATERNAL RECORD
+1. MATERNAL INFORMATION:
+- Name (Last, First, Middle):
+- Date Registered:
+- Age:
+- Civil Status:
+- Contact No.:
+- Address:
+- Occupation:
+2. OBSTETRIC HISTORY:
+- Gravida (G):
+- Para (P):
+- Abortion (A):
+- Living Children (L):
+3. CURRENT PREGNANCY:
+- LMP:
+- EDC / EDD:
+- AOG (weeks):
+4. PRENATAL MONITORING:
+- Date
+- AOG (weeks)
+- BP (mmHg)
+- Weight (kg)
+- Fundal Height (cm)
+- FHT (bpm)
+- Remarks
+5. LABORATORY / SCREENING:
+- Test / Screening
+- Done
+- Date
+- Result
+Items under Test / Screening:
+- CBC
+- Urinalysis
+- Blood Typing (ABO/Rh)
+- HBsAg
+- HIV
+- Syphilis (RPR/VDRL)
+- Others:
+6. DANGER SIGNS: (Advise to seek immediate care if present)
+- Vaginal bleeding
+- Severe abdominal pain
+- Severe headache / blurring of vision
+- Swelling of face, hands, or feet
+- High fever
+- Difficulty of breathing
+- Convulsions
+- Leaking of fluid
+- Decreased or no fetal movement
+7. CARE PLAN / INSTRUCTIONS:
+- Health Education / Counseling:
+- Supplements / Medications:
+- Next Prenatal Visit (Date/AOG):
+- Other Instructions:

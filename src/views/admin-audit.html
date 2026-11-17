@@ -219,11 +219,16 @@
       await loadAuditLogs();
 
       // 4. Attach filter handlers
-      document.getElementById('filter-search').addEventListener('input', applyFilters);
-      document.getElementById('filter-action').addEventListener('change', applyFilters);
-      document.getElementById('filter-timespan').addEventListener('change', applyFilters);
-      document.getElementById('refresh-logs-btn').addEventListener('click', loadAuditLogs);
-      document.getElementById('export-audit-csv-btn').addEventListener('click', exportAuditLogsCSV);
+      const filterSearch = document.getElementById('filter-search');
+      if (filterSearch) filterSearch.addEventListener('input', applyFilters);
+      const filterAction = document.getElementById('filter-action');
+      if (filterAction) filterAction.addEventListener('change', applyFilters);
+      const filterTime = document.getElementById('filter-timespan');
+      if (filterTime) filterTime.addEventListener('change', applyFilters);
+      const refreshBtn = document.getElementById('refresh-logs-btn');
+      if (refreshBtn) refreshBtn.addEventListener('click', loadAuditLogs);
+      const exportBtn = document.getElementById('export-audit-csv-btn');
+      if (exportBtn) exportBtn.addEventListener('click', exportAuditLogsCSV);
     });
 
     async function loadAuditLogs() {

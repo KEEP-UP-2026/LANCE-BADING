@@ -13,6 +13,9 @@ const nocache = (req, res, next) => {
 router.use(AuthMiddleware.authenticate);
 router.use(nocache);
 
+const ALLOWED_READ_ROLES = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
+const ALLOWED_WRITE_ROLES = ['RHU_ADMINISTRATOR', 'RECORDS_STAFF', 'ADMINISTRATIVE_STAFF'];
+
 // RHU Administrator pages
 router.get('/admin', 
   AuthMiddleware.requirePageAuth(['RHU_ADMINISTRATOR']), 
@@ -35,19 +38,28 @@ router.get('/admin/audit',
   }
 );
 
-// Records Staff & Administrative Staff page
+// Records Overview Route - Redirects any user away from /dashboard/records to their active portal
 router.get('/records', 
-  AuthMiddleware.requirePageAuth(['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF']), 
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES), 
   (req, res) => {
-    res.sendFile(path.join(__dirname, '../views/records.html'));
+    if (req.user && req.user.role === 'RHU_ADMINISTRATOR') {
+      return res.redirect('/dashboard/admin');
+    }
+    if (req.user && req.user.role === 'ADMINISTRATIVE_STAFF') {
+      return res.redirect('/dashboard/reports');
+    }
+    if (req.user && req.user.role === 'HEALTHCARE_PERSONNEL') {
+      return res.redirect('/dashboard/patients');
+    }
+    return res.redirect('/dashboard/patients');
   }
 );
 
-// Healthcare Personnel page
+// Healthcare Personnel page - Redirect to Patient Directory
 router.get('/healthcare', 
-  AuthMiddleware.requirePageAuth(['HEALTHCARE_PERSONNEL']), 
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES), 
   (req, res) => {
-    res.sendFile(path.join(__dirname, '../views/healthcare.html'));
+    res.redirect('/dashboard/patients');
   }
 );
 
@@ -68,9 +80,6 @@ router.get('/reports',
 );
 
 // Patient Management Page Routes (Clinical Staff only)
-const ALLOWED_READ_ROLES = ['RECORDS_STAFF', 'HEALTHCARE_PERSONNEL', 'ADMINISTRATIVE_STAFF'];
-const ALLOWED_WRITE_ROLES = ['RECORDS_STAFF', 'ADMINISTRATIVE_STAFF'];
-
 router.get('/patients', 
   AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
   (req, res) => {
@@ -100,10 +109,50 @@ router.get('/patients/profile/:id',
 );
 
 // Objective 3: New Web Pages Routes
-router.get('/records/upload/:patientId',
+router.get('/records/batch-upload',
   AuthMiddleware.requirePageAuth(ALLOWED_WRITE_ROLES),
   (req, res) => {
-    res.sendFile(path.join(__dirname, '../views/record-upload.html'));
+    res.redirect('/dashboard/records/batch-status?openUpload=true');
+  }
+);
+
+router.get('/records/batch-status',
+  AuthMiddleware.requirePageAuth(ALLOWED_WRITE_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/batch-status.html'));
+  }
+);
+
+router.get('/records/batch-status/:id',
+  AuthMiddleware.requirePageAuth(ALLOWED_WRITE_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/batch-status.html'));
+  }
+);
+
+router.get('/records/batch-review/:itemId',
+  AuthMiddleware.requirePageAuth(ALLOWED_WRITE_ROLES),
+  (req, res) => {
+    res.sendFile(path.join(__dirname, '../views/batch-review.html'));
+  }
+);
+
+// Legacy single-upload route redirected to modern batch scan/upload pipeline
+router.get(['/records/upload', '/records/upload/:patientId'],
+  AuthMiddleware.requirePageAuth(ALLOWED_WRITE_ROLES),
+  (req, res) => {
+    const patientId = req.params.patientId;
+    if (patientId) {
+      return res.redirect(`/dashboard/records/batch-status?openUpload=true&patient_id=${encodeURIComponent(patientId)}`);
+    }
+    return res.redirect('/dashboard/records/batch-status?openUpload=true');
+  }
+);
+
+router.get('/records/view',
+  AuthMiddleware.requirePageAuth(ALLOWED_READ_ROLES),
+  (req, res) => {
+    res.redirect('/dashboard/patients');
   }
 );
 

@@ -1,0 +1,52 @@
+CONSULTATION
+Title
+- CONSULTATION
+1. PATIENT INFORMATION:
+- Name (Last, First, Middle):
+- Date:
+- Age:
+- Sex:
+  - Male
+  - Female
+- Civil Status:
+- Address:
+- Contact No.:
+- Occupation:
+2. CHIEF COMPLAINT:
+- Chief Complaint
+3. HISTORY OF PRESENT ILLNESS:
+- History of Present Illness
+4. VITAL SIGNS:
+- BP (mmHg)
+- PR (bpm)
+- RR (cpm)
+- Temp (°C)
+- Height (cm)
+- Weight (kg)
+- BMI (kg/m²)
+5. MEDICAL HISTORY:
+- Allergies:
+  - None
+  - Specify:
+- Chronic Illness/es:
+  - None
+  - Specify:
+- Current Medication/s:
+  - None
+  - Specify:
+- Family History:
+  - None
+  - Specify:
+6. PHYSICAL EXAMINATION:
+- Physical Examination
+7. DIAGNOSIS / IMPRESSION:
+- Diagnosis / Impression
+8. TREATMENT / MANAGEMENT:
+- No.
+- Medication / Procedure / Advice
+- Dosage / Frequency
+- Duration
+9. FOLLOW-UP:
+- Return on:
+- As needed (PRN)
+- Remarks / Instructions:

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/jpeg" href="/images/LOGO.jpg">
+  <link rel="shortcut icon" href="/images/LOGO.jpg">
+  <title>Batch Processing Status Queue - KEEP UP</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .btn-pill {
+      border-radius: 24px !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      padding: 7px 16px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      transition: all 0.2s ease !important;
+      text-decoration: none !important;
+      cursor: pointer !important;
+      border: 1px solid transparent !important;
+    }
+
+    .btn-pill-primary {
+      background: #C62828 !important;
+      color: #ffffff !important;
+      border-color: #C62828 !important;
+      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25) !important;
+    }
+    .btn-pill-primary:hover {
+      background: #b71c1c !important;
+      border-color: #b71c1c !important;
+    }
+
+    .btn-pill-secondary {
+      background: #ffffff !important;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    .btn-pill-secondary:hover {
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .status-waiting { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .status-processing { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .status-ready { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .status-manual { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .status-confirmed { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+    .status-failed { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .status-rejected { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+
+    .filter-tab {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-tab.active {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+
+    /* Progress Bar */
+    .progress-bar-bg {
+      background: #f1f5f9;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #ef4444, #b91c1c);
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+
+    /* Modal Dropzone & Files */
+    .dropzone-container {
+      border: 2px dashed #fca5a5;
+      background: #fffafa;
+      border-radius: 16px;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .dropzone-container:hover, .dropzone-container.dragover {
+      border-color: #dc2626;
+      background: #fee2e2;
+      transform: translateY(-2px);
+    }
+
+    .file-badge-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.15s ease;
+    }
+    .file-badge-item:hover {
+      border-color: #fca5a5;
+      background: #fff8f8;
+    }
+
+    .problem-alert-box {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 14px;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-content-animated {
+      animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @media (max-width: 992px) {
+      .status-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    @media (max-width: 576px) {
+      .status-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-logo">
+          <img src="/images/LOGO.jpg" alt="RHU Paete Logo">
+        </div>
+        <span class="sidebar-brand-name">Keep Up</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="layout-user-initials">--</div>
+        <div class="user-info">
+          <div class="user-name" id="layout-user-name">Loading...</div>
+          <span class="user-role-badge" id="layout-user-role">---</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav" id="layout-nav-links"></ul>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">
+          <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Mobile Header -->
+      <header class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">
+          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <span class="sidebar-brand-name">Keep Up</span>
+        <div style="width: 32px; height: 32px; font-size: 13px;" class="user-avatar" id="mobile-user-initials">--</div>
+      </header>
+
+      <!-- Status Counters Card -->
+      <div class="content-card" style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 18px 20px; margin-bottom: 20px;">
+        <!-- Status Counters Grid -->
+        <div class="status-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;">
+          <div style="background: #f8fafc; padding: 14px 12px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center;">
+            <div style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">TOTAL</div>
+            <div id="count-total" style="font-size: 22px; font-weight: 900; color: #1e293b; margin-top: 2px;">0</div>
+          </div>
+          <div style="background: #eff6ff; padding: 14px 12px; border-radius: 12px; border: 1px solid #bfdbfe; text-align: center;">
+            <div style="font-size: 10px; font-weight: 800; color: #1d4ed8; text-transform: uppercase; letter-spacing: 0.05em;">PROCESSING</div>
+            <div id="count-processing" style="font-size: 22px; font-weight: 900; color: #1d4ed8; margin-top: 2px;">0</div>
+          </div>
+          <div style="background: #ecfdf5; padding: 14px 12px; border-radius: 12px; border: 1px solid #a7f3d0; text-align: center;">
+            <div style="font-size: 10px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.05em;">READY FOR REVIEW</div>
+            <div id="count-ready" style="font-size: 22px; font-weight: 900; color: #047857; margin-top: 2px;">0</div>
+          </div>
+          <div style="background: #fffbeb; padding: 14px 12px; border-radius: 12px; border: 1px solid #fde68a; text-align: center;">
+            <div style="font-size: 10px; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: 0.05em;">MANUAL REQUIRED</div>
+            <div id="count-manual" style="font-size: 22px; font-weight: 900; color: #b45309; margin-top: 2px;">0</div>
+          </div>
+          <div style="background: #f0fdf4; padding: 14px 12px; border-radius: 12px; border: 1px solid #86efac; text-align: center;">
+            <div style="font-size: 10px; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.05em;">CONFIRMED</div>
+            <div id="count-confirmed" style="font-size: 22px; font-weight: 900; color: #15803d; margin-top: 2px;">0</div>
+          </div>
+          <div style="background: #fef2f2; padding: 14px 12px; border-radius: 12px; border: 1px solid #fecaca; text-align: center;">
+            <div style="font-size: 10px; font-weight: 800; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.05em;">FAILED / ERRORS</div>
+            <div id="count-failed" style="font-size: 22px; font-weight: 900; color: #b91c1c; margin-top: 2px;">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Controls & Items Table -->
+      <div class="content-card" style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px 24px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="filter-tab active" onclick="setFilter('ALL', this)">All Documents</button>
+            <button type="button" class="filter-tab" onclick="setFilter('READY_FOR_REVIEW', this)">Ready for Review</button>
+            <button type="button" class="filter-tab" onclick="setFilter('MANUAL_REQUIRED', this)">Manual Handling</button>
+            <button type="button" class="filter-tab" onclick="setFilter('CONFIRMED', this)">Confirmed</button>
+            <button type="button" class="filter-tab" onclick="setFilter('FAILED', this)">Failed / Unsupported</button>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" class="btn-pill btn-pill-secondary" onclick="fetchAllBatchItems(true)" style="padding: 6px 14px; font-size: 12px;">
+              <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              Refresh
+            </button>
+            <button type="button" class="btn-pill btn-pill-primary" onclick="openBatchUploadModal()" style="padding: 6px 14px; font-size: 12px;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              Upload
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>SOURCE DOCUMENT</th>
+                <th>SUGGESTED CATEGORY</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="batch-items-tbody">
+              <tr>
+                <td colspan="4" style="text-align: center; color: #64748b; padding: 30px;">Loading batch documents...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Batch Upload Modal -->
+      <div id="batch-upload-modal" style="display: none; position: fixed; inset: 0; z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+        <div id="modal-backdrop" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); transition: opacity 0.2s;"></div>
+        
+        <div class="modal-content-animated" style="position: relative; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-width: 620px; width: 100%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
+          
+          <!-- Modal Header -->
+          <div style="padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; background: #f8fafc;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: currentColor;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              </div>
+              <div>
+                <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0;">Upload Documents</h3>
+                <p style="font-size: 12px; color: #64748b; margin: 2px 0 0;">Upload scanned health records for AI digitization</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeBatchUploadModal()" style="background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; padding: 4px; border-radius: 6px; line-height: 1; transition: color 0.15s;" onmouseover="this.style.color='#1e293b'" onmouseout="this.style.color='#94a3b8'" title="Close">&times;</button>
+          </div>
+
+          <!-- Modal Body -->
+          <div style="padding: 20px 24px; overflow-y: auto; max-height: calc(90vh - 145px);">
+            <!-- Dropzone -->
+            <div class="dropzone-container" id="modal-dropzone">
+              <input type="file" id="modal-file-input" multiple accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: currentColor;">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                </svg>
+              </div>
+              <h4 style="font-size: 14.5px; font-weight: 800; color: #1e293b; margin: 0 0 4px;">Drag and drop scanned documents here</h4>
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 12px;">Supported: PDF, PNG, JPG (Up to 25 files, max 20MB per file)</p>
+              <button type="button" class="btn-pill btn-pill-secondary" onclick="document.getElementById('modal-file-input').click();">
+                Browse Files
+              </button>
+            </div>
+
+            <!-- Pre-upload File List Preview -->
+            <div id="modal-file-list-section" style="display: none; margin-top: 18px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <h5 style="font-size: 13px; font-weight: 800; color: #1e293b; margin: 0;">
+                  Selected Documents (<span id="modal-selected-count">0</span>/25)
+                </h5>
+                <button type="button" class="btn-pill btn-pill-secondary" style="font-size: 11px !important; padding: 3px 10px !important;" onclick="clearModalFiles()">
+                  Clear All
+                </button>
+              </div>
+
+              <div id="modal-file-items-container" style="max-height: 200px; overflow-y: auto; padding-right: 4px;"></div>
+
+              <!-- Problem summary box if any invalid files found -->
+              <div id="modal-problems-container" style="display: none;" class="problem-alert-box">
+                <div style="font-weight: 800; color: #b91c1c; font-size: 12px; margin-bottom: 4px;">Upload Problems Detected:</div>
+                <ul id="modal-problems-list" style="margin: 0; padding-left: 18px; font-size: 11.5px; color: #991b1b;"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div style="padding: 14px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; background: #f8fafc;">
+            <button type="button" class="btn-pill btn-pill-secondary" onclick="closeBatchUploadModal()">Cancel</button>
+            <button type="button" id="modal-start-batch-btn" class="btn-pill btn-pill-primary" onclick="submitModalBatchUpload()">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+              Start Batch OCR &amp; AI Processing
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/toast.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    let allItems = [];
+    let currentFilter = 'ALL';
+    let pollInterval = null;
+    let modalSelectedFiles = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await loadUserProfile();
+      if (!user) return;
+      if (user.role !== 'RHU_ADMINISTRATOR' && user.role !== 'RECORDS_STAFF' && user.role !== 'ADMINISTRATIVE_STAFF') {
+        window.location.href = '/login';
+        return;
+      }
+      injectSidebarLinks(user.role);
+      setupModalDropzone();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('confirmed') === 'true') {
+        showToast('Record successfully confirmed and linked to patient chart!', 'success');
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      if (urlParams.get('patient_id')) {
+        sessionStorage.setItem('batchTargetPatientId', urlParams.get('patient_id'));
+      }
+
+      if (urlParams.get('openUpload') === 'true') {
+        openBatchUploadModal();
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+
+      await fetchAllBatchItems();
+      startPolling();
+    });
+
+    async function fetchAllBatchItems(isManual = false) {
+      try {
+        if (isManual) {
+          // Trigger queue recovery in background if anything is stuck
+          API.fetchJson('/api/records/batch/recover', { method: 'POST' }).catch(() => {});
+        }
+        const res = await API.fetchJson('/api/records/batch/all-items');
+        if (!res.success) {
+          showToast(res.message || 'Failed to load batch documents', 'error');
+          return;
+        }
+
+        allItems = res.items || [];
+        const counts = res.counts || {};
+
+        // Update Counters
+        document.getElementById('count-total').textContent = counts.total || 0;
+        document.getElementById('count-processing').textContent = counts.processing || 0;
+        document.getElementById('count-ready').textContent = counts.ready_for_review || 0;
+        document.getElementById('count-manual').textContent = counts.manual_required || 0;
+        document.getElementById('count-confirmed').textContent = counts.confirmed || 0;
+        document.getElementById('count-failed').textContent = counts.failed || 0;
+
+        renderItems();
+
+        if (isManual) {
+          showToast('Batch table refreshed!', 'info');
+        }
+      } catch (err) {
+        console.error('Fetch all batch items error:', err);
+      }
+    }
+
+    function startPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(() => {
+        fetchAllBatchItems();
+      }, 5000);
+    }
+
+    function setFilter(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      renderItems();
+    }
+
+    function renderItems() {
+      const tbody = document.getElementById('batch-items-tbody');
+      
+      if (!allItems || allItems.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: #64748b; padding: 40px 20px;">
+              <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">No batch documents found</div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 14px;">Upload documents to begin automated OCR and AI digitizing.</div>
+              <button type="button" class="btn-pill btn-pill-primary" onclick="openBatchUploadModal()" style="padding: 7px 16px;">
+                Upload
+              </button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let filtered = (allItems || []).filter(i => i.status !== 'REJECTED' && i.status !== 'ARCHIVED');
+      if (currentFilter === 'READY_FOR_REVIEW') {
+        filtered = filtered.filter(i => i.status === 'READY_FOR_REVIEW');
+      } else if (currentFilter === 'MANUAL_REQUIRED') {
+        filtered = filtered.filter(i => i.status === 'MANUAL_REQUIRED');
+      } else if (currentFilter === 'CONFIRMED') {
+        filtered = filtered.filter(i => i.status === 'CONFIRMED');
+      } else if (currentFilter === 'FAILED') {
+        filtered = filtered.filter(i => ['FAILED', 'UNSUPPORTED'].includes(i.status));
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: #64748b; padding: 30px; font-weight: 600;">
+              No documents matching current filter (${currentFilter.replace(/_/g, ' ')}).
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(item => {
+        let statusBadge = '';
+        let actionBtn = '';
+
+        if (item.status === 'READY_FOR_REVIEW') {
+          statusBadge = `<span class="status-badge status-ready">Ready for Review</span>`;
+          actionBtn = `
+            <a href="/dashboard/records/batch-review/${item.id}?from=/dashboard/records/batch-status" data-no-spa="true" class="btn-pill btn-pill-primary" style="padding: 5px 12px !important;">
+              Review Draft ➔
+            </a>
+          `;
+        } else if (item.status === 'MANUAL_REQUIRED') {
+          statusBadge = `<span class="status-badge status-manual">Manual Required</span>`;
+          actionBtn = `
+            <a href="/dashboard/records/batch-review/${item.id}?mode=manual&from=/dashboard/records/batch-status" data-no-spa="true" class="btn-pill btn-pill-secondary" style="border-color: #fde68a !important; color: #b45309 !important; padding: 5px 12px !important;">
+              Manual Entry
+            </a>
+          `;
+        } else if (item.status === 'CONFIRMED') {
+          statusBadge = `<span class="status-badge status-confirmed">Verified Record</span>`;
+          if (!item.target_patient_id) {
+            actionBtn = `<a href="/dashboard/records/batch-review/${item.id}?from=/dashboard/records/batch-status" data-no-spa="true" class="btn-pill btn-pill-secondary" style="padding: 5px 12px !important;">View Record</a>`;
+          } else if (item.confirmed_record_id) {
+            actionBtn = `<a href="/dashboard/records/view/${item.confirmed_record_id}?from=/dashboard/records/batch-status" class="btn-pill btn-pill-secondary" style="padding: 5px 12px !important;">View Record</a>`;
+          } else {
+            actionBtn = `<span style="font-size: 11px; color: #15803d; font-weight: 700;">Confirmed</span>`;
+          }
+        } else if (item.status === 'PROCESSING') {
+          statusBadge = `<span class="status-badge status-processing">Processing OCR...</span>`;
+          actionBtn = `<span style="font-size: 11px; color: #1d4ed8; font-weight: 600;">Extracting</span>`;
+        } else if (item.status === 'WAITING') {
+          statusBadge = `<span class="status-badge status-waiting">Waiting in Queue</span>`;
+          actionBtn = `<span style="font-size: 11px; color: #64748b; font-weight: 600;">Queued</span>`;
+        } else if (item.status === 'FAILED') {
+          statusBadge = `<span class="status-badge status-failed">Extraction Failed</span>`;
+          actionBtn = `
+            <a href="/dashboard/records/batch-review/${item.id}?mode=manual&from=/dashboard/records/batch-status" data-no-spa="true" class="btn-pill btn-pill-secondary" style="border-color: #fca5a5 !important; color: #b91c1c !important; padding: 5px 12px !important;">
+              Manual Fallback
+            </a>
+          `;
+        } else if (item.status === 'REJECTED') {
+          statusBadge = `<span class="status-badge status-rejected">Draft Rejected</span>`;
+          actionBtn = `<span style="font-size: 11px; color: #9ca3af; font-weight: 600;">Purged</span>`;
+        }
+
+        const categoryText = formatCategory(item.suggested_category);
+
+        html += `
+          <tr>
+            <td>
+              <span style="font-weight: 700; color: #1e293b; font-size: 13px;">${escapeHtml(item.original_filename)}</span>
+              ${item.error_message ? `<div style="font-size: 11px; color: #b91c1c; margin-top: 2px;">⚠️ ${escapeHtml(item.error_message)}</div>` : ''}
+            </td>
+            <td><span style="font-weight: 700; color: #475569; font-size: 12px;">${categoryText}</span></td>
+            <td>${statusBadge}</td>
+            <td>${actionBtn}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function formatCategory(cat) {
+      if (!cat) return 'Unclassified';
+      switch (cat) {
+        case 'PATIENT_INFORMATION_SHEET': return 'Individual Treatment Record';
+        case 'CONSULTATION_RECORD': return 'Consultation Record';
+        case 'IMMUNIZATION_RECORD':
+        case 'CHILDHOOD_IMMUNIZATION':
+        case 'ANTI_RABIES': return 'Childhood Immunization';
+        case 'MATERNAL_CARE':
+        case 'MATERNAL_CARE_RECORD': return 'Maternal Care Record';
+        default: return cat.replace(/_/g, ' ');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // BATCH UPLOAD MODAL LOGIC
+    // ─────────────────────────────────────────────────────────────
+    function openBatchUploadModal() {
+      const modal = document.getElementById('batch-upload-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeBatchUploadModal() {
+      const modal = document.getElementById('batch-upload-modal');
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
+    window.openBatchUploadModal = openBatchUploadModal;
+    window.closeBatchUploadModal = closeBatchUploadModal;
+
+    function setupModalDropzone() {
+      const dropzone = document.getElementById('modal-dropzone');
+      const fileInput = document.getElementById('modal-file-input');
+      const backdrop = document.getElementById('modal-backdrop');
+
+      if (!dropzone || !fileInput) return;
+
+      if (backdrop) {
+        backdrop.addEventListener('click', closeBatchUploadModal);
+      }
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleModalFiles(files);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        handleModalFiles(e.target.files);
+      });
+    }
+
+    function handleModalFiles(files) {
+      if (!files || files.length === 0) return;
+
+      const allowedExts = ['.pdf', '.png', '.jpg', '.jpeg'];
+      const maxPerFile = 20 * 1024 * 1024;
+      const problems = [];
+
+      Array.from(files).forEach(file => {
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedExts.includes(ext)) {
+          problems.push(`"${file.name}": Unsupported file extension (${ext}). Only PDF, PNG, JPG accepted.`);
+          return;
+        }
+        if (file.size > maxPerFile) {
+          problems.push(`"${file.name}": File size (${(file.size / (1024*1024)).toFixed(1)}MB) exceeds 20MB limit.`);
+          return;
+        }
+
+        const exists = modalSelectedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) {
+          modalSelectedFiles.push(file);
+        }
+      });
+
+      if (modalSelectedFiles.length > 25) {
+        showToast('Maximum 25 documents permitted per batch. Truncated to 25.', 'warning');
+        modalSelectedFiles = modalSelectedFiles.slice(0, 25);
+      }
+
+      renderModalSelectedFiles(problems);
+    }
+
+    function renderModalSelectedFiles(problems = []) {
+      const section = document.getElementById('modal-file-list-section');
+      const container = document.getElementById('modal-file-items-container');
+      const countSpan = document.getElementById('modal-selected-count');
+      const problemsContainer = document.getElementById('modal-problems-container');
+      const problemsList = document.getElementById('modal-problems-list');
+
+      if (!section || !container || !countSpan) return;
+
+      if (modalSelectedFiles.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      countSpan.textContent = modalSelectedFiles.length;
+
+      let html = '';
+      modalSelectedFiles.forEach((file, idx) => {
+        const ext = file.name.split('.').pop().toUpperCase();
+        const sizeKb = (file.size / 1024).toFixed(0);
+        html += `
+          <div class="file-badge-item">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="background: #fee2e2; color: #dc2626; font-size: 10px; font-weight: 900; padding: 3px 6px; border-radius: 4px;">${ext}</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #1e293b;">${escapeHtml(file.name)}</div>
+                <span style="font-size: 11px; color: #64748b;">${sizeKb} KB</span>
+              </div>
+            </div>
+            <button type="button" onclick="removeModalFile(${idx})" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;" title="Remove file">
+              ✕
+            </button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+
+      if (problems && problems.length > 0) {
+        problemsContainer.style.display = 'block';
+        problemsList.innerHTML = problems.map(p => `<li>${escapeHtml(p)}</li>`).join('');
+      } else {
+        problemsContainer.style.display = 'none';
+      }
+    }
+
+    function removeModalFile(index) {
+      modalSelectedFiles.splice(index, 1);
+      renderModalSelectedFiles();
+    }
+
+    function clearModalFiles() {
+      modalSelectedFiles = [];
+      const fileInput = document.getElementById('modal-file-input');
+      if (fileInput) fileInput.value = '';
+      renderModalSelectedFiles();
+    }
+
+    async function submitModalBatchUpload() {
+      if (modalSelectedFiles.length === 0) {
+        showToast('Please select at least 1 document to upload.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('modal-start-batch-btn');
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; margin-right: 6px;"><path d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"/></svg>
+        Validating & Submitting Batch...
+      `;
+
+      try {
+        const formData = new FormData();
+        modalSelectedFiles.forEach(file => {
+          formData.append('documents', file);
+        });
+        const targetPatientId = sessionStorage.getItem('batchTargetPatientId');
+        if (targetPatientId) {
+          formData.append('target_patient_id', targetPatientId);
+        }
+
+        const data = await API.postForm('/api/records/batch/upload', formData);
+        if (data && data.success) {
+          sessionStorage.removeItem('batchTargetPatientId');
+          showToast(`Batch queued successfully! Reference: ${data.batch_reference}`, 'success');
+          closeBatchUploadModal();
+          clearModalFiles();
+          btn.disabled = false;
+          btn.innerHTML = `
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            Start Batch OCR &amp; AI Processing
+          `;
+          await fetchAllBatchItems();
+          startPolling();
+        } else {
+          showToast((data && data.message) || 'Batch upload failed.', 'error');
+          if (data && data.problems && data.problems.length > 0) {
+            const problemsContainer = document.getElementById('modal-problems-container');
+            const problemsList = document.getElementById('modal-problems-list');
+            problemsContainer.style.display = 'block';
+            problemsList.innerHTML = data.problems.map(p => `<li><strong>${escapeHtml(p.filename)}:</strong> ${escapeHtml(p.reason)}</li>`).join('');
+          }
+          btn.disabled = false;
+          btn.innerHTML = `
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            Start Batch OCR &amp; AI Processing
+          `;
+        }
+      } catch (err) {
+        console.error('Submit batch error:', err);
+        showToast(err.message || 'An unexpected error occurred during batch submission.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+          Start Batch OCR &amp; AI Processing
+        `;
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('batch-upload-modal');
+        if (modal && modal.style.display === 'flex') {
+          closeBatchUploadModal();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

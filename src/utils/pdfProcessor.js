@@ -90,10 +90,19 @@ const PDFProcessor = {
     const fileExt = path.extname(filePath).toLowerCase();
     const isImage = ['.png', '.jpg', '.jpeg', '.webp'].includes(fileExt);
 
-    // For image files, run PaddleOCR directly
+    // For image files, run PaddleOCR directly with timeout protection
     if (isImage) {
       console.log(`[OCR] Running PaddleOCR on image: ${path.basename(filePath)} (pageType: ${pageType})`);
-      return await runPaddleOCR(filePath, 1, pageType);
+      const timeoutSec = parseInt(process.env.OCR_PROCESS_TIMEOUT_SECONDS || '120', 10);
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Image OCR processing timed out after ${timeoutSec} seconds.`));
+        }, timeoutSec * 1000);
+      });
+      return await Promise.race([
+        runPaddleOCR(filePath, 1, pageType),
+        timeoutPromise
+      ]);
     }
 
     // For PDFs: first try digital-native text extraction
